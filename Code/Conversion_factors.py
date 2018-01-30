@@ -13,6 +13,8 @@ keV2eV = 1e3                # from keV to eV
 GeV2eV = 1e9                # from GeV to eV
 TeV2eV = 1e12               # from TeV to eV
 TeV2keV = 1e9		        # from TeV to keV
+erg236erg = 1e36            # from erg to 10^36 erg
+t36erg238erg = 100.0        # from 10^36 erg to 10^38 erg
 
 # Length
 
@@ -29,6 +31,8 @@ mbarn2cm=1.0e-27            # from mbarn to cm
 
 day2sec = 86400.            # from day to sec
 yr2s=3.15576e7              # from year to sec
+yr26yr = 1e6                # from year to 10^6 years
+s6yr27yr = 10.0             # from 10^6 years to 10^7 years
 
 # Flux
 
