@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy
 from math import *
 import scipy.integrate as integrate
+from Functions import *
 
 # Physical constants and conversion factors
 from Physical_constants import *
@@ -93,8 +94,8 @@ while t[i] < lifetime:
     t6 = t[i]/yr26yr
 
         # outer radius and velocity of the forward shock
-    Rsb.append(27 * n0**alphar * L36**betar * t6**gammar)
-    Vsb.append(27*(gammar) * n0**alphar * L36**betar * t6**(gammar-1))
+    Rsb.append(ar * n0**alphar * L36**betar * t6**gammar)               # in pc
+    Vsb.append(ar*(gammar) * n0**alphar * L36**betar * t6**(gammar-1))  # in km/s
 
         # temperature and density profiles within the superbubble
     #r = numpy.linspace(0, Rsb[i], 100)
@@ -105,55 +106,44 @@ while t[i] < lifetime:
 
         # mass within the superbubble
     integral = integrate.quad(lambda x: (1-x)**deltan * x**2, 0, 1)[0]
-    Msb.append(4*numpy.pi * (Rsb[i]*pc2cm)**3 * an * n0**alphan * L38**betan * (t6/s6yr27yr)**gamman * integral * mu * mpg/Msun2g)
+    Msb.append(4*numpy.pi * (Rsb[i]*pc2cm)**3 * an * n0**alphan * L38**betan * (t6/s6yr27yr)**gamman * integral * mu * mpg/Msun2g) # in solar mass
 
         # swept mass
-    Mswept.append(4*numpy.pi/3.0 * (Rsb[i]*pc2cm)**3 * n0 * mu * mpg/Msun2g)
-    if t[i] == 1e3:
-        M3 = Msb[i]
-
-    if t[i] == 30e6:
-        M6 = Msb[i]
+    Mswept.append(4*numpy.pi/3.0 * (Rsb[i]*pc2cm)**3 * n0 * mu * mpg/Msun2g)    # in solar mass
 
         # ratio of mass
     Mratio.append(Msb[i]/Mswept[i])
 
 # Plots
-
-plt.figure(1)
-plt.plot(t, Rsb, '+')
-plt.title('Evolution of the superbubble radius')
-plt.xlabel('Time after the formation of the association (yr)')
-plt.ylabel('Radius (pc)')
-plt.xscale('log')
-plt.yscale('log')
-
-plt.figure(2)
-plt.plot(t, Vsb, '+')
-plt.title('Evolution of the superbubble velocity')
-plt.xlabel('Time after the formation of the association (yr)')
-plt.ylabel('Velocity (km/s)')
-plt.xscale('log')
-plt.yscale('log')
-
-plt.figure(3)
-plt.plot(t, Msb, '+', label='Mass within the SB')
-plt.plot(t, Mswept, '+', label='Swept mass')
-plt.title('Evolution of the mass')
-plt.xlabel('Time after the formation of the association (yr)')
-plt.xscale('log')
-plt.yscale('log')
-plt.ylabel(u'Mass'r'($M_\odot$)')
-plt.legend(loc='best')
-
-plt.figure(4)
-plt.plot(t, Mratio, '+')
-plt.title('Ratio between the swept mass and the mass within the SB')
-plt.xlabel('Time after the formation of the association (yr)')
-plt.ylabel(r'$M_{SB}/M_{swept}$')
-plt.xscale('log')
-plt.yscale('log')
-
+"""
+log_plot(1, 1, t, Rsb, 'none', 'Time evolution of the radius', 'Time (yr)', 'Radius (pc)')
+log_plot(2, 1, t, Vsb, 'none', 'Time evolution of the velocity', 'Time (yr)', 'Velocity (km/s)')
+log_plot(3, 2, t, np.array([Msb, Mswept]), ['Mass within the SB', 'Swept-up mass'], 'Time evolution of the masses', 'Time (yr)', u'Mass'r'($M_\odot$)')
+log_plot(4, 1, t, Mratio, 'none', 'Time evolution of the ratio between the two masses', 'Time (yr)', r'$M_{SB}/M_{swept-up}$')
 plt.show()
+"""
 
-print(M6/M3)
+# Computation of the thickness of the shell
+
+    # density in the shell
+TISM = 100                          # temperature of the ambiant gas (K)
+C02 = kb*TISM/(mu*mpg)/(km2cm)**2   # isothermal sound speed in the ambiant gas (km/s)
+Ts = 1e4                            # temperature of the shell (K)
+Cs2 = kb*Ts/(mu*mpg)/(km2cm)**2     # isothermal sound speed in the shell (km/s)
+ns = n0 * (Vsb[i]**2 + C02)/Cs2     # density in the shell (cm^-3)
+
+    # Volume of the shell
+Ms = (Mswept[i]-Msb[i])*Msun2g      # mass in the shell (g)
+Vs = Ms/(ns * mu * mpg)             # volume of the shell (cm^3)
+
+    # Solution
+Rc = exp(log(Rsb[i]**3 - 3/(4*numpy.pi)*Vs/(pc2cm**3))/3)
+h_1 = Rsb[i]-Rc
+coeff = [4*numpy.pi/3, -4*numpy.pi*Rsb[i], 4*numpy.pi*Rsb[i]**2, -Vs/pc2cm**3]
+h_2 = numpy.roots(coeff)
+
+for j in range (len(h_2)):
+    if h_2[j].imag == 0:
+        print('The thickness found from the first method is %.2f pc' %h_1)
+        print('The thickness found from the second method is %.2f pc' %h_2[j].real)
+        print('The radius of the superbubble is %.2f pc' %Rsb[i])
