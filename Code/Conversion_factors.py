@@ -13,8 +13,8 @@ keV2eV = 1e3                # from keV to eV
 GeV2eV = 1e9                # from GeV to eV
 TeV2eV = 1e12               # from TeV to eV
 TeV2keV = 1e9		        # from TeV to keV
-erg236erg = 1e36            # from erg to 10^36 erg
-t36erg238erg = 100.0        # from 10^36 erg to 10^38 erg
+erg236erg = 1e-36           # from erg to 10^36 erg
+t36erg238erg = 1e-2         # from 10^36 erg to 10^38 erg
 
 # Length
 
@@ -30,9 +30,9 @@ mbarn2cm=1.0e-27            # from mbarn to cm
 # Time
 
 day2sec = 86400.            # from day to sec
-yr2s = 3.15576e7              # from year to sec
-yr26yr = 1e6                # from year to 10^6 years
-s6yr27yr = 10.0             # from 10^6 years to 10^7 years
+yr2s = 3.15576e7            # from year to sec
+yr26yr = 1e-6               # from year to 10^6 years
+s6yr27yr = 0.1              # from 10^6 years to 10^7 years
 
 # Flux
 
@@ -48,3 +48,6 @@ Msun2g = 1.9891e33          # Msun to g
 # Various
 
 G2muG=1e6
+
+# temperature
+K26K = 1e-6                 # from K to 10^6 K
