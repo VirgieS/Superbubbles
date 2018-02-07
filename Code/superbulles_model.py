@@ -18,7 +18,7 @@ from Conversion_factors import *
 # Parameters for the system
 
     # OB asociation
-Nob = 100           # number of OB-stars in the association
+Nob = 1           # number of OB-stars in the association
 Lob = 1e36          # mean luminosity of an OB-star (erg/s)
 Pob = Nob*Lob       # mean power of the association (erg/s)
 
@@ -108,7 +108,7 @@ Lsb.append(0)
 
 # Stop criterion
 i = 0
-lifetime = 30e6 # average lifetime of the lowest mass B star (yr)
+lifetime = 1e6 # average lifetime of the lowest mass B star (yr)
 #hgalac = 150 # tickness of the galactic plane
 #while Rsb[i] < hgalac:
 while t[i] < lifetime:
@@ -145,9 +145,6 @@ while t[i] < lifetime:
 
         # luminosity of the SB (erg/s)
     Lsb.append(luminosity_SB(al, etal, zeta, at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, epsilon, Rsb[i])) # erg/s
-
-    if ((t[i]<tc + dt) and (t[i] > tc - dt)):
-        print(Lsb[i]/(Pob))
 
 pISM = numpy.ones_like(psb)*pISM
 Pob = numpy.ones_like(Lsb)*Pob

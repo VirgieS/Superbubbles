@@ -127,7 +127,7 @@ def density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb):
         # thickness of the shell (pc)
     Ms = (Mswept-Msb)*Msun2g                                    # mass in the shell (g)
     Vs = Ms/(ns * mu * mpg)                                     # volume of the shell (cm^3)
-    Rc = exp(log(Rsb**3 - 3/(4*numpy.pi)*Vs/(pc2cm**3))/3)      # radius of the continuity contact (pc)
+    Rc = exp(log(Rsb**3 - 3/(4*numpy.pi)*Vs/(pc2cm**3))*1/3.0)  # radius of the continuity contact (pc)
     hs = Rsb-Rc                                                 # thickness of the shell (pc)
 
     return ns, hs

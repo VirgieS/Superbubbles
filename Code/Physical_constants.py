@@ -2,7 +2,7 @@
 
 # cgs
 
-asb = 7.5646e-15		        # Radiation constant in erg/cm3/K4
+asb = 7.5646e-15		        # Radiation constant in erg/cm3/K^4
 cl = 2.99792458e10              # light velocity in cm/s
 hp = 6.6260755e-27              # Planck constant in erg.s
 kb = 1.380658e-16               # Boltzmann constant in erg/K
