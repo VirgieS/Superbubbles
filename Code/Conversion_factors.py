@@ -12,9 +12,13 @@ MeV2eV = 1e6                # from MeV to eV
 keV2eV = 1e3                # from keV to eV
 GeV2eV = 1e9                # from GeV to eV
 TeV2eV = 1e12               # from TeV to eV
+PeV2eV = 1e15               # from PeV to eV
 TeV2keV = 1e9		        # from TeV to keV
 erg236erg = 1e-36           # from erg to 10^36 erg
 t36erg238erg = 1e-2         # from 10^36 erg to 10^38 erg
+erg2GeV = 1/(eV2erg*GeV2eV) # from erg to GeV
+MeV2GeV = MeV2eV/GeV2eV     # from Mev to GeV
+PeV2GeV = PeV2eV/GeV2eV     # from PeV to GeV
 
 # Length
 

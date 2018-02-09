@@ -217,3 +217,32 @@ def profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, b
     nsb = an * n0**alphan * L38**betan * t7**gamman * (1-x)**deltan
 
     return Tsb, nsb
+
+def diffusion_spherical(t, Rsb, t0, NE, r0, D):
+    """
+    This function compute the intensity density of the cosmic rays at each time and radius
+    Inputs:
+        t       :       time (yr)
+        Rsb     :       radius of the SB (pc)
+        t0      :       time when the SN explode (yr)
+        NE      :       initial density of the population of CR (GeV^-1)
+        r0      :       position of the SN explosion (pc)
+        D       :       diffusion coefficient (cm^2 s^-1)
+    """
+    rmin = 0              # minimum radius (pc)
+    rmax = Rsb            # maximum radius (pc)
+    number_bin_r = 20.0
+    r = numpy.linspace(rmin, rmax, number_bin_r)    # position in pc
+    dr = (rmax - rmin)/number_bin_r     # in pc
+
+        # density of the particles in time and position (GeV^-1)
+    N = numpy.zeros(len(r))
+
+    if t >= t0:
+        if t == t0:
+            ind = numpy.where((r < r0 + dr/2.0) and (r > r0 - dr/2.0))
+            print(ind)
+            N[ind] = NE
+        else:
+            N = NE/((4*numpy.pi*D*(t-t0)*yr2s)**(3/2.0))*numpy.exp(-((r-r0)*pc2cm)**2/(4*D*(t-t0)*yr2s))
+    return N
