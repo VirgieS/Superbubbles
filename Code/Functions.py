@@ -211,7 +211,7 @@ def profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, b
         t7      :       age of the system expressed in 10^7 yr
         Rsb     :       outer radius of the SB (pc)
     """
-    r = numpy.linspace(0, Rsb[i], 100)
+    r = numpy.linspace(0, Rsb, 100)
     x = r/Rsb
     Tsb = at * n0**alphat * L38**betat * t7**gammat * (1-x)**deltat
     nsb = an * n0**alphan * L38**betan * t7**gamman * (1-x)**deltan
@@ -224,7 +224,7 @@ def diffusion_spherical(t, Rsb, t0, NE, r0, D):
     Inputs:
         t       :       time (yr)
         Rsb     :       radius of the SB (pc)
-        t0      :       time when the SN explode (yr)
+        t0      :       time when the SN explode (yr) for the test if the SN has already exploded
         NE      :       initial density of the population of CR (GeV^-1)
         r0      :       position of the SN explosion (pc)
         D       :       diffusion coefficient (cm^2 s^-1)
@@ -240,9 +240,8 @@ def diffusion_spherical(t, Rsb, t0, NE, r0, D):
 
     if t >= t0:
         if t == t0:
-            ind = numpy.where((r < r0 + dr/2.0) and (r > r0 - dr/2.0))
-            print(ind)
+            ind = numpy.where((r < r0 + dr/2.0) & (r > r0 - dr/2.0))[0]
             N[ind] = NE
         else:
             N = NE/((4*numpy.pi*D*(t-t0)*yr2s)**(3/2.0))*numpy.exp(-((r-r0)*pc2cm)**2/(4*D*(t-t0)*yr2s))
-    return N
+    return N, r
