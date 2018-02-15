@@ -6,10 +6,18 @@ import numpy
 from math import *
 import scipy.integrate as integrate
 from Functions import *
+import os
+import pickle
 
 # Physical constants and conversion factors
 from Physical_constants import *
 from Conversion_factors import *
+
+##--------------##
+# Path for files #
+##--------------##
+
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files')
 
 ##-----------##
 # Computation #
@@ -31,7 +39,7 @@ Emax = 1*PeV2GeV    # minimum kinetic energy: Emax = 1PeV in GeV
 number_bin_E = 10.0
 E = numpy.logspace(log10(Emin), log10(Emax), number_bin_E)  # GeV
 
-        # power-law distribution of the cosmic rays
+        # power-law distribution of the cosmic rays (GeV^-1 cm^-3)
             # N(p) = N0 * (p/p0)^(-alpha)
             # N(E) = N0/c * ((E^2 + 2*mp*c^2*E)^(-(1+alpha)/2) * (E + mp*c^2)/((E0^2 + 2*mp*E0)^(-alpha/2))
 eta = 0.1           # efficiency of the cosmic rays acceleration
@@ -42,8 +50,9 @@ p0 = 10             # normalization constant (GeV/c)
 #E0 = sqrt(p0**2 + mpg**2) - mpgev
 alpha = 2.0
 integral_E = integrate.quad(lambda E: (E**2 + 2*mpgev*E)**(-(1 + alpha)/2.0) * (E + mpgev) * E, Emin, Emax)[0]
-N0 = eta * Esng * cl * p0**(-alpha) * 1.0/integral_E        # normalization constant to have 0.1*Esn (GeV^-1)
-NE = N0/cl * (E**2 + 2*mpgev*E)**(-(1+alpha)/2.0) * (E + mpgev)/p0**(-alpha)
+N0 = eta * Esng * cl**(1-alpha) * p0**(-alpha) * 1.0/integral_E        # normalization constant to have 0.1*Esn (GeV^-1)
+N_E = N0/cl**(1-alpha) * (E**2 + 2*mpgev*E)**(-(1+alpha)/2.0) * (E + mpgev)/p0**(-alpha)
+
         # diffusion coefficient (cm^2 s^-1)
             # D(p) = D0 * (p/p0)^(-delta)
             # D(E) = D0 * (E^2 + 2*mpg*E)^(delta/2) * 1/p0^delta
@@ -54,7 +63,7 @@ D = D0 * (numpy.sqrt(E**2 + 2*mpgev*E)/p0)**delta
     # Computation of N(E,t,r)
 
         # SN explosion: position (pc) and time (yr)
-t0 = 20e6      # in yr
+t0 = 1e6      # in yr
 r0 = 0      # in pc
 
         # R(t) = a * n0^alphar * L36^betar * t6^gammar                  (pc)
@@ -85,22 +94,42 @@ while i < len(E):
         j += 1
         t6 = t[j] * yr26yr     # in 10^6 yr
         Rsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)[0]
-        Nr, r = diffusion_spherical(t[j], Rsb, t0, NE[i], r0, D[i]) # vector (len(r))
-        Nt.append(Nr)
+        Nr, r = diffusion_spherical(t[j], Rsb, t0, N_E[i], r0, D[i]) # vector (len(r))
+        N_part = shell_particles(Nr, r)
+        Nt.append(N_part)
         """
-        if (((j-1)%1000 == 0) and (i == 0)):
+        if ((t[j-1] - t0 == 2e6) and (i == 0)):
             figure_number += 1
-            ind = numpy.where(Nr == 0)[0]
-            if len(ind) == 0:
-                log_plot(figure_number, 1, r, Nr, 'none', 'Density of CR in the SB at t=%.2e yr and at %.2e GeV' %(t[j], E[i]), 'radius (pc)', 'N(r)')
-            else:
-                plt.figure(figure_number)
-                plt.plot(r, Nr, '+')
-                plt.title('Density of CR in the SB at t=%.2e yr and at %.2e GeV' %(t[j], E[i]))
-                plt.xlabel('radius (pc)')
-                plt.ylabel('N(r)')
-        """
+            plt.figure(figure_number)
+            plt.plot(r[1:], N_part, '+')
+            plt.title('Density of CR in the SB at t=%.2e yr and at %.2e GeV' %(t[j], E[i]))
+            plt.xlabel('radius (pc)')
+            plt.ylabel(u'N(r) 'r'($GeV^{-1}$)')
+            log_plot(figure_number, 1, r[1:], N_part, 'none', 'Density of CR in the SB at t=%.2e yr and at %.2e GeV' %(t[j], E[i]), 'radius (pc)', u'N(r) 'r'($GeV^{-1}$)')
+            """
     Ne.append(Nt)
     i += 1
 Ne = numpy.asarray(Ne)
-#plt.show()
+t = numpy.asarray(t)
+ind = numpy.where(t == 2e6)[0]
+
+n = len(N_part)
+m = len(E)
+
+y = numpy.zeros((n, m))
+
+for i in range (n):
+    for j in range (m):
+        y[i, j] = Ne[j, ind, i]
+
+log_plot(1, n, E, y, 'none', 'Density of CR in the SB', 'E (GeV)', u'N(E) 'r'($GeV^{-1}$)')
+plt.show()
+"""
+with open('data', 'wb') as data_write:
+    my_data_write = pickle.Pickler(data_write)
+    my_data_write.dump(Ne)
+
+with open('data', 'rb') as data_load:
+    my_data_load = pickle.Unpickler(data_load)
+    N_read = my_data_load.load()
+"""

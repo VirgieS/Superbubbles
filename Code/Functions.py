@@ -37,8 +37,11 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
     if number_of_plot > 1:
         for i in range (number_of_plot):
             y_plot = y[i,:]
-            plt.plot(x, y_plot, '+', label=label_name[i])
-        plt.legend(loc='best')
+            if label_name == 'none':
+                plt.plot(x, y_plot, '+')
+            else:
+                plt.plot(x, y_plot, '+', label=label_name[i])
+                plt.legend(loc='best')
     else:
         plt.plot(x, y, '+')
 
@@ -230,18 +233,51 @@ def diffusion_spherical(t, Rsb, t0, NE, r0, D):
         D       :       diffusion coefficient (cm^2 s^-1)
     """
     rmin = 0              # minimum radius (pc)
-    rmax = Rsb            # maximum radius (pc)
-    number_bin_r = 20.0
+    rmax = 500            # maximum radius (pc)
+    number_bin_r = 25
     r = numpy.linspace(rmin, rmax, number_bin_r)    # position in pc
     dr = (rmax - rmin)/number_bin_r     # in pc
+
+    delta_t = t - t0     # time after the SN explosion (yr)
 
         # density of the particles in time and position (GeV^-1)
     N = numpy.zeros(len(r))
 
-    if t >= t0:
-        if t == t0:
+    if delta_t > 0:
+        if delta_t == 0:
             ind = numpy.where((r < r0 + dr/2.0) & (r > r0 - dr/2.0))[0]
             N[ind] = NE
         else:
-            N = NE/((4*numpy.pi*D*(t-t0)*yr2s)**(3/2.0))*numpy.exp(-((r-r0)*pc2cm)**2/(4*D*(t-t0)*yr2s))
+            N = NE/((4*numpy.pi*D*(delta_t)*yr2s)**(3/2.0))*numpy.exp(-((r-r0)*pc2cm)**2/(4*D*(delta_t)*yr2s))
     return N, r
+
+def shell_particles(Nr, r):
+    """
+    This function compute the particles at each time and energy in each shell_aera
+    Inputs:
+        Nr          :       vector of density of particles for each radius (cm^-3)
+        r           :       vector of each radius (pc)
+    """
+
+    def shell_aera(N_out, N_in, r_out, r_in):
+        """
+        This function compute the aera of a shell with inner radius r and outer radius r+dr
+        Inputs:
+            N_out       :       density of particles at the outer radius (cm^-3)
+            N_int       :       density of particles at the inner radius (cm^-3)
+            r_out       :       outer radius (pc)
+            r_in        :       inner radius (pc)
+        """
+
+        r_out = r_out * pc2cm   # in cm
+        r_in = r_in * pc2cm     # in cm
+        dr = r_out - r_in       # dr in cm
+
+        return (N_out * r_out**2 + N_in * r_in**2) * dr/2.0
+
+    n = len(r) - 1
+    N_part = numpy.zeros(n)
+    for i in range (n):
+        N_part[i] = shell_aera(Nr[i+1], Nr[i], r[i+1], r[i])
+
+    return N_part
