@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import numpy
 from math import *
 import scipy.integrate as integrate
+from scipy.optimize import curve_fit
+from pylab import *
 from Functions import *
 import os
 import pickle
@@ -63,7 +65,7 @@ D = D0 * (numpy.sqrt(E**2 + 2*mpgev*E)/p0)**delta
     # Computation of N(E,t,r)
 
         # SN explosion: position (pc) and time (yr)
-t0 = 1e6      # in yr
+t0 = 0      # in yr
 r0 = 0      # in pc
 
         # R(t) = a * n0^alphar * L36^betar * t6^gammar                  (pc)
@@ -86,9 +88,18 @@ figure_number = 0
         # density of population (GeV^-1)
 while i < len(E):
     t = []          # in yr
+
+        # Initialization
     t.append(0)
     j = 0
+    t6 = t[j] * yr26yr     # in 10^6 yr
+    Rsb = 0
+    Nr, r = diffusion_spherical(t[j], Rsb, t0, N_E[i], r0, D[i]) # vector (len(r))
+
     Nt = []         # matrix (len(t)xlen(r))
+    N_part = shell_particles(Nr, r)
+    Nt.append(N_part)
+
     while t[j] < lifetime:
         t.append(t[j] + dt)
         j += 1
@@ -97,32 +108,49 @@ while i < len(E):
         Nr, r = diffusion_spherical(t[j], Rsb, t0, N_E[i], r0, D[i]) # vector (len(r))
         N_part = shell_particles(Nr, r)
         Nt.append(N_part)
-        """
+
         if ((t[j-1] - t0 == 2e6) and (i == 0)):
+            popt, pcov = curve_fit(gauss, r, Nr)
+            print(popt)
+            print(N_E[i])
+            print(D[i])
             figure_number += 1
             plt.figure(figure_number)
-            plt.plot(r[1:], N_part, '+')
+            plt.plot(r, Nr, '+')
+            plt.plot(r, gauss(r, *popt))
             plt.title('Density of CR in the SB at t=%.2e yr and at %.2e GeV' %(t[j], E[i]))
             plt.xlabel('radius (pc)')
             plt.ylabel(u'N(r) 'r'($GeV^{-1}$)')
-            log_plot(figure_number, 1, r[1:], N_part, 'none', 'Density of CR in the SB at t=%.2e yr and at %.2e GeV' %(t[j], E[i]), 'radius (pc)', u'N(r) 'r'($GeV^{-1}$)')
-            """
+
     Ne.append(Nt)
     i += 1
 Ne = numpy.asarray(Ne)
 t = numpy.asarray(t)
-ind = numpy.where(t == 2e6)[0]
+print(Ne.shape)
+
+    # number of particles at one time for each energy and each radius
+ind = numpy.where(t == t0 + 1000*dt)[0]
 
 n = len(N_part)
 m = len(E)
 
 y = numpy.zeros((n, m))
+label_name = []
 
 for i in range (n):
+    label_name.append(r'$r_{in}$ = %.2f pc'%r[i])
     for j in range (m):
         y[i, j] = Ne[j, ind, i]
 
-log_plot(1, n, E, y, 'none', 'Density of CR in the SB', 'E (GeV)', u'N(E) 'r'($GeV^{-1}$)')
+sum = numpy.zeros(m)
+for k in range (m):
+    sum[k] = numpy.sum(y[:,k])
+
+
+log_plot(2, n, E, y, label_name, 'Number of CR in the SB', 'E (GeV)', u'N(E) 'r'($GeV^{-1}$)', '+')
+log_plot(2, 1, E, sum, 'Sum', 'Number of CR in the SB', 'E (GeV)', u'N(E) 'r'($GeV^{-1}$)', 'x')
+log_plot(2, 1, E, N_E, 'injected', 'Number of CR in the SB', 'E (GeV)', u'N(E) 'r'($GeV^{-1}$)', '-')
+
 plt.show()
 """
 with open('data', 'wb') as data_write:

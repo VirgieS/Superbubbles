@@ -20,7 +20,7 @@ from Conversion_factors import *
 # Functions #
 ##---------##
 
-def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel):
+def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol):
     """
     Function to plot a log-log graphic
     Inputs:
@@ -34,16 +34,23 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
         ylabel:             label of the y-axis
     """
     plt.figure(figure_number)
+
     if number_of_plot > 1:
+
         for i in range (number_of_plot):
             y_plot = y[i,:]
             if label_name == 'none':
-                plt.plot(x, y_plot, '+')
+                plt.plot(x, y_plot, symbol)
             else:
-                plt.plot(x, y_plot, '+', label=label_name[i])
-                plt.legend(loc='best')
+                plt.plot(x, y_plot, symbol, label = label_name[i])
+                plt.legend(loc = 'best')
+
+    elif label_name == 'none':
+        plt.plot(x, y, symbol)
+
     else:
-        plt.plot(x, y, '+')
+        plt.plot(x, y, symbol, label = label_name)
+        plt.legend(loc = 'best')
 
     plt.title(title)
     plt.xlabel(xlabel)
@@ -234,11 +241,12 @@ def diffusion_spherical(t, Rsb, t0, NE, r0, D):
     """
     rmin = 0              # minimum radius (pc)
     rmax = 500            # maximum radius (pc)
-    number_bin_r = 25
+    number_bin_r = 10
     r = numpy.linspace(rmin, rmax, number_bin_r)    # position in pc
     dr = (rmax - rmin)/number_bin_r     # in pc
 
     delta_t = t - t0     # time after the SN explosion (yr)
+    delta_t = delta_t * yr2s
 
         # density of the particles in time and position (GeV^-1)
     N = numpy.zeros(len(r))
@@ -248,7 +256,7 @@ def diffusion_spherical(t, Rsb, t0, NE, r0, D):
             ind = numpy.where((r < r0 + dr/2.0) & (r > r0 - dr/2.0))[0]
             N[ind] = NE
         else:
-            N = NE/((4*numpy.pi*D*(delta_t)*yr2s)**(3/2.0))*numpy.exp(-((r-r0)*pc2cm)**2/(4*D*(delta_t)*yr2s))
+            N = NE/((4*numpy.pi*D*(delta_t))**(3/2.0))*numpy.exp(-((r-r0)*pc2cm)**2/(4*D*(delta_t)))
     return N, r
 
 def shell_particles(Nr, r):
@@ -259,7 +267,7 @@ def shell_particles(Nr, r):
         r           :       vector of each radius (pc)
     """
 
-    def shell_aera(N_out, N_in, r_out, r_in):
+    def shell_volume(N_out, N_in, r_out, r_in):
         """
         This function compute the aera of a shell with inner radius r and outer radius r+dr
         Inputs:
@@ -273,11 +281,14 @@ def shell_particles(Nr, r):
         r_in = r_in * pc2cm     # in cm
         dr = r_out - r_in       # dr in cm
 
-        return (N_out * r_out**2 + N_in * r_in**2) * dr/2.0
+        return 4 * numpy.pi * (N_out * r_out**2 + N_in * r_in**2) * dr/2.0
 
     n = len(r) - 1
     N_part = numpy.zeros(n)
     for i in range (n):
-        N_part[i] = shell_aera(Nr[i+1], Nr[i], r[i+1], r[i])
+        N_part[i] = shell_volume(Nr[i+1], Nr[i], r[i+1], r[i])
 
     return N_part
+
+def gauss(x, A, Dt):
+    return A/((4.*numpy.pi*Dt)**(3/2.0))*numpy.exp(-x**2/(4.*Dt))
