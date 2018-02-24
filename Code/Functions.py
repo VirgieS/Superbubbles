@@ -228,22 +228,20 @@ def profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, b
 
     return Tsb, nsb
 
-def diffusion_spherical(t, Rsb, t0, NE, r0, D):
+def diffusion_spherical(t, diff, t0, NE, D):
     """
     This function compute the intensity density of the cosmic rays at each time and radius
     Inputs:
         t       :       time (yr)
-        Rsb     :       radius of the SB (pc)
+        diff    :       distance of diffusion (pc)
         t0      :       time when the SN explode (yr) for the test if the SN has already exploded
         NE      :       initial density of the population of CR (GeV^-1)
-        r0      :       position of the SN explosion (pc)
         D       :       diffusion coefficient (cm^2 s^-1)
     """
-    rmin = 0              # minimum radius (pc)
-    rmax = 500            # maximum radius (pc)
-    number_bin_r = 10
+    rmin = 0.01                 # minimum radius (pc)
+    rmax = diff                 # maximum radius (pc)
+    number_bin_r = 30
     r = numpy.linspace(rmin, rmax, number_bin_r)    # position in pc
-    dr = (rmax - rmin)/number_bin_r     # in pc
 
     delta_t = t - t0     # time after the SN explosion (yr)
     delta_t = delta_t * yr2s
@@ -253,10 +251,9 @@ def diffusion_spherical(t, Rsb, t0, NE, r0, D):
 
     if delta_t > 0:
         if delta_t == 0:
-            ind = numpy.where((r < r0 + dr/2.0) & (r > r0 - dr/2.0))[0]
-            N[ind] = NE
+            N[0] = NE
         else:
-            N = NE/((4*numpy.pi*D*(delta_t))**(3/2.0))*numpy.exp(-((r-r0)*pc2cm)**2/(4*D*(delta_t)))
+            N = NE/((4*numpy.pi*D*(delta_t))**(3/2.0))*numpy.exp(-(r*pc2cm)**2/(4*D*(delta_t)))
     return N, r
 
 def shell_particles(Nr, r):
@@ -291,4 +288,12 @@ def shell_particles(Nr, r):
     return N_part
 
 def gauss(x, A, Dt):
-    return A/((4.*numpy.pi*Dt)**(3/2.0))*numpy.exp(-x**2/(4.*Dt))
+    """
+    Function to fit a gaussian on the density profile as function of the radius.
+    Input:
+        r       :   vector radius (pc)
+    Parameters:
+        A       :   normalization of the gaussian (pc)
+        Dt      :   factor related to the standard deviation (pc^2 s^-1 yr)
+    """
+    return A/((4.*numpy.pi*Dt * yr2s)**(3/2.0))*numpy.exp(-(x)**2/(4.*Dt * yr2s))

@@ -19,7 +19,7 @@ from Conversion_factors import *
 # Path for files #
 ##--------------##
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files')
+#os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files')
 
 ##-----------##
 # Computation #
@@ -28,7 +28,7 @@ os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files')
 # Parameters for the system
 
     # Initialization
-lifetime = 30e6         # average lifetime of the lowest mass B star (yr)
+lifetime = 30e6         # lifetime of the OB association (yr)
 dt = 1e3                # time interval (yr)
 Rsb = []                # radius of the SB (pc)
 Rsb.append(0)
@@ -43,7 +43,7 @@ E = numpy.logspace(log10(Emin), log10(Emax), number_bin_E)  # GeV
 
         # power-law distribution of the cosmic rays (GeV^-1 cm^-3)
             # N(p) = N0 * (p/p0)^(-alpha)
-            # N(E) = N0/c * ((E^2 + 2*mp*c^2*E)^(-(1+alpha)/2) * (E + mp*c^2)/((E0^2 + 2*mp*E0)^(-alpha/2))
+            # N(E) = N0/c * ((E^2 + 2*mp*c^2*E)^(-(1+alpha)/2) * (E + mp*c^2)/((E0^2 + 2*mp*E0)^(-alpha/2)) d^3(r)
 eta = 0.1           # efficiency of the cosmic rays acceleration
 Esn = 1e51          # total kinetic energy released from the SN explosion (erg)
 Esng = Esn*erg2GeV  # in GeV
@@ -52,8 +52,8 @@ p0 = 10             # normalization constant (GeV/c)
 #E0 = sqrt(p0**2 + mpg**2) - mpgev
 alpha = 2.0
 integral_E = integrate.quad(lambda E: (E**2 + 2*mpgev*E)**(-(1 + alpha)/2.0) * (E + mpgev) * E, Emin, Emax)[0]
-N0 = eta * Esng * cl**(1-alpha) * p0**(-alpha) * 1.0/integral_E        # normalization constant to have 0.1*Esn (GeV^-1)
-N_E = N0/cl**(1-alpha) * (E**2 + 2*mpgev*E)**(-(1+alpha)/2.0) * (E + mpgev)/p0**(-alpha)
+N0 = eta * Esng * cl**(1-alpha) * p0**(-alpha) * 1.0/integral_E                             # normalization constant to have 0.1*Esn (GeV^-1 c)
+N_E = N0/cl**(1-alpha) * (E**2 + 2*mpgev*E)**(-(1+alpha)/2.0) * (E + mpgev)/p0**(-alpha)    # GeV^-1
 
         # diffusion coefficient (cm^2 s^-1)
             # D(p) = D0 * (p/p0)^(-delta)
@@ -64,15 +64,15 @@ D = D0 * (numpy.sqrt(E**2 + 2*mpgev*E)/p0)**delta
 
     # Computation of N(E,t,r)
 
-        # SN explosion: position (pc) and time (yr)
+        # SN explosion: time (yr)
 t0 = 0      # in yr
-r0 = 0      # in pc
 
         # R(t) = a * n0^alphar * L36^betar * t6^gammar                  (pc)
 ar = 27.0
 alphar = -1.0/5
 betar = 1.0/5
 gammar = 3.0/5
+
         # parameters of the OB association
 n0 = 1              # mean density of the interstellar medium (particle/cm^3)
 Nob = 1             # number of OB-stars in the association
@@ -85,6 +85,8 @@ i = 0
 Ne = []             # matrix (len(E)xlen(t)xlen(r))
 figure_number = 0
 
+R_max = 1000
+
         # density of population (GeV^-1)
 while i < len(E):
     t = []          # in yr
@@ -93,52 +95,61 @@ while i < len(E):
     t.append(0)
     j = 0
     t6 = t[j] * yr26yr     # in 10^6 yr
-    Rsb = 0
-    Nr, r = diffusion_spherical(t[j], Rsb, t0, N_E[i], r0, D[i]) # vector (len(r))
+    Nr, r = diffusion_spherical(t[j], R_max, t0, N_E[i], D[i]) # vector (len(r))
 
     Nt = []         # matrix (len(t)xlen(r))
     N_part = shell_particles(Nr, r)
     Nt.append(N_part)
 
     while t[j] < lifetime:
+            # time (yr)
         t.append(t[j] + dt)
         j += 1
         t6 = t[j] * yr26yr     # in 10^6 yr
-        Rsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)[0]
-        Nr, r = diffusion_spherical(t[j], Rsb, t0, N_E[i], r0, D[i]) # vector (len(r))
+
+            # Density of population as function of the radius (cm^-3)
+        #Rsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)[0]     # radius of the SB
+        #diff = sqrt(6 * D[i] * t[j] * yr2s)/pc2cm                               # distance of diffusion (pc)
+        Nr, r = diffusion_spherical(t[j], R_max, t0, N_E[i], D[i])               # density (cm^-3) and vector r
         N_part = shell_particles(Nr, r)
         Nt.append(N_part)
 
-        if ((t[j-1] - t0 == 2e6) and (i == 0)):
+        if ((t[j] - t0 == 1000*dt) and (i == len(E)-1)):
             popt, pcov = curve_fit(gauss, r, Nr)
-            print(popt)
-            print(N_E[i])
-            print(D[i])
             figure_number += 1
             plt.figure(figure_number)
-            plt.plot(r, Nr, '+')
-            plt.plot(r, gauss(r, *popt))
+            plt.plot(r, Nr, '+', label = 'Simulation')
+            plt.plot(r, gauss(r, *popt), label='Fit')
             plt.title('Density of CR in the SB at t=%.2e yr and at %.2e GeV' %(t[j], E[i]))
             plt.xlabel('radius (pc)')
             plt.ylabel(u'N(r) 'r'($GeV^{-1}$)')
+            plt.legend(loc = 'best')
+
+                # Verification
+            delta_t = t[j]-t0
+            print('The diffusion distance of the CR at dt = %.2e yr and E = %.2e GeV:' %(delta_t, E[i]))
+            print(sqrt(6 * D[i] * t[j] * yr2s)/pc2cm)
+
+            Dopt = popt[1]* (pc2cm)**2
+            print('The simulated standard deviation of the CR at dt = %.2e and E = %.2e GeV:' %(delta_t, E[i]))
+            print(sqrt(6 * Dopt * yr2s)/pc2cm)
 
     Ne.append(Nt)
     i += 1
 Ne = numpy.asarray(Ne)
 t = numpy.asarray(t)
-print(Ne.shape)
 
     # number of particles at one time for each energy and each radius
-ind = numpy.where(t == t0 + 1000*dt)[0]
+ind = numpy.where(t == t0 + 1000*dt)[0]       # choose one time
 
 n = len(N_part)
 m = len(E)
 
 y = numpy.zeros((n, m))
-label_name = []
+#label_name = []
 
 for i in range (n):
-    label_name.append(r'$r_{in}$ = %.2f pc'%r[i])
+    #label_name.append(r'$r_{in}$ = %.2f pc'%r[i])
     for j in range (m):
         y[i, j] = Ne[j, ind, i]
 
@@ -146,10 +157,10 @@ sum = numpy.zeros(m)
 for k in range (m):
     sum[k] = numpy.sum(y[:,k])
 
-
-log_plot(2, n, E, y, label_name, 'Number of CR in the SB', 'E (GeV)', u'N(E) 'r'($GeV^{-1}$)', '+')
-log_plot(2, 1, E, sum, 'Sum', 'Number of CR in the SB', 'E (GeV)', u'N(E) 'r'($GeV^{-1}$)', 'x')
-log_plot(2, 1, E, N_E, 'injected', 'Number of CR in the SB', 'E (GeV)', u'N(E) 'r'($GeV^{-1}$)', '-')
+label_name = 'none'
+log_plot(2, n, E, y, label_name, 'Number of CR in the SB at %.2e yr after the SN explosion' %t[ind] , 'E (GeV)', u'N(E) 'r'($GeV^{-1}$)', '+')
+log_plot(2, 1, E, sum, 'Sum', 'Number of CR in the SB at %.2e yr after the SN explosion'%t[ind] , 'E (GeV)', u'N(E) 'r'($GeV^{-1}$)', 'x')
+log_plot(2, 1, E, N_E, 'Injected', 'Number of CR in the SB at %.2e yr after the SN explosion'%t[ind] , 'E (GeV)', u'N(E) 'r'($GeV^{-1}$)', '-')
 
 plt.show()
 """
