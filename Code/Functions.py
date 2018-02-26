@@ -195,7 +195,7 @@ def luminosity_SB(al, etal, zeta, at, alphat, betat, gammat, deltat, an, alphan,
     integral_lsb = integrate.quad(lambda x: (1-x)**deltax * x**2, 1, 0)[0]
     return al * zeta * (at6 * n0**alphat * L38**betat * t7**gammat)**(etal) * epsilon * (an * n0**alphan * L38**betan * t7**gamman)**2 * integral_lsb * (Rsb*pc2cm)**3 # in erg/s
 
-def profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb):
+def profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, dr):
     """
     Function to compute the density and the temperature profiles in the superbubble
     From equations 4 and 5 of the article of Mac Low and McCray (1987)
@@ -220,27 +220,31 @@ def profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, b
         L38     :       total luminosity injected by the stars and SN expressed in 10^38 erg/s
         t7      :       age of the system expressed in 10^7 yr
         Rsb     :       outer radius of the SB (pc)
+        dr      :       interval in space (pc)
     """
-    r = numpy.linspace(0, Rsb, 100)
+    rmin = 0
+    rmax = Rsb
+    number_bin_r = (rmax - rmin)/dr
+    r = numpy.linspace(rmin, rmax, number_bin_r)
     x = r/Rsb
     Tsb = at * n0**alphat * L38**betat * t7**gammat * (1-x)**deltat
     nsb = an * n0**alphan * L38**betan * t7**gamman * (1-x)**deltan
 
     return Tsb, nsb
 
-def diffusion_spherical(t, diff, t0, NE, D):
+def diffusion_spherical(t, R_max, t0, NE, D):
     """
     This function compute the intensity density of the cosmic rays at each time and radius
     Inputs:
         t       :       time (yr)
-        diff    :       distance of diffusion (pc)
+        R_max   :       maximum distance for the computation (pc)
         t0      :       time when the SN explode (yr) for the test if the SN has already exploded
         NE      :       initial density of the population of CR (GeV^-1)
         D       :       diffusion coefficient (cm^2 s^-1)
     """
     rmin = 0.01                 # minimum radius (pc)
-    rmax = diff                 # maximum radius (pc)
-    number_bin_r = 30
+    rmax = R_max                # maximum radius (pc)
+    number_bin_r = 25
     r = numpy.linspace(rmin, rmax, number_bin_r)    # position in pc
 
     delta_t = t - t0     # time after the SN explosion (yr)
@@ -258,7 +262,7 @@ def diffusion_spherical(t, diff, t0, NE, D):
 
 def shell_particles(Nr, r):
     """
-    This function compute the particles at each time and energy in each shell_aera
+    This function computes the particles at each time and energy in each shell_aera
     Inputs:
         Nr          :       vector of density of particles for each radius (cm^-3)
         r           :       vector of each radius (pc)
@@ -266,7 +270,7 @@ def shell_particles(Nr, r):
 
     def shell_volume(N_out, N_in, r_out, r_in):
         """
-        This function compute the aera of a shell with inner radius r and outer radius r+dr
+        This function computes the aera of a shell with inner radius r and outer radius r+dr
         Inputs:
             N_out       :       density of particles at the outer radius (cm^-3)
             N_int       :       density of particles at the inner radius (cm^-3)
@@ -297,3 +301,23 @@ def gauss(x, A, Dt):
         Dt      :   factor related to the standard deviation (pc^2 s^-1 yr)
     """
     return A/((4.*numpy.pi*Dt * yr2s)**(3/2.0))*numpy.exp(-(x)**2/(4.*Dt * yr2s))
+
+def profile_gas_density(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu, Vsb, C02, Mswept, Msb, r):
+    """
+    This function computes the gas desnity profile along a distance r (pc)
+    Inputs:
+    """
+    n = len(r)-1
+    dr = r[n]-r[n-1]
+    nsb = profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, dr)[1]
+    ns, hs = density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb)
+
+    n_tot = n0 * numpy.ones(n)
+
+    ind1 = numpy.where(r < Rsb-hs)[0]
+    n_tot[ind1] = nsb[ind1]
+
+    ind2 = numpy.where((r >= Rsb-hs) & (r <= Rsb))[0]
+    n_tot[ind2] = ns
+
+    return n_tot

@@ -19,6 +19,7 @@ t36erg238erg = 1e-2         # from 10^36 erg to 10^38 erg
 erg2GeV = 1/(eV2erg*GeV2eV) # from erg to GeV
 MeV2GeV = MeV2eV/GeV2eV     # from Mev to GeV
 PeV2GeV = PeV2eV/GeV2eV     # from PeV to GeV
+TeV2GeV = TeV2eV/GeV2eV     # from TeV to GeV
 
 # Length
 
