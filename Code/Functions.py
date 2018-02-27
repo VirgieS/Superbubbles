@@ -39,6 +39,8 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
 
         for i in range (number_of_plot):
             y_plot = y[i,:]
+            if len(symbol) > 1:
+                symbol = symbol[i]
             if label_name == 'none':
                 plt.plot(x, y_plot, symbol)
             else:
@@ -58,6 +60,44 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
     plt.xscale('log')
     plt.yscale('log')
     #plt.show()
+    return
+
+def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol):
+    """
+    Function to plot a linear graphic
+    Inputs:
+        figure_number:      define the number of the figure
+        number_of_plot:     define how many plot do you want on one figure (with the same axis)
+        x:                  x-vector
+        y:                  y-array (line = one y-array and row = each different y-plot)
+        label_name:         legend of one plots
+        title:              title of the plot
+        xlabel:             label of the x-axis
+        ylabel:             label of the y-axis
+    """
+    plt.figure(figure_number)
+
+    if number_of_plot > 1:
+
+        for i in range (number_of_plot):
+            y_plot = y[i,:]
+            if label_name == 'none':
+                plt.plot(x, y_plot, symbol[i])
+            else:
+                plt.plot(x, y_plot, symbol[i], label = label_name[i])
+                plt.legend(loc = 'best')
+
+    elif label_name == 'none':
+        plt.plot(x, y, symbol)
+
+    else:
+        plt.plot(x, y, symbol, label = label_name)
+        plt.legend(loc = 'best')
+
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+
     return
 
 def radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6):
@@ -106,10 +146,12 @@ def masses(an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu):
     """
 
         # mass within the superbubble (solar mass)
+        # integral over x of the density in the SB
     integral_msb = integrate.quad(lambda x: (1-x)**deltan * x**2, 0, 1)[0]
     Msb = 4*numpy.pi * (Rsb*pc2cm)**3 * an * n0**alphan * L38**betan * t7**gamman * integral_msb * mu * mpg/Msun2g
 
         # swept-up mass (solar mass)
+        # Mswept = Volume_sb * n0 * mu * mpg
     Mswept = 4*numpy.pi/3.0 * (Rsb*pc2cm)**3 * n0 * mu * mpg/Msun2g
 
     return Msb, Mswept
@@ -123,11 +165,11 @@ def density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb):
     Inputs:
         mu      :       average molecular weight
         n0      :       atomic density (cm^-3)
-        Vsb     :       velocity of the forward shock expressed in km/s
-        C02     :       isothermal sound speed in the ambient medium in km/s
-        Mswept  :       swept-up mass by the suerbubble expressed in solar masses
-        Msb     :       mass in the superbubble expressed in solar masses
-        Rsb     :       outer radius of the superbubble expressed in pc
+        Vsb     :       velocity of the forward shock (km/s)
+        C02     :       isothermal sound speed in the ambient medium (km/s)
+        Mswept  :       swept-up mass by the suerbubble (solar masses)
+        Msb     :       mass in the superbubble (solar masses)
+        Rsb     :       outer radius of the superbubble (pc)
     """
         # density in the shell (cm^-3)
     Ts = 1e4                                    # temperature of the shell (K)
@@ -162,9 +204,9 @@ def luminosity_SB(al, etal, zeta, at, alphat, betat, gammat, deltat, an, alphan,
     """
     Function to compute the pressure in the superbubble
     From the equation 6 of the article Mac Low and McCray (1987)
-        C = ne * n * LambdaT                (erg cm^-3 s^-1)
+        C = ne * n * LambdaT                :   cooling rate per unit volume (erg cm^-3 s^-1)
         where LambdaT = al * T6^etal * zeta (erg cm^3 s^-1)
-              ne = epsilon * n (cm^-3)
+              ne = epsilon * n              : density of electrons (cm^-3)
         Lsb = int_Volumesb (C)          (erg/s)
     Inputs:
         # expression of LambdaT = al * T6^etal * zeta
@@ -224,7 +266,7 @@ def profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, b
     """
     rmin = 0
     rmax = Rsb
-    number_bin_r = (rmax - rmin)/dr
+    number_bin_r = (rmax - rmin)/dr + 1
     r = numpy.linspace(rmin, rmax, number_bin_r)
     x = r/Rsb
     Tsb = at * n0**alphat * L38**betat * t7**gammat * (1-x)**deltat
@@ -232,29 +274,31 @@ def profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, b
 
     return Tsb, nsb
 
-def diffusion_spherical(t, R_max, t0, NE, D):
+def diffusion_spherical(t, R_max, t0, NE, D, dr):
     """
-    This function compute the intensity density of the cosmic rays at each time and radius
+    Function to the density of the cosmic rays at each time and radius
+        N(E, r, deltat) = N(E, 0, t0)/(4*pi*D(E)*deltat) * exp(-r^2/(4*D(E)*deltat))
     Inputs:
         t       :       time (yr)
         R_max   :       maximum distance for the computation (pc)
         t0      :       time when the SN explode (yr) for the test if the SN has already exploded
         NE      :       initial density of the population of CR (GeV^-1)
         D       :       diffusion coefficient (cm^2 s^-1)
+        dr      :       space interval (pc)
     """
-    rmin = 0.01                 # minimum radius (pc)
+    rmin = 0                    # minimum radius (pc)
     rmax = R_max                # maximum radius (pc)
-    number_bin_r = 25
+    number_bin_r = (rmax-rmin)/dr + 1
     r = numpy.linspace(rmin, rmax, number_bin_r)    # position in pc
 
-    delta_t = t - t0     # time after the SN explosion (yr)
-    delta_t = delta_t * yr2s
+    delta_t = t - t0            # time after the SN explosion (yr)
+    delta_t = delta_t * yr2s    # in s
 
         # density of the particles in time and position (GeV^-1)
     N = numpy.zeros(len(r))
 
-    if delta_t > 0:
-        if delta_t == 0:
+    if delta_t >= 0:            # if there is already an explosion
+        if delta_t == 0:        # at the SN explosion
             N[0] = NE
         else:
             N = NE/((4*numpy.pi*D*(delta_t))**(3/2.0))*numpy.exp(-(r*pc2cm)**2/(4*D*(delta_t)))
@@ -262,7 +306,7 @@ def diffusion_spherical(t, R_max, t0, NE, D):
 
 def shell_particles(Nr, r):
     """
-    This function computes the particles at each time and energy in each shell_aera
+    Function to compute the number of particles at each time and energy in each shell_aera
     Inputs:
         Nr          :       vector of density of particles for each radius (cm^-3)
         r           :       vector of each radius (pc)
@@ -270,7 +314,7 @@ def shell_particles(Nr, r):
 
     def shell_volume(N_out, N_in, r_out, r_in):
         """
-        This function computes the aera of a shell with inner radius r and outer radius r+dr
+        Function to compute the volume of a shell with inner radius r and outer radius r+dr
         Inputs:
             N_out       :       density of particles at the outer radius (cm^-3)
             N_int       :       density of particles at the inner radius (cm^-3)
@@ -296,7 +340,7 @@ def gauss(x, A, Dt):
     Function to fit a gaussian on the density profile as function of the radius.
     Input:
         r       :   vector radius (pc)
-    Parameters:
+    Fit parameters:
         A       :   normalization of the gaussian (pc)
         Dt      :   factor related to the standard deviation (pc^2 s^-1 yr)
     """
@@ -304,20 +348,44 @@ def gauss(x, A, Dt):
 
 def profile_gas_density(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu, Vsb, C02, Mswept, Msb, r):
     """
-    This function computes the gas desnity profile along a distance r (pc)
+    Function to compute the gas desnity profile along a distance r (pc)
     Inputs:
+        # expression of T = at * n0^alphat * L38^betat * t7^deltat * (1-x)^deltat
+        at      :       numerical factor in the expression of T
+        alphat  :       exponent of the density in the expression of T
+        betat   :       exponent of the luminosity in the expression of T
+        gammat  :       exponent of the time in the expression of T
+        deltat  :       exponent of the radius in the expression of T
+        # expression of n = an * n0^alphan * L38^betan * t7^deltan * (1-x)^deltan
+        an      :       numerical factor in the expression of n
+        alphan  :       exponent of the density in the expression of n
+        betan   :       exponent of the luminosity in the expression of n
+        gamman  :       exponent of the time in the expression of n
+        deltan  :       exponent of the radius in the expression of n
+        # others parameters
+        n0      :       atomic density expressed in cm^-3
+        L38     :       total luminosity injected by the stars and SN expressed in 10^38 erg/s
+        t7      :       age of the system expressed in 10^7 yr
+        Rsb     :       outer radius of the SB (pc)
+        mu      :       average molecular weight
+        Vsb     :       velocity of the forward shock (km/s)
+        C02     :       isothermal sound speed in the ambient medium (km/s)
+        Mswept  :       swept-up mass by the suerbubble (solar masses)
+        Msb     :       mass in the superbubble (solar masses)
     """
-    n = len(r)-1
+    n = len(r) - 1
     dr = r[n]-r[n-1]
     nsb = profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, dr)[1]
     ns, hs = density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb)
 
-    n_tot = n0 * numpy.ones(n)
+    n_tot = n0 * numpy.ones(n + 1)
 
-    ind1 = numpy.where(r < Rsb-hs)[0]
-    n_tot[ind1] = nsb[ind1]
+    ind1 = numpy.where(r[1:] < Rsb-hs)[0]
+    if len(nsb) > 0:
 
-    ind2 = numpy.where((r >= Rsb-hs) & (r <= Rsb))[0]
-    n_tot[ind2] = ns
+        n_tot[ind1] = nsb[ind1]
+
+        ind2 = numpy.where((r >= Rsb-hs) & (r <= Rsb))[0]
+        n_tot[ind2] = ns
 
     return n_tot

@@ -12,7 +12,7 @@ import os
 import pickle
 import naima
 import astropy.units as units
-from naima.models import InverseCompton, TableModel
+from naima.models import PionDecay, TableModel
 
 # Physical constants and conversion factors
 from Physical_constants import *
@@ -28,7 +28,7 @@ os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files')
 # Computation #
 ##-----------##
 
-Emin = 100 * MeV2GeV          # 100 MeV = 0.1 GeV
+Emin = 100 * MeV2GeV            # 100 MeV = 0.1 GeV
 Emax = 100 * TeV2GeV            # 100 TeV = 100 000 GeV
 
 with open('energy.dat', 'rb') as energy_load:
@@ -53,14 +53,15 @@ with open('energy.dat', 'rb') as energy_load:
                     if ((i == 2000) and (j == 20)):
 
                         model = TableModel(E * units.GeV, Ne[:, i, j] * 1/units.GeV, amplitude = 1)
-                        IC = InverseCompton(model, seed_photon_fields=['CMB'])
+                        PD = PionDecay(model, nh = 1 * 1/units.cm**3, nuclear_enhancement = True)
 
                         spectrum_energy = numpy.logspace(log10(Emin), log10(Emax), 1000) * units.GeV
-                        sed_IC = IC.sed(spectrum_energy, distance = 0 * units.kpc)
+                        sed_PD = PD.sed(spectrum_energy, distance = 0 * units.kpc)
 
                 #model = TableModel(E * units.GeV, Ne[:, 2000, 20] * 1/units.GeV, amplitude = 1)
                 #IC = InverseCompton(model, seed_photon_fields=['CMB'])
                 #spectrum_energy = numpy.logspace(log10(Emin), log10(Emax), 1000) * units.GeV
                 #sed_IC = IC.sed(spectrum_energy, distance = 0 * units.kpc)
-                        plt.loglog(spectrum_energy,sed_IC,lw=2, label='IC (total)',c=naima.plot.color_cycle[0])
+                        plt.loglog(spectrum_energy,sed_PD,lw=2, label='PD',c=naima.plot.color_cycle[0])
+                        plt.legend(loc='lower left')
                         plt.show()
