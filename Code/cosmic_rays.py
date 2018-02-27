@@ -11,9 +11,10 @@ from Functions import *
 import os
 import pickle
 
-# Physical constants and conversion factors
+# Physical constants, conversion factors and parameters fot the SB
 from Physical_constants import *
 from Conversion_factors import *
+#from Parameters_SB import *
 
 ##--------------##
 # Path for files #
@@ -74,22 +75,10 @@ with open('energy.dat', 'wb') as energy_write:
                     # SN explosion: time (yr)
             t0 = 0      # in yr
 
-                    # R(t) = a * n0^alphar * L36^betar * t6^gammar                  (pc)
-            ar = 27.0
-            alphar = -1.0/5
-            betar = 1.0/5
-            gammar = 3.0/5
-
-                    # parameters of the OB association
-            n0 = 1              # mean density of the interstellar medium (particle/cm^3)
-            Nob = 1             # number of OB-stars in the association
-            Lob = 1e36          # mean luminosity of an OB-star (erg/s)
-            Pob = Nob*Lob       # mean power of the association (erg/s)
-            L36 = Pob * erg236erg       # mechanical energy expressed in 10^36 erg/s
-
                     # Initialization
             i = 0
-            Ne = []             # matrix (len(E)xlen(t)xlen(r))
+            Ne = []             # matrix (len(E)xlen(t)xlen(r)) to register the particles distribution
+            #Ngas = []           # matrix (len(t)xlen(r)) to register the gas density for each time and each radius
             figure_number = 0
 
             R_max = 1000
@@ -109,6 +98,9 @@ with open('energy.dat', 'wb') as energy_write:
                 N_part = shell_particles(Nr, r)
                 Nt.append(N_part)
 
+                #if i == 0:
+                #    Ngas = []           # matrix (len(t)xlen(r)) to register the gas density for each time and each radius
+
                 while t[j] < lifetime:
                         # time (yr)
                     t.append(t[j] + dt)
@@ -119,6 +111,10 @@ with open('energy.dat', 'wb') as energy_write:
                         # Density of population as function of the radius (cm^-3)
                     #diff = sqrt(6 * D[i] * t[j] * yr2s)/pc2cm                               # distance of diffusion (pc)
                     Nr, r = diffusion_spherical(t[j], R_max, t0, N_E[i], D[i])               # density (cm^-3) and vector r
+
+                    #if i == 0:
+                    #    Nrgas = profile_gas_density(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu, Vsb, C02, Mswept, Msb, r)
+                    #    Ngas.append(Nrgas)
 
                     N_part = shell_particles(Nr, r)
                     Nt.append(N_part)
@@ -176,6 +172,27 @@ log_plot(2, n, E, y, label_name, 'Number of CR in the SB at %.2e yr after the SN
 log_plot(2, 1, E, sum, 'Sum', 'Number of CR in the SB at %.2e yr after the SN explosion'%t[ind] , 'E (GeV)', u'N(E) 'r'($GeV^{-1}$)', 'x')
 log_plot(2, 1, E, N_E, 'Injected', 'Number of CR in the SB at %.2e yr after the SN explosion'%t[ind] , 'E (GeV)', u'N(E) 'r'($GeV^{-1}$)', '-')
 
-#log_plot(3, 1, E, N_E, 'Injected', 'Number of CR in the SB at %.2e yr after the SN explosion'%t[ind] , 'E (GeV)', u'N(E) 'r'($GeV^{-1}$)', '-')
+    # Verification
+deltat = []             # time interval after the SN explosion (yr)
+Ntot = numpy.sum(N_E)   # total number of particles injected in the SB (particles)
+Nratio = []             # ratio of remained particles in time
+
+for i in range (len(t)):
+
+    if t[i] <= t0:
+        continue
+
+    else:
+        deltat.append(t[i]-t0)
+        z = numpy.zeros((m, n))
+        for j in range (m):
+            for k in range (n):
+                z[j, k] = Ne[j, i, k]
+
+        Ntot_t = numpy.sum(z)
+        Nratio.append(Ntot_t/Ntot)
+
+plot(3, 1, deltat, Nratio, 'none', 'Ratio of remained particles in the considered volume', 'Time after the explosion (yr)', r'$N_{tot, t}/N_{tot, 0}$', '-')
+
 
 plt.show()
