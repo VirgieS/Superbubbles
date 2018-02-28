@@ -18,11 +18,6 @@ from Parameters_SB import *
 
 # Computation of the radius of the superbubble during the time
 
-    # time vector (must be given in yr)
-t = []
-t.append(0.0)   # birth of the association (yr)
-dt = 1e3        # time interval (yr)
-
     # Important quantities
 L36 = Pob * erg236erg     # mechanical energy expressed in 10^36 erg/s
 L38 = L36 * t36erg238erg  # mechanical energy expressed in 10^38 erg/s
@@ -62,15 +57,18 @@ psb.append(0)
 pratio.append(0)
 Lsb.append(0)
 
-# Stop criterion
-i = 0
-lifetime = 1e6 # average lifetime of the lowest mass B star (yr)
+# Initialization
+t0 = 0.01          # creation of the SB (yr)
+tmin = t0
+tmax = lifetime
+number_bin_t = 30
+t = numpy.logspace(log10(tmin), log10(tmax), number_bin_t)
+
+figure_number = 1
 #hgalac = 150 # tickness of the galactic plane
 #while Rsb[i] < hgalac:
-while t[i] < lifetime:
+for i in range (1,len(t)):
 
-    t.append(t[i]+dt)
-    i +=1
     t6 = t[i] * yr26yr
     t7 = t6 * s6yr27yr
 
@@ -101,19 +99,47 @@ while t[i] < lifetime:
 
         # luminosity of the SB (erg/s)
     Lsb.append(luminosity_SB(al, etal, zeta, at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, epsilon, Rsb[i])) # erg/s
+    """
+    number_bin_r = 20
+    if i == 25:
+        rmin = 0                    # minimum radius (pc)
+        rmax = Rsb[i]-h[i]          # maximum radius (pc)
+        r = numpy.linspace(rmin, rmax, number_bin_r)    # position in pc
+        Tsb, nsb = profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, r)
+        plot(1, 1, r/Rsb[i], nsb, 'at %.2f yr'%t[i], 'Density profile within the SB', 'radius (pc)', u'n(r) 'r'($cm^{-3}$)', '+')
+        figure_number +=1
 
+    if i == 5:
+        rmin = 0                    # minimum radius (pc)
+        rmax = Rsb[i]-h[i]          # maximum radius (pc)
+        r = numpy.linspace(rmin, rmax, number_bin_r)    # position in pc
+        Tsb, nsb, r = profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, r)
+        plot(2, 1, r/Rsb[i], nsb, 'at %.2f yr'%t[i], 'Density profile within the SB', 'radius (pc)', u'n(r) 'r'($cm^{-3}$)', '+')
+        figure_number +=1
+    """
 pISM = numpy.ones_like(psb)*pISM
 Pob = numpy.ones_like(Lsb)*Pob
 
 # Plots
-log_plot(1, 1, t, Rsb, 'none', 'Time evolution of the radius', 'Time (yr)', 'Radius (pc)', '+')
-log_plot(2, 1, t, Vsb, 'none', 'Time evolution of the velocity', 'Time (yr)', 'Velocity (km/s)', '+')
-log_plot(3, 2, t, numpy.array([Msb, Mswept]), ['Mass within the SB from the density profile', 'Swept-up mass'], 'Time evolution of the masses', 'Time (yr)', u'Mass'r'($M_\odot$)', ['+', 'x'])
-log_plot(4, 1, t, Mratio, 'none', 'Time evolution of the ratio between the two masses', 'Time (yr)', r'$M_{SB}/M_{swept-up}$', '+')
-log_plot(5, 1, t, ns, 'none', 'Time evolution of the density in the shell', 'Time (yr)', r'$n_s$($cm^{-3}$)', '+')
-log_plot(6, 1, t, h, 'none', 'Time evolution of the thickness of the shell', 'Time (yr)', 'h (pc)', '+')
-log_plot(7, 1, t, hratio, 'none', 'Time evolution of the ratio between the thickness of the shell and the radius of the SB', 'Time (yr)', r'$h_s/R_{SB}$', '+')
-log_plot(8, 2, t, numpy.array([psb, pISM]), ['within the SB', 'in the ISM'], 'Time evolution of the pressures', 'Time (yr)', u'Pressure 'r'(dyne $cm^{-2}$)', ['+', 'x'])
-log_plot(9, 1, t, pratio, 'none', 'Time evolution of the ratio between the two pressures', 'Time (yr)', r'$p_{SB}/p_{ISM}$', '+')
-log_plot(10, 2, t, numpy.array([Lsb, Pob]), ['of the SB', 'of the stars'], 'Time evolution of the luminosities', 'Time (yr)', u'L 'r'(erg $s^{-1}$)', ['+', 'x'])
+log_plot(figure_number, 1, t, Rsb, 'none', 'Time evolution of the radius', 'Time (yr)', 'Radius (pc)', '+')
+figure_number +=1
+log_plot(figure_number, 1, t, Vsb, 'none', 'Time evolution of the velocity', 'Time (yr)', 'Velocity (km/s)', '+')
+figure_number +=1
+log_plot(figure_number, 2, t, numpy.array([Msb, Mswept]), ['Mass within the SB from the density profile', 'Swept-up mass'], 'Time evolution of the masses', 'Time (yr)', u'Mass'r'($M_\odot$)', ['+', 'x'])
+figure_number +=1
+log_plot(figure_number, 1, t, Mratio, 'none', 'Time evolution of the ratio between the two masses', 'Time (yr)', r'$M_{SB}/M_{swept-up}$', '+')
+figure_number +=1
+log_plot(figure_number, 1, t, ns, 'none', 'Time evolution of the density in the shell', 'Time (yr)', r'$n_s$($cm^{-3}$)', '+')
+figure_number +=1
+log_plot(figure_number, 1, t, h, 'none', 'Time evolution of the thickness of the shell', 'Time (yr)', 'h (pc)', '+')
+figure_number +=1
+log_plot(figure_number, 1, t, hratio, 'none', 'Time evolution of the ratio between the thickness of the shell and the radius of the SB', 'Time (yr)', r'$h_s/R_{SB}$', '+')
+figure_number +=1
+log_plot(figure_number, 2, t, numpy.array([psb, pISM]), ['within the SB', 'in the ISM'], 'Time evolution of the pressures', 'Time (yr)', u'Pressure 'r'(dyne $cm^{-2}$)', ['+', 'x'])
+figure_number +=1
+log_plot(figure_number, 1, t, pratio, 'none', 'Time evolution of the ratio between the two pressures', 'Time (yr)', r'$p_{SB}/p_{ISM}$', '+')
+figure_number +=1
+log_plot(figure_number, 2, t, numpy.array([Lsb, Pob]), ['of the SB', 'of the stars'], 'Time evolution of the luminosities', 'Time (yr)', u'L 'r'(erg $s^{-1}$)', ['+', 'x'])
+figure_number +=1
+
 plt.show()
