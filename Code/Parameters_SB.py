@@ -8,6 +8,7 @@ Here are all the free parameters for the system!
 Nob = 100           # number of OB-stars in the association
 Lob = 1e36          # mean luminosity of an OB-star (erg/s)
 Pob = Nob*Lob       # mean power of the association (erg/s)
+lifetime = 30e6     # average lifetime of the lowest B star (yr)
 
     # Fit parameters of the model
 n0 = 1              # mean density of the interstellar medium (particle/cm^3)

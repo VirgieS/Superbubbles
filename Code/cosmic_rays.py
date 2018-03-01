@@ -3,10 +3,9 @@
 ##------------------------##
 import matplotlib.pyplot as plt
 import numpy
-from math import *
 import scipy.integrate as integrate
 from scipy.optimize import curve_fit
-from pylab import *
+from scipy.special import erfc
 from Functions import *
 import os
 import pickle
@@ -45,7 +44,7 @@ with open('gas', 'wb') as gas_write:
             Emin = 1            # minimum kinetic energy: Emin = 1GeV
             Emax = 1*PeV2GeV    # minimum kinetic energy: Emax = 1PeV in GeV
             number_bin_E = 10.0
-            E = numpy.logspace(log10(Emin), log10(Emax), number_bin_E)  # GeV
+            E = numpy.logspace(numpy.log10(Emin), numpy.log10(Emax), number_bin_E)  # GeV
 
             my_energy_write = pickle.Pickler(energy_write)
             my_energy_write.dump(E)
@@ -53,6 +52,7 @@ with open('gas', 'wb') as gas_write:
                 # power-law distribution of the cosmic rays (GeV^-1 cm^-3)
                     # N(p) = N0 * (p/p0)^(-alpha)
                     # N(E) = N0/c * ((E^2 + 2*mp*c^2*E)^(-(1+alpha)/2) * (E + mp*c^2)/((E0^2 + 2*mp*E0)^(-alpha/2)) d^3(r)
+
             eta = 0.1           # efficiency of the cosmic rays acceleration
             Esn = 1e51          # total kinetic energy released from the SN explosion (erg)
             Esng = Esn*erg2GeV  # in GeV
@@ -60,9 +60,8 @@ with open('gas', 'wb') as gas_write:
             p0 = 10             # normalization constant (GeV/c)
             #E0 = sqrt(p0**2 + mpg**2) - mpgev
             alpha = 2.0
-            integral_E = integrate.quad(lambda E: (E**2 + 2*mpgev*E)**(-(1 + alpha)/2.0) * (E + mpgev) * E, Emin, Emax)[0]
-            N0 = eta * Esng * cl**(1-alpha) * p0**(-alpha) * 1.0/integral_E                             # normalization constant to have 0.1*Esn (GeV^-1 c)
-            N_E = N0/cl**(1-alpha) * (E**2 + 2*mpgev*E)**(-(1+alpha)/2.0) * (E + mpgev)/p0**(-alpha)    # GeV^-1
+
+            N_E = power_law_distribution(Emin, Emax, E, alpha, eta, Esn, p0)
 
                 # diffusion coefficient (cm^2 s^-1)
                     # D(p) = D0 * (p/p0)^(-delta)
@@ -80,7 +79,7 @@ with open('gas', 'wb') as gas_write:
             tmin = t0       # nothing happens before the first SN explosion (yr)
             tmax = lifetime
             number_bin_t = 40
-            t = numpy.logspace(log10(tmin), log10(tmax), number_bin_t)
+            t = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)
 
                 # Initialization
             figure_number = 1
@@ -94,27 +93,28 @@ with open('gas', 'wb') as gas_write:
                 t6 = t[j] * yr26yr      # 10^6 yr
                 t7 = t6 * s6yr27yr      # 10^7 yr
 
-                    # Computation of the distance array (pc)
-                Rsb, Vsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)   # radius and velocity of the SB
-                Msb, Mswept = masses(an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu) # swept-up and inner masses (solar masses)
-                hs, ns = density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb)                           # thickness and density of the shell (pc)
-                rmin = 0                    # minimum radius (pc)
+                    # First zone: in the SB
+                        # Computation of the distance array (pc)
+                Rsb, Vsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)           # radius and velocity of the SB
+                Msb, Mswept = masses(an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu)   # swept-up and inner masses (solar masses)
+                hs, ns = density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb)            # thickness and density of the shell (pc)
+                rmin = 0.01                 # minimum radius (pc)
                 rmax = Rsb                  # maximum radius (pc)
-                number_bin_r = 50           # number of bin for r from 0 to Rsb
-                r = numpy.linspace(rmin, rmax, number_bin_r)    # position in pc
+                number_bin_r = 60           # number of bin for r from 0 to Rsb
+                r = numpy.logspace(numpy.log(rmin), numpy.log10(rmax), number_bin_r)    # position in pc
 
                     # Computation of the density of gas in the SB (cm^-3)
                 n_gas = ns * numpy.ones_like(r)
-                ind = numpy.where(r < Rsb-hs)
+                ind = numpy.where(r < Rsb-hs)[0]
                 rsb = r[ind]
                 nsb = profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, rsb, Rsb)[1]
                 n_gas[ind] = nsb
                 ngas.append(n_gas)
-
+                """
                 if j == 5:
                     plot(figure_number, 1, r, n_gas, 'none', 'Density of gas in the SB at t=%.2e yr' %t[j], 'radius (pc)', u'n(r) 'r'($cm^{-3}$)', '+')
                     figure_number +=1
-
+                """
                     # For recording the distribution of particles for each time
                 Nr = []         # (GeV^-1) : matrix of dimension (len(r)-1) x len(E))
 
@@ -154,6 +154,15 @@ with open('gas', 'wb') as gas_write:
                 #    print('The simulated standard deviation of the CR at dt = %.2e and E = %.2e GeV:' %(delta_t, E[len(E)-1]))
                 #    print(sqrt(6 * Dopt * yr2s)/pc2cm)
 
+                    # Second zone: outside the SB
+                        # For the desnity of gas (cm^-3): n(r) = n0
+                ngas.append(n0)
+
+                        # For the particle distribution (GeV^-1): N_part = 4 * pi * int_Rsb^inf Ne r^2 dr
+                x = (Rsb*pc2cm)/(numpy.sqrt(4 * D * t[j]*yr2s))
+                N_part = N_E/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * erfc(x) + 2 * numpy.exp(-x**2) * x)
+                Nr.append(N_part)
+
                     # recording
                 Ntot.append(Nr)
 
@@ -170,7 +179,7 @@ with open('gas', 'wb') as gas_write:
         # Choosen one time
 ind = 1        # chosen time (yr)
         # Initialization
-n = len(r)-1    # length of r
+n = len(r)      # length of r
 m = len(E)      # length of E
 y = numpy.zeros((n, m))
 #label_name = []
@@ -180,7 +189,6 @@ for i in range (n):
     #label_name.append(r'$r_{in}$ = %.2f pc'%r[i])
     for j in range (m):
         y[i, j] = Ntot[ind, i, j]
-
 sum = numpy.zeros(m)
 for k in range (m):
     sum[k] = numpy.sum(y[:,k])

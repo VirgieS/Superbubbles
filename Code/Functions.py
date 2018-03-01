@@ -7,7 +7,6 @@ Here are all functions needed for the superbubble model
 ##----------##
 import matplotlib.pyplot as plt
 import numpy
-from math import *
 import scipy.integrate as integrate
 
 ##-----------------------------------------##
@@ -179,7 +178,7 @@ def density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb):
         # thickness of the shell (pc)
     Ms = (Mswept-Msb)*Msun2g                                    # mass in the shell (g)
     Vs = Ms/(ns * mu * mpg)                                     # volume of the shell (cm^3)
-    Rc = exp(log(Rsb**3 - 3/(4*numpy.pi)*Vs/(pc2cm**3))*1/3.0)  # radius of the continuity contact (pc)
+    Rc = numpy.exp(numpy.log(Rsb**3 - 3/(4*numpy.pi)*Vs/(pc2cm**3))*1/3.0)  # radius of the continuity contact (pc)
     hs = Rsb-Rc                                                 # thickness of the shell (pc)
 
     return ns, hs
@@ -237,7 +236,7 @@ def luminosity_SB(al, etal, zeta, at, alphat, betat, gammat, deltat, an, alphan,
     integral_lsb = integrate.quad(lambda x: (1-x)**deltax * x**2, 1, 0)[0]
     return al * zeta * (at6 * n0**alphat * L38**betat * t7**gammat)**(etal) * epsilon * (an * n0**alphan * L38**betan * t7**gamman)**2 * integral_lsb * (Rsb*pc2cm)**3 # in erg/s
 
-def profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, dr):
+def profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, rsb, Rsb):
     """
     Function to compute the density and the temperature profiles in the superbubble
     From equations 4 and 5 of the article of Mac Low and McCray (1987)
@@ -261,79 +260,71 @@ def profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, b
         n0      :       atomic density expressed in cm^-3
         L38     :       total luminosity injected by the stars and SN expressed in 10^38 erg/s
         t7      :       age of the system expressed in 10^7 yr
+        R_sb    :       array of distance (pc)
         Rsb     :       outer radius of the SB (pc)
-        dr      :       interval in space (pc)
     """
-    rmin = 0
-    rmax = Rsb
-    number_bin_r = (rmax - rmin)/dr + 1
-    r = numpy.linspace(rmin, rmax, number_bin_r)
-    x = r/Rsb
+    x = rsb/Rsb
     Tsb = at * n0**alphat * L38**betat * t7**gammat * (1-x)**deltat
     nsb = an * n0**alphan * L38**betan * t7**gamman * (1-x)**deltan
 
     return Tsb, nsb
 
-def diffusion_spherical(t, R_max, t0, NE, D, dr):
+def power_law_distribution(Emin, Emax, E, alpha, eta, Esn, p0):
+    """
+    Function to compute the power-law distribution of the CR particles
+    Inputs:
+        Emin    :       minimum energy of the distribution (GeV)
+        Emax    :       maximum energy of the distribution (GeV)
+        E       :       energy array (GeV)
+        alpha   :       exponent of the power-law distribution
+        eta     :       efficiency of the cosmic rays acceleration
+        Esn     :       energy released by the SN explosion (GeV)
+        p0      :       normalization constant (GeV/c)
+    """
+    mpgev = mp*MeV2GeV  # mass of the proton in GeV
+
+    integral_E = integrate.quad(lambda E: (E**2 + 2*mpgev*E)**(-(1 + alpha)/2.0) * (E + mpgev) * E, Emin, Emax)[0]
+    N0 = eta * Esn * cl**(1-alpha) * p0**(-alpha) * 1.0/integral_E         # normalization constant (GeV^-1 c)
+
+    return N0/cl**(1-alpha) * (E**2 + 2*mpgev*E)**(-(1+alpha)/2.0) * (E + mpgev)/p0**(-alpha)    # GeV^-1
+
+def diffusion_spherical(t, r, t0, NE, D):
     """
     Function to the density of the cosmic rays at each time and radius
         N(E, r, deltat) = N(E, 0, t0)/(4*pi*D(E)*deltat) * exp(-r^2/(4*D(E)*deltat))
     Inputs:
         t       :       time (yr)
-        R_max   :       maximum distance for the computation (pc)
+        r       :       distance (pc)
         t0      :       time when the SN explode (yr) for the test if the SN has already exploded
         NE      :       initial density of the population of CR (GeV^-1)
         D       :       diffusion coefficient (cm^2 s^-1)
-        dr      :       space interval (pc)
     """
-    rmin = 0                    # minimum radius (pc)
-    rmax = R_max                # maximum radius (pc)
-    number_bin_r = (rmax-rmin)/dr + 1
-    r = numpy.linspace(rmin, rmax, number_bin_r)    # position in pc
+    #rmin = 0                    # minimum radius (pc)
+    #rmax = R_max                # maximum radius (pc)
+    #number_bin_r = (rmax-rmin)/dr + 1
+    #r = numpy.linspace(rmin, rmax, number_bin_r)    # position in pc
 
     delta_t = t - t0            # time after the SN explosion (yr)
     delta_t = delta_t * yr2s    # in s
 
         # density of the particles in time and position (GeV^-1)
-    N = numpy.zeros(len(r))
+    N = numpy.zeros(len(NE))
 
     if delta_t >= 0:            # if there is already an explosion
-        if delta_t == 0:        # at the SN explosion
-            N[0] = NE
+        if t == t0:        # at the SN explosion
+            print(explosion)
+            N = NE
         else:
             N = NE/((4*numpy.pi*D*(delta_t))**(3/2.0))*numpy.exp(-(r*pc2cm)**2/(4*D*(delta_t)))
-    return N, r
+    return N
 
-def shell_particles(Nr, r):
-    """
-    Function to compute the number of particles at each time and energy in each shell_aera
-    Inputs:
-        Nr          :       vector of density of particles for each radius (cm^-3)
-        r           :       vector of each radius (pc)
-    """
+def shell_particles(Ne_in, r_in, Ne_out, r_out):
 
-    def shell_volume(N_out, N_in, r_out, r_in):
-        """
-        Function to compute the volume of a shell with inner radius r and outer radius r+dr
-        Inputs:
-            N_out       :       density of particles at the outer radius (cm^-3)
-            N_int       :       density of particles at the inner radius (cm^-3)
-            r_out       :       outer radius (pc)
-            r_in        :       inner radius (pc)
-        """
+    r_out = r_out * pc2cm   # in cm
+    r_in = r_in * pc2cm     # in cm
+    dr = r_out - r_in       # dr in cm
 
-        r_out = r_out * pc2cm   # in cm
-        r_in = r_in * pc2cm     # in cm
-        dr = r_out - r_in       # dr in cm
-
-        return 4 * numpy.pi * (N_out * r_out**2 + N_in * r_in**2) * dr/2.0
-
-    n = len(r) - 1
-    N_part = numpy.zeros(n)
-    for i in range (n):
-        N_part[i] = shell_volume(Nr[i+1], Nr[i], r[i+1], r[i])
-
-    return N_part
+    return 4 * numpy.pi * (Ne_out * r_out**2 + Ne_in * r_in**2) * dr/2.0
 
 def gauss(x, A, Dt):
     """
