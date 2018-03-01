@@ -288,6 +288,18 @@ def power_law_distribution(Emin, Emax, E, alpha, eta, Esn, p0):
 
     return N0/cl**(1-alpha) * (E**2 + 2*mpgev*E)**(-(1+alpha)/2.0) * (E + mpgev)/p0**(-alpha)    # GeV^-1
 
+def diffusion_coefficient(p0, D0, E, delta):
+    """
+    Function to compute the diffusion coefficient with a power-law
+    Inputs:
+        p0      :       normalization constant (GeV/c)
+        D0      :       diffusion coefficient at p0 (cm^2 s^-1)
+        E       :       energy array (GeV)
+        delta   :       exponent of the power-law expression
+    """
+    mpgev = mp*MeV2GeV  # mass of the proton in GeV
+    return D0 * (numpy.sqrt(E**2 + 2*mpgev*E)/p0)**delta
+
 def diffusion_spherical(t, r, t0, NE, D):
     """
     Function to the density of the cosmic rays at each time and radius

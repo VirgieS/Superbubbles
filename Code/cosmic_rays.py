@@ -38,141 +38,163 @@ C02 = kb*TISM/(mu*mpg)/(km2cm)**2   # isothermal sound speed in the ambiant gas 
     # Computation of the diffusion coefficient and the initial density profile
 with open('gas', 'wb') as gas_write:
     with open('energy', 'wb') as energy_write:
-        with open('data', 'wb') as data_write:
+        with open('time', 'wb') as time_write:
+            with open('distance', 'wb') as distance_write:
+                with open('data', 'wb') as data_write:
 
-                    # Energies
-            Emin = 1            # minimum kinetic energy: Emin = 1GeV
-            Emax = 1*PeV2GeV    # minimum kinetic energy: Emax = 1PeV in GeV
-            number_bin_E = 10.0
-            E = numpy.logspace(numpy.log10(Emin), numpy.log10(Emax), number_bin_E)  # GeV
+                            # Energies
+                    Emin = 1            # minimum kinetic energy: Emin = 1GeV
+                    Emax = 1*PeV2GeV    # minimum kinetic energy: Emax = 1PeV in GeV
+                    number_bin_E = 10.0
+                    E = numpy.logspace(numpy.log10(Emin), numpy.log10(Emax), number_bin_E)  # GeV
 
-            my_energy_write = pickle.Pickler(energy_write)
-            my_energy_write.dump(E)
+                    my_energy_write = pickle.Pickler(energy_write)
+                    my_energy_write.dump(E)
 
-                # power-law distribution of the cosmic rays (GeV^-1 cm^-3)
-                    # N(p) = N0 * (p/p0)^(-alpha)
-                    # N(E) = N0/c * ((E^2 + 2*mp*c^2*E)^(-(1+alpha)/2) * (E + mp*c^2)/((E0^2 + 2*mp*E0)^(-alpha/2)) d^3(r)
+                        # power-law distribution of the cosmic rays (GeV^-1 cm^-3)
+                            # N(p) = N0 * (p/p0)^(-alpha)
+                            # N(E) = N0/c * ((E^2 + 2*mp*c^2*E)^(-(1+alpha)/2) * (E + mp*c^2)/((E0^2 + 2*mp*E0)^(-alpha/2)) d^3(r)
 
-            eta = 0.1           # efficiency of the cosmic rays acceleration
-            Esn = 1e51          # total kinetic energy released from the SN explosion (erg)
-            Esng = Esn*erg2GeV  # in GeV
-            mpgev = mp*MeV2GeV  # mass of the proton in GeV
-            p0 = 10             # normalization constant (GeV/c)
-            #E0 = sqrt(p0**2 + mpg**2) - mpgev
-            alpha = 2.0
+                    eta = 0.1           # efficiency of the cosmic rays acceleration
+                    Esn = 1e51          # total kinetic energy released from the SN explosion (erg)
+                    Esng = Esn*erg2GeV  # in GeV
+                    p0 = 10             # normalization constant (GeV/c)
+                    alpha = 2.0         # exponent of the power-law distribution
 
-            N_E = power_law_distribution(Emin, Emax, E, alpha, eta, Esn, p0)
+                    N_E = power_law_distribution(Emin, Emax, E, alpha, eta, Esn, p0)
 
-                # diffusion coefficient (cm^2 s^-1)
-                    # D(p) = D0 * (p/p0)^(-delta)
-                    # D(E) = D0 * (E^2 + 2*mpg*E)^(delta/2) * 1/p0^delta
-            delta = 1.0/3
-            D0 = 1e28           # diffusion coefficient at 10 GeV/c in cm^2 s^-1
-            D = D0 * (numpy.sqrt(E**2 + 2*mpgev*E)/p0)**delta
+                        # diffusion coefficient (cm^2 s^-1)
+                            # D(p) = D0 * (p/p0)^(-delta)
+                            # D(E) = D0 * (E^2 + 2*mpg*E)^(delta/2) * 1/p0^delta
+                    delta = 1.0/3       # exponent of the power-law of the diffusion coefficient
+                    D0 = 1e28           # diffusion coefficient at 10 GeV/c in cm^2 s^-1
 
-                # Computation of N(E,t,r), particles distribution (GeV^-1)
+                    D = diffusion_coefficient(p0, D0, E, delta)
 
-                    # SN explosion: time (yr)
-            t0 = 3e6      # in yr
+                        # Computation of N(E,t,r), particles distribution (GeV^-1)
 
-                    # time vector (yr)
-            tmin = t0       # nothing happens before the first SN explosion (yr)
-            tmax = lifetime
-            number_bin_t = 40
-            t = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)
+                            # SN explosion: time (yr)
+                    t0 = 3e6      # in yr
 
-                # Initialization
-            figure_number = 1
+                            # time vector (yr)
+                    tmin = t0       # nothing happens before the first SN explosion (yr)
+                    tmax = lifetime
+                    number_bin_t = 40
+                    t = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)
 
-                # Recording
-            Ntot = []               # particles distribution for each timey, distance and energy: the matrix of dimension len(t)x(len(r)-1)xlen(E)
-            ngas = []               # desnity of gas for each time and distance : matrix of dimension len(t)xlen(r)-1
+                    my_time_write = pickle.Pickler(time_write)
+                    my_time_write.dump(t)
 
-            for j in range (len(t)):
+                        # Initialization
+                    figure_number = 1
 
-                t6 = t[j] * yr26yr      # 10^6 yr
-                t7 = t6 * s6yr27yr      # 10^7 yr
+                        # Recording
+                    Ntot = []               # particles distribution for each timey, distance and energy: the matrix of dimension len(t)x(len(r)-1)xlen(E)
+                    ngas = []               # density of gas for each time and distance : matrix of dimension len(t)xlen(r)
+                    distance = []           # distance array for each time: array of dimension len(t)xlen(r)
 
-                    # First zone: in the SB
-                        # Computation of the distance array (pc)
-                Rsb, Vsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)           # radius and velocity of the SB
-                Msb, Mswept = masses(an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu)   # swept-up and inner masses (solar masses)
-                hs, ns = density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb)            # thickness and density of the shell (pc)
-                rmin = 0.01                 # minimum radius (pc)
-                rmax = Rsb                  # maximum radius (pc)
-                number_bin_r = 60           # number of bin for r from 0 to Rsb
-                r = numpy.logspace(numpy.log(rmin), numpy.log10(rmax), number_bin_r)    # position in pc
+                    for j in range (len(t)):
 
-                    # Computation of the density of gas in the SB (cm^-3)
-                n_gas = ns * numpy.ones_like(r)
-                ind = numpy.where(r < Rsb-hs)[0]
-                rsb = r[ind]
-                nsb = profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, rsb, Rsb)[1]
-                n_gas[ind] = nsb
-                ngas.append(n_gas)
-                """
-                if j == 5:
-                    plot(figure_number, 1, r, n_gas, 'none', 'Density of gas in the SB at t=%.2e yr' %t[j], 'radius (pc)', u'n(r) 'r'($cm^{-3}$)', '+')
-                    figure_number +=1
-                """
-                    # For recording the distribution of particles for each time
-                Nr = []         # (GeV^-1) : matrix of dimension (len(r)-1) x len(E))
+                        t6 = t[j] * yr26yr      # 10^6 yr
+                        t7 = t6 * s6yr27yr      # 10^7 yr
 
-                    # For the verification of the density of particles (cm^-3 GeV^-1)
-                #Nverif = numpy.zeros_like(r)  # density of particles at a chosen energy (cm^-3 GeV^-1)
-                #energy = len(E)-1                # index of the chosen energy
+                            # First zone: in the SB
+                                # Computation of the distance array (pc)
+                        Rsb, Vsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)           # radius and velocity of the SB
+                        Msb, Mswept = masses(an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu)   # swept-up and inner masses (solar masses)
+                        hs, ns = density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb)            # thickness and density of the shell (pc)
+                        rmin = 0.01                 # minimum radius (pc)
+                        rmax = Rsb                  # maximum radius (pc)
+                        number_bin_r = 60           # number of bin for r from 0 to Rsb
+                        r = numpy.logspace(numpy.log(rmin), numpy.log10(rmax), number_bin_r)    # position in pc
 
-                for i in range (len(r)-1):
+                        distance.append(r)
 
-                        # Computation of the density of particles (cm^-3 GeV^-1)
-                    Ne_in = diffusion_spherical(t[j], r[i], t0, N_E, D)            # density of particles at the inner radius (cm^-3 GeV^-1)
-                    Ne_out = diffusion_spherical(t[j], r[i+1], t0, N_E, D)         # density of particles at the outer radius (cm^-3 GeV^-1)
+                            # Computation of the density of gas in the SB (cm^-3)
+                        n_gas = ns * numpy.ones_like(r)
+                        ind = numpy.where(r < Rsb-hs)[0]
+                        rsb = r[ind]
+                        nsb = profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, rsb, Rsb)[1]
+                        n_gas[ind] = nsb
+                        n_gas = n_gas.tolist()
+                        """
+                        if j == 5:
+                            plot(figure_number, 1, r, n_gas, 'none', 'Density of gas in the SB at t=%.2e yr' %t[j], 'radius (pc)', u'n(r) 'r'($cm^{-3}$)', '+')
+                            figure_number +=1
+                        """
+                            # For recording the distribution of particles for each time
+                        Nr = []         # (GeV^-1) : matrix of dimension (len(r)-1) x len(E))
 
-                    #Nverif[i] = Ne_in[energy]
+                            # For the verification of the density of particles (cm^-3 GeV^-1)
+                        #Nverif = numpy.zeros_like(r)  # density of particles at a chosen energy (cm^-3 GeV^-1)
+                        #energy = len(E)-1                # index of the chosen energy
 
-                        # Computation of the particles distribution (GeV^-1): array of dimension len(E)
-                    N_part = shell_particles(Ne_in, r[i], Ne_out, r[i+1])
+                        Ne_in = diffusion_spherical(t[j], r[0], t0, N_E, D)
+                        r_in = r[0]
 
-                        # recording
-                    Nr.append(N_part)
+                        for i in range (1,len(r)):
 
-                #Nverif[len(Nverif)-1] = Ne_out[energy]
+                                # Computation of the density of particles (cm^-3 GeV^-1)
+                            Ne_out = diffusion_spherical(t[j], r[i], t0, N_E, D)         # density of particles at the outer radius (cm^-3 GeV^-1)
 
-                #if (t[j] - t0 == 10*dt):    # chosen of time interval after the SN explosion (yr)
-                #    popt, pcov = curve_fit(gauss, r, Nverif)
-                #    fit = gauss(r, *popt)
-                #    plot(figure_number, 1, r, Nverif, 'Simulation', 'Density of CR in the SB at t=%.2e yr and at %.2e GeV' %(t[j], E[energy]), 'radius (pc)', u'N(r) 'r'($GeV^{-1}$)', '+')
-                #    plot(figure_number, 1, r, fit, 'Fit', 'Density of CR in the SB at t=%.2e yr and at %.2e GeV' %(t[j], E[energy]), 'radius (pc)', u'N(r) 'r'($GeV^{-1}$)', '-')
-                #    figure_number += 1
+                            #Nverif[i] = Ne_in[energy]
 
-                    # Verification
-                #    delta_t = t[j]-t0
-                #    print('The diffusion distance of the CR at dt = %.2e yr and E = %.2e GeV:' %(delta_t, E[len(E)-1]))
-                #    print(sqrt(6 * D[len(E)-1] * t[j] * yr2s)/pc2cm)
+                                # Computation of the particles distribution (GeV^-1): array of dimension len(E)
+                            r_out = r[i]
+                            N_part = shell_particles(Ne_in, r_in, Ne_out, r_out)
 
-                #    Dopt = popt[1]* (pc2cm)**2
-                #    print('The simulated standard deviation of the CR at dt = %.2e and E = %.2e GeV:' %(delta_t, E[len(E)-1]))
-                #    print(sqrt(6 * Dopt * yr2s)/pc2cm)
+                                # recording
+                            Nr.append(N_part)
 
-                    # Second zone: outside the SB
-                        # For the desnity of gas (cm^-3): n(r) = n0
-                ngas.append(n0)
+                                # Change
+                            Ne_in = Ne_out
+                            r_in = r_out
 
-                        # For the particle distribution (GeV^-1): N_part = 4 * pi * int_Rsb^inf Ne r^2 dr
-                x = (Rsb*pc2cm)/(numpy.sqrt(4 * D * t[j]*yr2s))
-                N_part = N_E/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * erfc(x) + 2 * numpy.exp(-x**2) * x)
-                Nr.append(N_part)
+                        #Nverif[len(Nverif)-1] = Ne_out[energy]
 
-                    # recording
-                Ntot.append(Nr)
+                        #if (t[j] - t0 == 10*dt):    # chosen of time interval after the SN explosion (yr)
+                        #    popt, pcov = curve_fit(gauss, r, Nverif)
+                        #    fit = gauss(r, *popt)
+                        #    plot(figure_number, 1, r, Nverif, 'Simulation', 'Density of CR in the SB at t=%.2e yr and at %.2e GeV' %(t[j], E[energy]), 'radius (pc)', u'N(r) 'r'($GeV^{-1}$)', '+')
+                        #    plot(figure_number, 1, r, fit, 'Fit', 'Density of CR in the SB at t=%.2e yr and at %.2e GeV' %(t[j], E[energy]), 'radius (pc)', u'N(r) 'r'($GeV^{-1}$)', '-')
+                        #    figure_number += 1
 
-            Ntot = numpy.asarray(Ntot)
-            my_data_write = pickle.Pickler(data_write)
-            my_energy_write.dump(Ntot)
+                            # Verification
+                        #    delta_t = t[j]-t0
+                        #    print('The diffusion distance of the CR at dt = %.2e yr and E = %.2e GeV:' %(delta_t, E[len(E)-1]))
+                        #    print(sqrt(6 * D[len(E)-1] * t[j] * yr2s)/pc2cm)
 
-        ngas = numpy.asarray(ngas)
-        my_gas_write = pickle.Pickler(gas_write)
-        my_gas_write.dump(ngas)
+                        #    Dopt = popt[1]* (pc2cm)**2
+                        #    print('The simulated standard deviation of the CR at dt = %.2e and E = %.2e GeV:' %(delta_t, E[len(E)-1]))
+                        #    print(sqrt(6 * Dopt * yr2s)/pc2cm)
+
+                            # Second zone: outside the SB
+                                # For the desnity of gas (cm^-3): n(r) = n0
+                        n_gas.append(n0)
+
+                                # For the particle distribution (GeV^-1): N_part = 4 * pi * int_Rsb^inf Ne r^2 dr
+                        x = (Rsb*pc2cm)/(numpy.sqrt(4 * D * t[j]*yr2s))
+                        N_part = N_E/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * erfc(x) + 2 * numpy.exp(-x**2) * x)
+                        Nr.append(N_part)
+
+                            # recording
+                        Ntot.append(Nr)
+                        ngas.append(n_gas)
+
+                    Ntot = numpy.asarray(Ntot)
+                    print(Ntot.shape)
+                    my_data_write = pickle.Pickler(data_write)
+                    my_data_write.dump(Ntot)
+
+                    distance = numpy.asarray(distance)
+                    print(distance.shape)
+                    my_distance_write = pickle.Pickler(distance_write)
+                    my_distance_write.dump(distance)
+
+                ngas = numpy.asarray(ngas)
+                print(ngas.shape)
+                my_gas_write = pickle.Pickler(gas_write)
+                my_gas_write.dump(ngas)
 
     # number of particles at one time for each energy and each radius
 
@@ -180,6 +202,7 @@ with open('gas', 'wb') as gas_write:
 ind = 1        # chosen time (yr)
         # Initialization
 n = len(r)      # length of r
+print(n)
 m = len(E)      # length of E
 y = numpy.zeros((n, m))
 #label_name = []
