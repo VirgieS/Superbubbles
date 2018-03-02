@@ -26,64 +26,116 @@ os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files')
 
 Emin = 100 * MeV2GeV            # 100 MeV = 0.1 GeV
 Emax = 100 * TeV2GeV            # 100 TeV = 100 000 GeV
+number_bin_E = 20
 
-with open('gas', 'rb') as gas_load:
-    with open('energy', 'rb') as energy_load:
-        with open('data', 'rb') as data_load:
-            with open('distance', 'rb') as distance_load:
-                with open('time', 'rb') as time_load:
+with open('spectra', 'wb') as spectra_write:
+    with open('gas', 'rb') as gas_load:
+        with open('energy', 'rb') as energy_load:
+            with open('data', 'rb') as data_load:
+                with open('distance', 'rb') as distance_load:
+                    with open('time', 'rb') as time_load:
 
-                        # Loading of data: ngas, energy, nCR, radius and time
-                    my_gas_load = pickle.Unpickler(gas_load)
-                    ngas = my_gas_load.load()
+                        #my_spectra_write = pickle.Pickler(spectra_read)
 
-                    my_energy_load = pickle.Unpickler(energy_load)
-                    E = my_energy_load.load()
+                            # Loading of data: ngas, energy, nCR, radius and time
+                        my_gas_load = pickle.Unpickler(gas_load)
+                        ngas = my_gas_load.load()
 
-                    my_data_load = pickle.Unpickler(data_load)
-                    Ntot = my_data_load.load()
+                        my_energy_load = pickle.Unpickler(energy_load)
+                        E = my_energy_load.load()
 
-                    my_distance_load = pickle.Unpickler(distance_load)
-                    r = my_distance_load.load()
-                    print(r.shape)
+                        my_data_load = pickle.Unpickler(data_load)
+                        Ntot = my_data_load.load()
 
-                    my_time_load = pickle.Unpickler(time_load)
-                    t = my_time_load.load()
+                        my_distance_load = pickle.Unpickler(distance_load)
+                        r = my_distance_load.load()
 
-                    n = len(t)
-                    l = len(E)
+                        my_time_load = pickle.Unpickler(time_load)
+                        t = my_time_load.load()
 
-                    for i in range (n):
-                        m = len(r[i])
+                        n = len(t)
 
-                        for j in range (m):
+                        spectrum = []
+                        sed = []
 
-                            if numpy.all(Ntot[i, j, :] == 0): # Condition if there are relativistic particles
-                                continue
+                        for i in range (n):
+                            m = len(r[i])
+                            spectrum_r = []
+                            sed_r = []
 
-                    """
-                    for i in range (len(Ne[0, :, 0])):
-                        for j in range (len(Ne[0, i, :])):
+                            for j in range (m):
 
-                            if numpy.all(Ne[:, i, j] == 0): # Condition if there are relativistic particles
-                                continue
-                            else:
-                                #model = TableModel(E * units.GeV, Ne[:, i, j] * 1/units.GeV, amplitude = 1)
-                                #IC = InverseCompton(model, seed_photon_fields=['CMB'])
+                                #if numpy.all(Ntot[i, j, :] == 0): # Condition if there are relativistic particles
+                                #    continue
 
-                                if ((i == 2000) and (j == 20)):
+                                #else:
+                                #    model = TableModel(E * units.GeV, Ntot[i, j, :] * 1/units.GeV, amplitude = 1)
+                                #    PD = PionDecay(model, nh = ngas[i,j+1] * 1/units.cm**3, nuclear_enhancement = True)
 
-                                    model = TableModel(E * units.GeV, Ne[:, i, j] * 1/units.GeV, amplitude = 1)
-                                    PD = PionDecay(model, nh = 1 * 1/units.cm**3, nuclear_enhancement = True)
+                                #    spectrum_energy = numpy.logspace(numpy.log10(Emin), numpy.log10(Emax), number_bin_E) * units.GeV
+                                #    sed_PD = PD.sed(spectrum_energy, distance = 0 * units.kpc)
 
-                                    spectrum_energy = numpy.logspace(log10(Emin), log10(Emax), 1000) * units.GeV
-                                    sed_PD = PD.sed(spectrum_energy, distance = 0 * units.kpc)
+                                #    spectrum_r.append(spectrum_energy)
+                                    #print(numpy.asarray(spectrum_r).shape)
+                                #    sed_r.append(sed_PD)
 
-                            #model = TableModel(E * units.GeV, Ne[:, 2000, 20] * 1/units.GeV, amplitude = 1)
-                            #IC = InverseCompton(model, seed_photon_fields=['CMB'])
-                            #spectrum_energy = numpy.logspace(log10(Emin), log10(Emax), 1000) * units.GeV
-                            #sed_IC = IC.sed(spectrum_energy, distance = 0 * units.kpc)
-                                    plt.loglog(spectrum_energy,sed_PD,lw=2, label='PD',c=naima.plot.color_cycle[0])
-                                    plt.legend(loc='lower left')
-                                    plt.show()
-                                    """
+                                model = TableModel(E * units.GeV, Ntot[i, j, :] * 1/units.GeV, amplitude = 1)
+                                PD = PionDecay(model, nh = ngas[i,j+1] * 1/units.cm**3, nuclear_enhancement = True)
+
+                                spectrum_energy = numpy.logspace(numpy.log10(Emin), numpy.log10(Emax), number_bin_E) * units.GeV
+
+                                sed_PD = PD.sed(spectrum_energy, distance = 0 * units.kpc)
+
+                                spectrum_r.append(spectrum_energy)
+                                sed_r.append(sed_PD)
+
+                            spectrum.append(spectrum_r)
+                            sed.append(sed_r)
+
+                        spectrum = numpy.asarray(spectrum)
+                        spectrum_unit = spectrum_energy.unit
+                        sed = numpy.asarray(sed)
+                        lum_unit = units.erg*1/units.s*1/units.GeV
+                        pickle.dump(spectrum, spectra_write)
+                        pickle.dump(spectrum_unit, spectra_write)
+                        pickle.dump(sed, spectra_write)
+                        pickle.dump(lum_unit, spectra_write)
+
+                        #print(numpy.asarray(spectrum).shape)
+                        #print(numpy.asarray(sed).shape)
+                        """
+                                    if ((i == 2) and (j == 20)):
+
+                                            # Computation of the Pion Decay
+                                        model = TableModel(E * units.GeV, Ntot[i, j, :] * 1/units.GeV, amplitude = 1)
+                                        PD = PionDecay(model, nh = ngas[i,j] * 1/units.cm**3, nuclear_enhancement = True)
+
+                                        spectrum_energy = numpy.logspace(numpy.log10(Emin), numpy.log10(Emax), number_bin_E) * units.GeV
+                                        sed_PD = PD.sed(spectrum_energy, distance = 0 * units.kpc)
+                                        Lum = numpy.asarray(sed_PD)
+                                        unit_luminosity = units.erg*1/units.s*1/units.GeV
+
+                                            # Plot
+                                        plt.figure(figsize=(8,5))
+                                        plt.rc('font', family='sans')
+                                        plt.rc('mathtext', fontset='custom')
+                                        plt.loglog(spectrum_energy,sed_PD,lw=2,c=naima.plot.color_cycle[0])
+                                        plt.title('Production of photons by Pion Decay')
+                                        plt.xlabel('Photon energy [{0}]'.format(spectrum_energy.unit.to_string('latex_inline')))
+                                        plt.ylabel('$L_E$ [{0}]'.format(unit_luminosity.unit.to_string('latex_inline')))
+                                        #plt.ylabel('$E^2 dN/dE$ [{0}]'.format(sed_PD.unit.to_string('latex_inline')))
+                                        plt.tight_layout()
+                                        plt.show()
+
+                                            # Flux
+                                                # First zone
+                                        E1 = 100        # 100 GeV (GeV)
+                                        ind1 = numpy.where(E <= E1)[0]
+                                        Flux1 = integration_log(E[ind1], Lum[ind1])
+                                        print('Photon flux for the first zone (100 MeV to 100 GeV): %.5e'%Flux1)
+
+                                                # Second zone
+                                        ind2 = numpy.where(E > E1)[0]
+                                        Flux2 = integration_log(E[ind2], Lum[ind2])
+                                        print('Photon flux for the first zone (100 GeV to 100 TeV): %.5e'%Flux2)
+                        """

@@ -182,17 +182,14 @@ with open('gas', 'wb') as gas_write:
                         ngas.append(n_gas)
 
                     Ntot = numpy.asarray(Ntot)
-                    print(Ntot.shape)
                     my_data_write = pickle.Pickler(data_write)
                     my_data_write.dump(Ntot)
 
                     distance = numpy.asarray(distance)
-                    print(distance.shape)
                     my_distance_write = pickle.Pickler(distance_write)
                     my_distance_write.dump(distance)
 
                 ngas = numpy.asarray(ngas)
-                print(ngas.shape)
                 my_gas_write = pickle.Pickler(gas_write)
                 my_gas_write.dump(ngas)
 
@@ -202,7 +199,6 @@ with open('gas', 'wb') as gas_write:
 ind = 1        # chosen time (yr)
         # Initialization
 n = len(r)      # length of r
-print(n)
 m = len(E)      # length of E
 y = numpy.zeros((n, m))
 #label_name = []

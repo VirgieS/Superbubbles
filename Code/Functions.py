@@ -41,23 +41,21 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
             if len(symbol) > 1:
                 symbol = symbol[i]
             if label_name == 'none':
-                plt.plot(x, y_plot, symbol)
+                plt.loglog(x, y_plot, symbol)
             else:
-                plt.plot(x, y_plot, symbol, label = label_name[i])
+                plt.loglog(x, y_plot, symbol, label = label_name[i])
                 plt.legend(loc = 'best')
 
     elif label_name == 'none':
-        plt.plot(x, y, symbol)
+        plt.loglog(x, y, symbol)
 
     else:
-        plt.plot(x, y, symbol, label = label_name)
+        plt.loglog(x, y, symbol, label = label_name)
         plt.legend(loc = 'best')
 
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.xscale('log')
-    plt.yscale('log')
     #plt.show()
     return
 
@@ -392,3 +390,52 @@ def profile_gas_density(at, alphat, betat, gammat, deltat, an, alphan, betan, ga
         n_tot[ind2] = ns
 
     return n_tot
+
+def integration_log(x, y):
+
+    """
+    Return the integrale of a function in log-log scale
+
+    Parameters :
+        x           : abscisse of the function
+        y           : function that we integrate along x : y = f(x)
+    """
+
+    #Looking for a and b for y = a*x^b
+    def calculate_ab(xi, xf, yi, yf):
+        logxi = numpy.log(xi)
+        logxf = numpy.log(xf)
+        logyi = numpy.log(yi)
+        logyf = numpy.log(yf)
+        b = (logyf - logyi)/(logxf - logxi)
+        loga = logyi - b*logxi
+        a = numpy.exp(loga)
+        a = numpy.nan_to_num(a)
+        return a, b
+
+    #Calculate deltaS from deltaS = int from xi to xf a*x^b
+    def delta_S(xi, xf, yi, yf):
+        [a, b] = calculate_ab(xi, xf, yi, yf)
+        return a/(b+1)*(xf**(b+1) - xi**(b+1))
+
+    integral = 0
+
+    # Because the function integral_log works only if there is more than two elements not zero
+    idx=(y > 0.0)
+    #idy=(y < 0.0) # only used if the function has negative value
+    idt = idx #+ idy
+    if sum(idt) > 2:
+
+        x = x[idt]
+        y = y[idt]
+
+        #Calculate total integral from init to final a*x^b
+        deltaS = 0
+
+        for i in range (1, len(x)):
+            deltaS = delta_S(x[i-1], x[i], y[i-1], y[i])
+            integral = integral + deltaS
+
+            integral = numpy.nan_to_num(integral)
+
+    return integral
