@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy
 import scipy.integrate as integrate
 from scipy.optimize import curve_fit
-from scipy.special import erfc
+from scipy.special import erfc, erf
 from Functions import *
 import os
 import pickle
@@ -79,7 +79,7 @@ with open('gas', 'wb') as gas_write:
                             # time vector (yr)
                     tmin = t0       # nothing happens before the first SN explosion (yr)
                     tmax = lifetime
-                    number_bin_t = 40
+                    number_bin_t = 30
                     t = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)
 
                     my_time_write = pickle.Pickler(time_write)
@@ -104,18 +104,15 @@ with open('gas', 'wb') as gas_write:
                         Msb, Mswept = masses(an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu)   # swept-up and inner masses (solar masses)
                         hs, ns = density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb)            # thickness and density of the shell (pc)
                         rmin = 0.01                 # minimum radius (pc)
-                        rmax = Rsb                  # maximum radius (pc)
-                        number_bin_r = 60           # number of bin for r from 0 to Rsb
+                        rmax = Rsb-hs               # maximum radius (pc)
+                        number_bin_r = 20          # number of bin for r from 0 to Rsb-hs
                         r = numpy.logspace(numpy.log(rmin), numpy.log10(rmax), number_bin_r)    # position in pc
 
                         distance.append(r)
 
                             # Computation of the density of gas in the SB (cm^-3)
-                        n_gas = ns * numpy.ones_like(r)
-                        ind = numpy.where(r < Rsb-hs)[0]
-                        rsb = r[ind]
-                        nsb = profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, rsb, Rsb)[1]
-                        n_gas[ind] = nsb
+                        nsb = profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, r, Rsb)[1]
+                        n_gas = nsb
                         n_gas = n_gas.tolist()
                         """
                         if j == 5:
@@ -129,26 +126,28 @@ with open('gas', 'wb') as gas_write:
                         #Nverif = numpy.zeros_like(r)  # density of particles at a chosen energy (cm^-3 GeV^-1)
                         #energy = len(E)-1                # index of the chosen energy
 
-                        Ne_in = diffusion_spherical(t[j], r[0], t0, N_E, D)
                         r_in = r[0]
+                        r_out = r[1]
+                        Ne_in = diffusion_spherical(t[j], r_in, t0, N_E, D)
+                        Ne_out = diffusion_spherical(t[j], r_out, t0, N_E, D)
+                        N_part = shell_particles(Ne_in, r_in, Ne_out, r_out)
+                        Nr.append(N_part)
 
-                        for i in range (1,len(r)):
+                        for i in range (2, number_bin_r):
 
-                                # Computation of the density of particles (cm^-3 GeV^-1)
-                            Ne_out = diffusion_spherical(t[j], r[i], t0, N_E, D)         # density of particles at the outer radius (cm^-3 GeV^-1)
-
-                            #Nverif[i] = Ne_in[energy]
-
-                                # Computation of the particles distribution (GeV^-1): array of dimension len(E)
+                            r_in = r_out
                             r_out = r[i]
+                            Ne_in = diffusion_spherical(t[j], r_in, t0, N_E, D)
+                            Ne_out = diffusion_spherical(t[j], r_out, t0, N_E, D)
                             N_part = shell_particles(Ne_in, r_in, Ne_out, r_out)
-
-                                # recording
                             Nr.append(N_part)
 
-                                # Change
-                            Ne_in = Ne_out
-                            r_in = r_out
+                            """
+                            if i == 2 and j == 10 :
+                                Ne = shell_particles2(0, numpy.inf, N_E, D, t[j])
+                                log_plot(figure_number, 2, E, [N_E, Ne], ['Injected', 'Computed'], 'Comparaison' , 'E (GeV)', u'N(E) 'r'($GeV^{-1}$)', '-')
+                                figure_number +=1
+                            """
 
                         #Nverif[len(Nverif)-1] = Ne_out[energy]
 
@@ -168,13 +167,28 @@ with open('gas', 'wb') as gas_write:
                         #    print('The simulated standard deviation of the CR at dt = %.2e and E = %.2e GeV:' %(delta_t, E[len(E)-1]))
                         #    print(sqrt(6 * Dopt * yr2s)/pc2cm)
 
-                            # Second zone: outside the SB
-                                # For the desnity of gas (cm^-3): n(r) = n0
+                            # Second zone: inside the supershell
+                                # For the density of gas: n(r) = ns
+                        n_gas.append(ns)
+
+                                # For the particle distribution (GeV^-1): N_part = 4 * pi * int_{Rsb-hs}^Rsb Ne
+                        rmin = Rsb-hs       # in pc
+                        rmax = Rsb          # in pc
+                        #a = (rmin*pc2cm)/(numpy.sqrt(4 * D * t[j]*yr2s))
+                        b = (rmax*pc2cm)/(numpy.sqrt(4 * D * t[j]*yr2s))
+                        #N_part = N_E/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * (erf(b) - erf(a)) + 2 * (numpy.exp(-b**2) * b - numpy.exp(-a**2) * a))
+                        N_part = shell_particles2(rmin, rmax, N_E, D, t[j])
+                        #print(N_part)
+                        Nr.append(N_part)
+
+                            # Third zone: outside the SB
+                                # For the density of gas (cm^-3): n(r) = n0
                         n_gas.append(n0)
 
                                 # For the particle distribution (GeV^-1): N_part = 4 * pi * int_Rsb^inf Ne r^2 dr
-                        x = (Rsb*pc2cm)/(numpy.sqrt(4 * D * t[j]*yr2s))
-                        N_part = N_E/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * erfc(x) + 2 * numpy.exp(-x**2) * x)
+                        #x = (Rsb*pc2cm)/(numpy.sqrt(4 * D * t[j]*yr2s))
+                        #N_part = N_E/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * erfc(b) + 2 * numpy.exp(-b**2) * b)
+                        N_part = shell_particles2(rmax, numpy.inf, N_E, D, t[j])
                         Nr.append(N_part)
 
                             # recording

@@ -8,6 +8,7 @@ Here are all functions needed for the superbubble model
 import matplotlib.pyplot as plt
 import numpy
 import scipy.integrate as integrate
+from scipy.special import erf, erfc
 
 ##-----------------------------------------##
 # Physical constants and Conversion factors #
@@ -37,7 +38,7 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
     if number_of_plot > 1:
 
         for i in range (number_of_plot):
-            y_plot = y[i,:]
+            y_plot = y[i]
             if len(symbol) > 1:
                 symbol = symbol[i]
             if label_name == 'none':
@@ -335,6 +336,28 @@ def shell_particles(Ne_in, r_in, Ne_out, r_out):
     dr = r_out - r_in       # dr in cm
 
     return 4 * numpy.pi * (Ne_out * r_out**2 + Ne_in * r_in**2) * dr/2.0
+
+def shell_particles2(r_in, r_out, NE, D, t):
+    """
+    Function to compute the number of particles in a shell of inner radius r_in and outer radius r_out
+    Inputs:
+        r_in        :       inner radius of the shell (pc)
+        r_out       :       outer radisu of the shell (pc)
+        NE          :       initial particles distribution (GeV^-1)
+        D           :       diffusion coefficient (cm^2 s^-1)
+        t           :       time (yr)
+    """
+
+    r_out = r_out * pc2cm   # in cm
+    r_in = r_in * pc2cm     # in cm
+    t = t * yr2s            # in s
+
+    a = r_in/(numpy.sqrt(4 * D * t))
+    b = r_out/(numpy.sqrt(4 * D * t))
+
+    N = NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * (erf(b) - erf(a)) + 2 * (numpy.exp(-a**2) * a - numpy.exp(-b**2) * b))
+
+    return N
 
 def gauss(x, A, Dt):
     """

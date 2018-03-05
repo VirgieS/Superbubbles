@@ -28,7 +28,7 @@ Emin = 100 * MeV2GeV            # 100 MeV = 0.1 GeV
 Emax = 100 * TeV2GeV            # 100 TeV = 100 000 GeV
 number_bin_E = 50
 
-pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Gamma_emission/'
+pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Gamma_emission3/'
 
 with open('spectra', 'rb') as spectra_read:
 
@@ -50,13 +50,13 @@ with open('spectra', 'rb') as spectra_read:
         fig = plt.figure(figsize=(8,5))
         plt.rc('font', family='sans')
         plt.rc('mathtext', fontset='custom')
-        plt.loglog(spectrum[i,0], lum_gamma[i,0], lw=2, c=naima.plot.color_cycle[0])
+        plt.loglog(spectrum[i,20], lum_gamma[i,20], lw=2, c=naima.plot.color_cycle[0])
         plt.title('Production of photons by Pion Decay')
         plt.xlabel('Photon energy [{0}]'.format(spectrum.unit.to_string('latex_inline')))
         #plt.ylabel('$L_E$ [{0}]'.format(spectrum_unit.unit.to_string('latex_inline')))
         plt.ylabel('$L_E$ [{0}]'.format(lum_gamma.unit.to_string('latex_inline')))
         plt.tight_layout()
-        fig.savefig(pathfigure+'T%.2f.eps'%i)
+        fig.savefig(pathfigure+'T%d.eps'%i)
         figure_number += 1
 
     plt.show()
