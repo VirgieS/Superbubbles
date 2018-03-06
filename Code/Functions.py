@@ -39,12 +39,15 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
 
         for i in range (number_of_plot):
             y_plot = y[i]
+
             if len(symbol) > 1:
-                symbol = symbol[i]
+                sym = symbol[i]
+
             if label_name == 'none':
                 plt.loglog(x, y_plot, symbol)
+
             else:
-                plt.loglog(x, y_plot, symbol, label = label_name[i])
+                plt.loglog(x, y_plot, sym, label = label_name[i])
                 plt.legend(loc = 'best')
 
     elif label_name == 'none':
@@ -329,15 +332,7 @@ def diffusion_spherical(t, r, t0, NE, D):
             N = NE/((4*numpy.pi*D*(delta_t))**(3/2.0))*numpy.exp(-(r*pc2cm)**2/(4*D*(delta_t)))
     return N
 
-def shell_particles(Ne_in, r_in, Ne_out, r_out):
-
-    r_out = r_out * pc2cm   # in cm
-    r_in = r_in * pc2cm     # in cm
-    dr = r_out - r_in       # dr in cm
-
-    return 4 * numpy.pi * (Ne_out * r_out**2 + Ne_in * r_in**2) * dr/2.0
-
-def shell_particles2(r_in, r_out, NE, D, t):
+def shell_particles(r_in, r_out, NE, D, t):
     """
     Function to compute the number of particles in a shell of inner radius r_in and outer radius r_out
     Inputs:
@@ -355,9 +350,23 @@ def shell_particles2(r_in, r_out, NE, D, t):
     a = r_in/(numpy.sqrt(4 * D * t))
     b = r_out/(numpy.sqrt(4 * D * t))
 
-    N = NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * (erf(b) - erf(a)) + 2 * (numpy.exp(-a**2) * a - numpy.exp(-b**2) * b))
+    #N = NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * (erf(b) - erf(a)) + 2 * numpy.exp(-a**2) * a - 2 * numpy.exp(-b**2) * b)
 
-    return N
+    return NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * (erf(b) - erf(a)) + 2 * numpy.exp(-a**2) * a - 2 * numpy.exp(-b**2) * b)
+
+def inf_particles(Rsb, NE, D, t):
+    """
+    Function to compute the number of particles outside the superbubble.
+    Inputs:
+        Rsb         :       outer radius of the SB (pc)
+        NE          :       initial particles distribution (GeV^-1)
+        D           :       diffusion coefficient (cm^2 s^-1)
+        t           :       time (yr)
+    """
+
+    a = (Rsb*pc2cm)/(numpy.sqrt(4 * D * t * yr2s))
+
+    return NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * erfc(a) + 2 * numpy.exp(-a**2) * a)
 
 def gauss(x, A, Dt):
     """

@@ -98,15 +98,15 @@ with open('gas', 'wb') as gas_write:
                         t6 = t[j] * yr26yr      # 10^6 yr
                         t7 = t6 * s6yr27yr      # 10^7 yr
 
-                            # First zone: in the SB
+                            # First zone: in the cavity of the SB
                                 # Computation of the distance array (pc)
                         Rsb, Vsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)           # radius and velocity of the SB
                         Msb, Mswept = masses(an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu)   # swept-up and inner masses (solar masses)
                         hs, ns = density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb)            # thickness and density of the shell (pc)
                         rmin = 0.01                 # minimum radius (pc)
                         rmax = Rsb-hs               # maximum radius (pc)
-                        number_bin_r = 20          # number of bin for r from 0 to Rsb-hs
-                        r = numpy.logspace(numpy.log(rmin), numpy.log10(rmax), number_bin_r)    # position in pc
+                        number_bin_r = 15           # number of bin for r from 0 to Rsb-hs
+                        r = numpy.logspace(numpy.log10(rmin), numpy.log10(rmax), number_bin_r)    # position (pc)
 
                         distance.append(r)
 
@@ -123,33 +123,24 @@ with open('gas', 'wb') as gas_write:
                         Nr = []         # (GeV^-1) : matrix of dimension (len(r)-1) x len(E))
 
                             # For the verification of the density of particles (cm^-3 GeV^-1)
-                        #Nverif = numpy.zeros_like(r)  # density of particles at a chosen energy (cm^-3 GeV^-1)
-                        #energy = len(E)-1                # index of the chosen energy
+                        #Nverif = numpy.zeros_like(r)       # density of particles at a chosen energy (cm^-3 GeV^-1)
+                        #energy = len(E)-1                  # index of the chosen energy
 
-                        r_in = r[0]
-                        r_out = r[1]
-                        Ne_in = diffusion_spherical(t[j], r_in, t0, N_E, D)
-                        Ne_out = diffusion_spherical(t[j], r_out, t0, N_E, D)
-                        N_part = shell_particles(Ne_in, r_in, Ne_out, r_out)
+                        r_in = 0
+                        r_out = r[0]
+                        N_part = shell_particles(r_in, r_out, N_E, D, t[j])
                         Nr.append(N_part)
 
-                        for i in range (2, number_bin_r):
+                        for i in range (1, number_bin_r):
 
                             r_in = r_out
                             r_out = r[i]
-                            Ne_in = diffusion_spherical(t[j], r_in, t0, N_E, D)
-                            Ne_out = diffusion_spherical(t[j], r_out, t0, N_E, D)
-                            N_part = shell_particles(Ne_in, r_in, Ne_out, r_out)
+                            N_part = shell_particles(r_in, r_out, N_E, D, t[j])
                             Nr.append(N_part)
 
-                            """
-                            if i == 2 and j == 10 :
-                                Ne = shell_particles2(0, numpy.inf, N_E, D, t[j])
-                                log_plot(figure_number, 2, E, [N_E, Ne], ['Injected', 'Computed'], 'Comparaison' , 'E (GeV)', u'N(E) 'r'($GeV^{-1}$)', '-')
-                                figure_number +=1
-                            """
+                        #Ne_out = diffusion_spherical(t[j], r, t0, NE[energy], D[energy])
 
-                        #Nverif[len(Nverif)-1] = Ne_out[energy]
+                        #Nverif[len(Nverif)-1] = Ne_out
 
                         #if (t[j] - t0 == 10*dt):    # chosen of time interval after the SN explosion (yr)
                         #    popt, pcov = curve_fit(gauss, r, Nverif)
@@ -172,12 +163,12 @@ with open('gas', 'wb') as gas_write:
                         n_gas.append(ns)
 
                                 # For the particle distribution (GeV^-1): N_part = 4 * pi * int_{Rsb-hs}^Rsb Ne
-                        rmin = Rsb-hs       # in pc
-                        rmax = Rsb          # in pc
+                        r_in = Rsb-hs       # in pc
+                        r_out = Rsb          # in pc
                         #a = (rmin*pc2cm)/(numpy.sqrt(4 * D * t[j]*yr2s))
-                        b = (rmax*pc2cm)/(numpy.sqrt(4 * D * t[j]*yr2s))
+                        #b = (rmax*pc2cm)/(numpy.sqrt(4 * D * t[j]*yr2s))
                         #N_part = N_E/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * (erf(b) - erf(a)) + 2 * (numpy.exp(-b**2) * b - numpy.exp(-a**2) * a))
-                        N_part = shell_particles2(rmin, rmax, N_E, D, t[j])
+                        N_part = shell_particles(r_in, r_out, N_E, D, t[j])
                         #print(N_part)
                         Nr.append(N_part)
 
@@ -188,7 +179,7 @@ with open('gas', 'wb') as gas_write:
                                 # For the particle distribution (GeV^-1): N_part = 4 * pi * int_Rsb^inf Ne r^2 dr
                         #x = (Rsb*pc2cm)/(numpy.sqrt(4 * D * t[j]*yr2s))
                         #N_part = N_E/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * erfc(b) + 2 * numpy.exp(-b**2) * b)
-                        N_part = shell_particles2(rmax, numpy.inf, N_E, D, t[j])
+                        N_part = inf_particles(Rsb, N_E, D, t[j])
                         Nr.append(N_part)
 
                             # recording
@@ -212,7 +203,7 @@ with open('gas', 'wb') as gas_write:
         # Choosen one time
 ind = 1        # chosen time (yr)
         # Initialization
-n = len(r)      # length of r
+n = len(Nr)      # length of r
 m = len(E)      # length of E
 y = numpy.zeros((n, m))
 #label_name = []
@@ -251,10 +242,14 @@ for i in range (len(t)):            # index for time
 
         for j in range (n):         # index for distance
             for k in range (m):     # index for energy
+                #if j == 16:
+                    #print(Ntot[i, j, k])
                 z[k, j] = Ntot[i, j, k]
 
         Nremain = numpy.sum(z)
         Nratio.append(Nremain/Ninit)
+#print(z)
+#print(Nremain)
 plot(figure_number, 1, deltat, Nratio, 'none', 'Ratio of remained particles in the considered volume', 'Time after the explosion (yr)', r'$N_{tot, t}/N_{tot, 0}$', '-')
 
 plt.show()
