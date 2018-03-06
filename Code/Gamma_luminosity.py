@@ -24,10 +24,6 @@ os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files')
 # Computation #
 ##-----------##
 
-Emin = 100 * MeV2GeV            # 100 MeV = 0.1 GeV
-Emax = 100 * TeV2GeV            # 100 TeV = 100 000 GeV
-number_bin_E = 20
-
 with open('spectra', 'wb') as spectra_write:
     with open('gas', 'rb') as gas_load:
         with open('energy', 'rb') as energy_load:
@@ -53,13 +49,19 @@ with open('spectra', 'wb') as spectra_write:
                         my_time_load = pickle.Unpickler(time_load)
                         t = my_time_load.load()
 
+                            # Energy spectrum (GeV)
+                        Emin = 100 * MeV2GeV            # 100 MeV = 0.1 GeV
+                        Emax = 100 * TeV2GeV            # 100 TeV = 100 000 GeV
+                        number_bin_E = 20
+                        spectrum_energy = numpy.logspace(numpy.log10(Emin), numpy.log10(Emax), number_bin_E) * units.GeV
+
                         n = len(t)
 
                         spectrum = []
                         sed = []
 
                         for i in range (n):
-                            m = len(r[i])
+                            m = len(r[i])+2
                             spectrum_r = []
                             sed_r = []
 
@@ -80,13 +82,13 @@ with open('spectra', 'wb') as spectra_write:
                                 #    sed_r.append(sed_PD)
 
                                 model = TableModel(E * units.GeV, Ntot[i, j, :] * 1/units.GeV, amplitude = 1)
-                                PD = PionDecay(model, nh = ngas[i,j+1] * 1/units.cm**3, nuclear_enhancement = True)
+                                PD = PionDecay(model, nh = ngas[i,j] * 1/units.cm**3, nuclear_enhancement = True)
 
-                                spectrum_energy = numpy.logspace(numpy.log10(Emin), numpy.log10(Emax), number_bin_E) * units.GeV
+                                #spectrum_energy = numpy.logspace(numpy.log10(Emin), numpy.log10(Emax), number_bin_E) * units.GeV
 
                                 sed_PD = PD.sed(spectrum_energy, distance = 0 * units.kpc)
 
-                                spectrum_r.append(spectrum_energy)
+                                #spectrum_r.append(spectrum_energy)
                                 sed_r.append(sed_PD)
 
                                 """
@@ -126,10 +128,10 @@ with open('spectra', 'wb') as spectra_write:
 
                                     plt.show()
                             """
-                            spectrum.append(spectrum_r)
+                            #spectrum.append(spectrum_r)
                             sed.append(sed_r)
 
-                        spectrum = numpy.asarray(spectrum)
+                        spectrum = numpy.asarray(spectrum_energy)
                         spectrum_unit = spectrum_energy.unit
                         sed = numpy.asarray(sed)
                         sed_unit = sed_PD.unit

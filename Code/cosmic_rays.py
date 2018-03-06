@@ -206,11 +206,9 @@ ind = 1        # chosen time (yr)
 n = len(Nr)      # length of r
 m = len(E)      # length of E
 y = numpy.zeros((n, m))
-#label_name = []
 
     # Computation
 for i in range (n):
-    #label_name.append(r'$r_{in}$ = %.2f pc'%r[i])
     for j in range (m):
         y[i, j] = Ntot[ind, i, j]
 sum = numpy.zeros(m)
