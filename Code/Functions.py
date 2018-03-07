@@ -33,7 +33,8 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
         xlabel:             label of the x-axis
         ylabel:             label of the y-axis
     """
-    plt.figure(figure_number)
+    plt.figure(figure_number, figsize=(8,5))
+    #plt.figure(figsize=(8,5))
 
     if number_of_plot > 1:
 
@@ -60,7 +61,7 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    #plt.show()
+    #fig.savefig(pathfigure+name_figure)
     return
 
 def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol):
@@ -76,16 +77,21 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
         xlabel:             label of the x-axis
         ylabel:             label of the y-axis
     """
-    plt.figure(figure_number)
+    plt.figure(figure_number, figsize = (8,5))
 
     if number_of_plot > 1:
 
         for i in range (number_of_plot):
-            y_plot = y[i,:]
+            y_plot = y[i]
+
+            if len(symbol) > 1:
+                sym = symbol[i]
+
             if label_name == 'none':
-                plt.plot(x, y_plot, symbol[i])
+                plt.plot(x, y_plot, symbol)
+
             else:
-                plt.plot(x, y_plot, symbol[i], label = label_name[i])
+                plt.plot(x, y_plot, sym, label = label_name[i])
                 plt.legend(loc = 'best')
 
     elif label_name == 'none':
@@ -98,7 +104,7 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-
+    #fig.savefig(pathfigure+name_figure)
     return
 
 def radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6):
@@ -271,7 +277,7 @@ def profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, b
 
     return Tsb, nsb
 
-def power_law_distribution(Emin, Emax, E, alpha, eta, Esn, p0):
+def power_law_distribution(Emin, Emax, E, alpha, eta, Esng, p0):
     """
     Function to compute the power-law distribution of the CR particles
     Inputs:
@@ -280,13 +286,13 @@ def power_law_distribution(Emin, Emax, E, alpha, eta, Esn, p0):
         E       :       energy array (GeV)
         alpha   :       exponent of the power-law distribution
         eta     :       efficiency of the cosmic rays acceleration
-        Esn     :       energy released by the SN explosion (GeV)
+        Esng    :       energy released by the SN explosion (GeV)
         p0      :       normalization constant (GeV/c)
     """
     mpgev = mp*MeV2GeV  # mass of the proton in GeV
 
     integral_E = integrate.quad(lambda E: (E**2 + 2*mpgev*E)**(-(1 + alpha)/2.0) * (E + mpgev) * E, Emin, Emax)[0]
-    N0 = eta * Esn * cl**(1-alpha) * p0**(-alpha) * 1.0/integral_E         # normalization constant (GeV^-1 c)
+    N0 = eta * Esng * cl**(1-alpha) * p0**(-alpha) * 1.0/integral_E         # normalization constant (GeV^-1 c)
 
     return N0/cl**(1-alpha) * (E**2 + 2*mpgev*E)**(-(1+alpha)/2.0) * (E + mpgev)/p0**(-alpha)    # GeV^-1
 
@@ -319,17 +325,17 @@ def diffusion_spherical(t, r, t0, NE, D):
     #r = numpy.linspace(rmin, rmax, number_bin_r)    # position in pc
 
     delta_t = t - t0            # time after the SN explosion (yr)
-    delta_t = delta_t * yr2s    # in s
+    #delta_t = delta_t * yr2s    # in s
 
         # density of the particles in time and position (GeV^-1)
-    N = numpy.zeros(len(NE))
+    N = numpy.zeros(len(r))
 
     if delta_t >= 0:            # if there is already an explosion
-        if t == t0:        # at the SN explosion
-            print(explosion)
-            N = NE
+        if delta_t < 1e-9:        # at the SN explosion
+            print('explosion')
+            N[0] = NE
         else:
-            N = NE/((4*numpy.pi*D*(delta_t))**(3/2.0))*numpy.exp(-(r*pc2cm)**2/(4*D*(delta_t)))
+            N = NE/((4*numpy.pi*D*(delta_t*yr2s))**(3/2.0))*numpy.exp(-(r*pc2cm)**2/(4*D*(delta_t*yr2s)))
     return N
 
 def shell_particles(r_in, r_out, NE, D, t):
@@ -377,7 +383,7 @@ def gauss(x, A, Dt):
         A       :   normalization of the gaussian (pc)
         Dt      :   factor related to the standard deviation (pc^2 s^-1 yr)
     """
-    return A/((4.*numpy.pi*Dt * yr2s)**(3/2.0))*numpy.exp(-(x)**2/(4.*Dt * yr2s))
+    return A/((4.*numpy.pi*Dt)**(3/2.0))*numpy.exp(-(x)**2/(4.*Dt))
 
 def profile_gas_density(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu, Vsb, C02, Mswept, Msb, r):
     """

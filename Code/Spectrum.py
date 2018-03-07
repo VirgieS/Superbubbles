@@ -9,6 +9,7 @@ import pickle
 import naima
 import astropy.units as units
 from naima.models import PionDecay, TableModel
+from scipy.integrate import trapz
 
 # Physical constants and conversion factors
 from Physical_constants import *
@@ -42,16 +43,21 @@ with open('time', 'rb') as time_load:
             spectrum = spectrum_energy*spectrum_unit
             sed_PD = pickle.load(spectra_read)
             sed_PD_unit = pickle.load(spectra_read)
-            lum_gamma = sed_PD * sed_PD_unit
+            #sed_PD = sed_PD * sed_PD_unit
+            lum_gamma = sed_PD/spectrum_energy
+            #print(lum_gamma.unit)
+            #lum_gamma = numpy.asarray(lum_gamma)
+            #lum_gamma = lum_gamma * sed_PD_unit * 1/spectrum_unit
+            sed_PD = sed_PD * sed_PD_unit
 
             figure_number = 1
 
             n = len(t)
-            E = 100        # The speration of the two spectral zones (GeV)
+            Esep = 100          # The separation of the two spectral zones (GeV)
 
                 # Computation of the gamma luminosity for two ranges of energy (from 0.1 GeV to 100 GeV and from 100 GeV to 100 000 GeV)
-            ind1 = numpy.where(spectrum_energy < E)[0]         # for the first range
-            ind2 = numpy.where(spectrum_energy >= E)[0]        # for the second range
+            ind1 = numpy.where(spectrum_energy < Esep)[0]         # for the first range
+            ind2 = numpy.where(spectrum_energy >= Esep)[0]        # for the second range
 
                     # For recording
             Fluxsbt1 = []
@@ -69,16 +75,15 @@ with open('time', 'rb') as time_load:
                 Fluxsb1 = []
                 Fluxsb2 = []
                 m = len(rsb[i])
-
                 """
                 fig = plt.figure(figsize=(8,5))
                 plt.rc('font', family='sans')
                 plt.rc('mathtext', fontset='custom')
-                plt.loglog(spectrum, lum_gamma[i,2], lw=2, c=naima.plot.color_cycle[0])
+                plt.loglog(spectrum, sed_PD[i,2], lw=2, c=naima.plot.color_cycle[0])
                 plt.title('Production of photons by Pion Decay')
                 plt.xlabel('Photon energy [{0}]'.format(spectrum.unit.to_string('latex_inline')))
                 #plt.ylabel('$E L_E$ [{0}]'.format(spectrum_unit.unit.to_string('latex_inline')))
-                plt.ylabel('$L_E$ [{0}]'.format(lum_gamma.unit.to_string('latex_inline')))
+                plt.ylabel('$E dN/dE$ [{0}]'.format(sed_PD.unit.to_string('latex_inline')))
                 plt.tight_layout()
                 fig.savefig(pathfigure+'T%d.eps'%i)
                 figure_number += 1
@@ -86,11 +91,12 @@ with open('time', 'rb') as time_load:
 
                 for j in range (m):
 
-                    Flux1 = integration_log(spectrum_energy[ind1], sed_PD[i, j, ind1])
-                    print(Flux1)
+                    #Flux1 = integration_log(spectrum_energy[ind1], lum_gamma[i, j, ind1])
+                    Flux1= trapz(lum_gamma[i, j, ind1], spectrum_energy[ind1])
                     Fluxsb1.append(Flux1)
 
-                    Flux2 = integration_log(spectrum_energy[ind2], sed_PD[i, j, ind2])
+                    #Flux2 = integration_log(spectrum_energy[ind2], lum_gamma[i, j, ind2])
+                    Flux2 = trapz(lum_gamma[i, j, ind2], spectrum_energy[ind2])
                     Fluxsb2.append(Flux2)
 
                     # Sum of each contribution (erg s^-1)
@@ -102,15 +108,19 @@ with open('time', 'rb') as time_load:
                 Fluxsbt2.append(Lumsb2)
 
                     # Second zone: in the supershell (erg s^-1)
-                Fluxshell1 = integration_log(spectrum_energy[ind1], sed_PD[i, m, ind1])
-                Fluxshell2 = integration_log(spectrum_energy[ind2], sed_PD[i, m, ind2])
+                #Fluxshell1 = integration_log(spectrum_energy[ind1], lum_gamma[i, m, ind1])
+                Fluxshell1 = trapz(lum_gamma[i, m, ind1], spectrum_energy[ind1])
+                #Fluxshell2 = integration_log(spectrum_energy[ind2], lum_gamma[i, m, ind2])
+                Fluxshell2 = trapz(lum_gamma[i, m, ind2], spectrum_energy[ind2])
 
                 Fluxshellt1.append(Fluxshell1)
                 Fluxshellt2.append(Fluxshell2)
 
                     # Third zone: outside the SB (erg s^-1)
-                Fluxout1 = integration_log(spectrum_energy[ind1], sed_PD[i, m+1, ind1])
-                Fluxout2 = integration_log(spectrum_energy[ind2], sed_PD[i, m+1, ind2])
+                #Fluxout1 = integration_log(spectrum_energy[ind1], lum_gamma[i, m+1, ind1])
+                Fluxout1 = trapz(lum_gamma[i, m+1, ind1], spectrum_energy[ind1])
+                #Fluxout2 = integration_log(spectrum_energy[ind2], lum_gamma[i, m+1, ind2])
+                Fluxout2 = trapz(lum_gamma[i, m+1, ind2], spectrum_energy[ind2])
 
                 Fluxoutt1.append(Fluxout1)
                 Fluxoutt2.append(Fluxout2)
@@ -133,7 +143,9 @@ with open('time', 'rb') as time_load:
                 Fluxoutt2 = numpy.asarray(Fluxoutt2)
                 """
 
-            log_plot(figure_number, 4, t, [Fluxsbt2, Fluxshellt2, Fluxoutt2, Fluxtott2], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble', 'Time (yr)', r'$L_{\gamma}$ (0.1-100 GeV)', ['+', '+', '+', '-'])
+            log_plot(figure_number, 4, t, [Fluxsbt1, Fluxshellt1, Fluxoutt1, Fluxtott1], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble', 'Time (yr)', r'$L_{\gamma}$ (0.1-100 GeV)', ['+', '+', '+', '-'])
+            figure_number += 1
+            log_plot(figure_number, 4, t, [Fluxsbt2, Fluxshellt2, Fluxoutt2, Fluxtott2], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble', 'Time (yr)', r'$L_{\gamma}$ (100-100 000 GeV)', ['+', '+', '+', '-'])
             plt.show()
     """
     # Flux

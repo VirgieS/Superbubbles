@@ -34,20 +34,25 @@ with open('spectra', 'wb') as spectra_write:
                         #my_spectra_write = pickle.Pickler(spectra_read)
 
                             # Loading of data: ngas, energy, nCR, radius and time
-                        my_gas_load = pickle.Unpickler(gas_load)
-                        ngas = my_gas_load.load()
+                        #my_gas_load = pickle.Unpickler(gas_load)
+                        ngas = pickle.load(gas_load)
+                        ngas_unit = pickle.load(gas_load)
+                        ngas = ngas * ngas_unit
 
-                        my_energy_load = pickle.Unpickler(energy_load)
-                        E = my_energy_load.load()
+                        ECR = pickle.load(energy_load)
+                        ECR_unit = pickle.load(energy_load)
+                        ECR = ECR * ECR_unit
 
-                        my_data_load = pickle.Unpickler(data_load)
-                        Ntot = my_data_load.load()
+                        #my_data_load = pickle.Unpickler(data_load)
+                        Ntot = pickle.load(data_load)
+                        Ntot_unit = pickle.load(data_load)
+                        Ntot = Ntot * Ntot_unit
 
-                        my_distance_load = pickle.Unpickler(distance_load)
-                        r = my_distance_load.load()
+                        #my_distance_load = pickle.Unpickler(distance_load)
+                        r = pickle.load(distance_load)
 
-                        my_time_load = pickle.Unpickler(time_load)
-                        t = my_time_load.load()
+                        #my_time_load = pickle.Unpickler(time_load)
+                        t = pickle.load(time_load)
 
                             # Energy spectrum (GeV)
                         Emin = 100 * MeV2GeV            # 100 MeV = 0.1 GeV
@@ -81,8 +86,8 @@ with open('spectra', 'wb') as spectra_write:
                                     #print(numpy.asarray(spectrum_r).shape)
                                 #    sed_r.append(sed_PD)
 
-                                model = TableModel(E * units.GeV, Ntot[i, j, :] * 1/units.GeV, amplitude = 1)
-                                PD = PionDecay(model, nh = ngas[i,j] * 1/units.cm**3, nuclear_enhancement = True)
+                                model = TableModel(ECR, Ntot[i, j, :], amplitude = 1)
+                                PD = PionDecay(model, nh = ngas[i,j], nuclear_enhancement = True)
 
                                 #spectrum_energy = numpy.logspace(numpy.log10(Emin), numpy.log10(Emax), number_bin_E) * units.GeV
 
