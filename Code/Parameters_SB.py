@@ -55,3 +55,7 @@ epsilon = 1.2   # ratio ne/n
 
     # In the ISM
 TISM = 100                          # temperature of the ambient gas (K)
+
+    # Released energy by the acceleration of particles for one SN (erg)
+eta = 0.1           # efficiency of the cosmic rays acceleration
+Esn = 1e51          # total kinetic energy released from the SN explosion (erg)

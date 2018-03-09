@@ -33,8 +33,7 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
         xlabel:             label of the x-axis
         ylabel:             label of the y-axis
     """
-    plt.figure(figure_number, figsize=(8,5))
-    #plt.figure(figsize=(8,5))
+    plt.figure(figure_number, figsize=(10,7))
 
     if number_of_plot > 1:
 
@@ -61,7 +60,7 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    #fig.savefig(pathfigure+name_figure)
+
     return
 
 def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol):
@@ -77,7 +76,7 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
         xlabel:             label of the x-axis
         ylabel:             label of the y-axis
     """
-    plt.figure(figure_number, figsize = (8,5))
+    plt.figure(figure_number, figsize = (10,7))
 
     if number_of_plot > 1:
 
@@ -101,6 +100,7 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
         plt.plot(x, y, symbol, label = label_name)
         plt.legend(loc = 'best')
 
+    plt.tight_layout()
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
@@ -331,14 +331,14 @@ def diffusion_spherical(t, r, t0, NE, D):
     N = numpy.zeros(len(r))
 
     if delta_t >= 0:            # if there is already an explosion
-        if delta_t < 1e-9:        # at the SN explosion
+        if delta_t == 0:        # at the SN explosion
             print('explosion')
             N[0] = NE
         else:
             N = NE/((4*numpy.pi*D*(delta_t*yr2s))**(3/2.0))*numpy.exp(-(r*pc2cm)**2/(4*D*(delta_t*yr2s)))
     return N
 
-def shell_particles(r_in, r_out, NE, D, t):
+def shell_particles(r_in, r_out, NE, D, deltat):
     """
     Function to compute the number of particles in a shell of inner radius r_in and outer radius r_out
     Inputs:
@@ -346,31 +346,31 @@ def shell_particles(r_in, r_out, NE, D, t):
         r_out       :       outer radisu of the shell (pc)
         NE          :       initial particles distribution (GeV^-1)
         D           :       diffusion coefficient (cm^2 s^-1)
-        t           :       time (yr)
+        deltat      :       time after the SN explosion (yr)
     """
 
     r_out = r_out * pc2cm   # in cm
     r_in = r_in * pc2cm     # in cm
-    t = t * yr2s            # in s
+    deltat = deltat * yr2s            # in s
 
-    a = r_in/(numpy.sqrt(4 * D * t))
-    b = r_out/(numpy.sqrt(4 * D * t))
+    a = r_in/(numpy.sqrt(4 * D * deltat))
+    b = r_out/(numpy.sqrt(4 * D * deltat))
 
     #N = NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * (erf(b) - erf(a)) + 2 * numpy.exp(-a**2) * a - 2 * numpy.exp(-b**2) * b)
 
     return NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * (erf(b) - erf(a)) + 2 * numpy.exp(-a**2) * a - 2 * numpy.exp(-b**2) * b)
 
-def inf_particles(Rsb, NE, D, t):
+def inf_particles(Rsb, NE, D, deltat):
     """
     Function to compute the number of particles outside the superbubble.
     Inputs:
         Rsb         :       outer radius of the SB (pc)
         NE          :       initial particles distribution (GeV^-1)
         D           :       diffusion coefficient (cm^2 s^-1)
-        t           :       time (yr)
+        deltat      :       time after the SN explosion (yr)
     """
 
-    a = (Rsb*pc2cm)/(numpy.sqrt(4 * D * t * yr2s))
+    a = (Rsb*pc2cm)/(numpy.sqrt(4 * D * deltat * yr2s))
 
     return NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * erfc(a) + 2 * numpy.exp(-a**2) * a)
 

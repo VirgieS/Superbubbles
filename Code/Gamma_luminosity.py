@@ -3,12 +3,12 @@
 ##------------------------##
 import matplotlib.pyplot as plt
 import numpy
-from Functions import *
 import os
 import pickle
 import naima
 import astropy.units as units
 from naima.models import PionDecay, TableModel
+from Functions import *
 
 # Physical constants and conversion factors
 from Physical_constants import *
@@ -18,7 +18,7 @@ from Conversion_factors import *
 # Path for files #
 ##--------------##
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/n_SN/')
 
 ##-----------##
 # Computation #
@@ -31,10 +31,8 @@ with open('spectra', 'wb') as spectra_write:
                 with open('distance', 'rb') as distance_load:
                     with open('time', 'rb') as time_load:
 
-                        #my_spectra_write = pickle.Pickler(spectra_read)
-
                             # Loading of data: ngas, energy, nCR, radius and time
-                        #my_gas_load = pickle.Unpickler(gas_load)
+
                         ngas = pickle.load(gas_load)
                         ngas_unit = pickle.load(gas_load)
                         ngas = ngas * ngas_unit
@@ -43,15 +41,12 @@ with open('spectra', 'wb') as spectra_write:
                         ECR_unit = pickle.load(energy_load)
                         ECR = ECR * ECR_unit
 
-                        #my_data_load = pickle.Unpickler(data_load)
                         Ntot = pickle.load(data_load)
                         Ntot_unit = pickle.load(data_load)
                         Ntot = Ntot * Ntot_unit
 
-                        #my_distance_load = pickle.Unpickler(distance_load)
                         r = pickle.load(distance_load)
 
-                        #my_time_load = pickle.Unpickler(time_load)
                         t = pickle.load(time_load)
 
                             # Energy spectrum (GeV)
@@ -65,35 +60,16 @@ with open('spectra', 'wb') as spectra_write:
                         spectrum = []
                         sed = []
 
-                        for i in range (n):
+                        for i in range (n):         # for each time step
                             m = len(r[i])+2
                             spectrum_r = []
                             sed_r = []
 
-                            for j in range (m):
-
-                                #if numpy.all(Ntot[i, j, :] == 0): # Condition if there are relativistic particles
-                                #    continue
-
-                                #else:
-                                #    model = TableModel(E * units.GeV, Ntot[i, j, :] * 1/units.GeV, amplitude = 1)
-                                #    PD = PionDecay(model, nh = ngas[i,j+1] * 1/units.cm**3, nuclear_enhancement = True)
-
-                                #    spectrum_energy = numpy.logspace(numpy.log10(Emin), numpy.log10(Emax), number_bin_E) * units.GeV
-                                #    sed_PD = PD.sed(spectrum_energy, distance = 0 * units.kpc)
-
-                                #    spectrum_r.append(spectrum_energy)
-                                    #print(numpy.asarray(spectrum_r).shape)
-                                #    sed_r.append(sed_PD)
-
+                            for j in range (m):     # for each radius step
                                 model = TableModel(ECR, Ntot[i, j, :], amplitude = 1)
                                 PD = PionDecay(model, nh = ngas[i,j], nuclear_enhancement = True)
 
-                                #spectrum_energy = numpy.logspace(numpy.log10(Emin), numpy.log10(Emax), number_bin_E) * units.GeV
-
                                 sed_PD = PD.sed(spectrum_energy, distance = 0 * units.kpc)
-
-                                #spectrum_r.append(spectrum_energy)
                                 sed_r.append(sed_PD)
 
                                 """
@@ -133,18 +109,13 @@ with open('spectra', 'wb') as spectra_write:
 
                                     plt.show()
                             """
-                            #spectrum.append(spectrum_r)
                             sed.append(sed_r)
 
                         spectrum = numpy.asarray(spectrum_energy)
                         spectrum_unit = spectrum_energy.unit
                         sed = numpy.asarray(sed)
                         sed_unit = sed_PD.unit
-                        #lum_unit = units.erg*1/units.s*1/units.GeV
                         pickle.dump(spectrum, spectra_write)
                         pickle.dump(spectrum_unit, spectra_write)
                         pickle.dump(sed, spectra_write)
                         pickle.dump(sed_unit, spectra_write)
-
-                        #print(numpy.asarray(spectrum).shape)
-                        #print(numpy.asarray(sed).shape)
