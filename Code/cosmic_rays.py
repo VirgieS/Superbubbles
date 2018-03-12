@@ -88,6 +88,7 @@ with open('gas', 'wb') as gas_write:                                            
                             # SN explosion: time (yr)
                     t0 = [3e6, 4e6]      # in yr
                     nt0 = len(t0)
+                    print(nt0)
 
                     pickle.dump(t0, time_write)     # Recording the SN explosion time (yr)
 
@@ -107,39 +108,57 @@ with open('gas', 'wb') as gas_write:                                            
 
                         # Recording
                     Ntotsn = []               # particles distribution for each time, distance and energy: the matrix of dimension len(t0)xlen(t)x(len(r)+2)xlen(E)
-                    ngassn = []               # density of gas for each time and distance : matrix of dimension len(t0)xlen(t)x(len(r)+2)
-                    distancesn = []           # distance array for each time: array of dimension len(t0)xlen(t)x(len(r))
+                    ngastot = []               # density of gas for each time and distance : matrix of dimension len(t0)xlen(t)x(len(r)+2)
+                    distance = []           # distance array for each time: array of dimension len(t0)xlen(t)x(len(r))
 
                         # For verification
                     #Nverift = []
 
-                    for k in range (0,nt0):
+                    for i in range (nt):        # for each time step
                         Ntot = []               # particles distribution for each time, distance and energy: the matrix of dimension len(t)x(len(r)+1)xlen(E)
                         ngas = []               # density of gas for each time and distance : matrix of dimension len(t)x(len(r)+1)
-                        distance = []           # distance array for each time: array of dimension len(t)x(len(r)+1)
-                        print(k)
 
-                        for j in range (nt):
+                            # Initialization
+                        t6 = t[i] * yr26yr      # 10^6 yr
+                        t7 = t6 * s6yr27yr      # 10^7 yr
 
-                            if t[j] < t0[k]:
-                                #print('no explosion yet')
+                            # r array
+                        Rsb, Vsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)           # radius and velocity of the SB
+                        Msb, Mswept = masses(an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu)   # swept-up and inner masses (solar masses)
+                        hs, ns = density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb)            # thickness and density of the shell (pc)
+
+                        rmin = 0.01                 # minimum radius (pc)
+                        rmax = Rsb-hs               # maximum radius (pc)
+                        number_bin_r = 15           # number of bin for r from 0 to Rsb-hs
+                        r = numpy.logspace(numpy.log10(rmin), numpy.log10(rmax), number_bin_r)    # position (pc)
+
+                        distance.append(r)
+
+                            # Density of gas (cm^-3)
+                                # First zone: in the cavity
+
+                        nsb = profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, r, Rsb)[1]
+                        n_gas = nsb
+                        n_gas = n_gas.tolist()
+
+                                # Second zone: in the supershell
+                        n_gas.append(ns)
+
+                                # Third zone: outside the superbubble
+                        n_gas.append(n0)
+
+                                # Recording for each time step
+                        ngastot.append(n_gas)
+
+                        for j in range (nt0):       # for each SN explosion
+
+                            if t[i] < t0[j]:
                                 continue
                             else:
 
-                                t6 = t[j] * yr26yr      # 10^6 yr
-                                t7 = t6 * s6yr27yr      # 10^7 yr
-                                deltat = t[j]-t0[k]
+                                deltaT = t[i]-t0[j]
 
-                                    ## --------------------------------- ##
-                                    # First zone: in the cavity of the SB #
-                                    ## --------------------------------- ##
-
-                                        # Computation of the distance array (pc)
-                                Rsb, Vsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)           # radius and velocity of the SB
-                                Msb, Mswept = masses(an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu)   # swept-up and inner masses (solar masses)
-                                hs, ns = density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb)            # thickness and density of the shell (pc)
-
-                                if deltat < 1e-9:
+                                if deltaT < 1e-9:
                                     print('SN explosion')
 
                                     print('Radius of the Superbubble: %.2f pc'%Rsb)
@@ -149,17 +168,12 @@ with open('gas', 'wb') as gas_write:                                            
                                     print('Diffusion coefficient at %.2e GeV: %.2e cm^2 s^{-1}' %(E[number_bin_E - 1], D[number_bin_E - 1]))
                                     tdiff = (Rsb*pc2cm)**2/(6*D[number_bin_E - 1]) * 1/yr2s
                                     print('Diffusion time: %.2f yr' %tdiff)
-                                rmin = 0.01                 # minimum radius (pc)
-                                rmax = Rsb-hs               # maximum radius (pc)
-                                number_bin_r = 15           # number of bin for r from 0 to Rsb-hs
-                                r = numpy.logspace(numpy.log10(rmin), numpy.log10(rmax), number_bin_r)    # position (pc)
+                                    deltaT = 0
 
-                                distance.append(r)
+                                    ## --------------------------------- ##
+                                    # First zone: in the cavity of the SB #
+                                    ## --------------------------------- ##
 
-                                        # Computation of the density of gas in the SB (cm^-3)
-                                nsb = profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, r, Rsb)[1]
-                                n_gas = nsb
-                                n_gas = n_gas.tolist()
                                 """
                                 if j == 5:
                                     plot(figure_number, 1, r, n_gas, 'none', 'Density of gas in the SB at t=%.2e yr' %t[j], 'radius (pc)', u'n(r) 'r'($cm^{-3}$)', '+', 'r')
@@ -171,16 +185,14 @@ with open('gas', 'wb') as gas_write:                                            
                                         # r array (pc)
                                 r_in = 0
                                 r_out = r[0]
-                                N_part = shell_particles(r_in, r_out, N_E, D, deltat)
+                                N_part = shell_particles(r_in, r_out, N_E, D, deltaT)
                                 Nr.append(N_part)
 
-                                for i in range (1, number_bin_r):
-                                    if deltat < 1e-9:
-                                        deltat = 0
+                                for k in range (1, number_bin_r):   # for each radius inside the SB
 
                                     r_in = r_out
-                                    r_out = r[i]
-                                    N_part = shell_particles(r_in, r_out, N_E, D, deltat)
+                                    r_out = r[k]
+                                    N_part = shell_particles(r_in, r_out, N_E, D, deltaT)
                                     Nr.append(N_part)
                                 """
                                 Nverife = []
@@ -217,49 +229,40 @@ with open('gas', 'wb') as gas_write:                                            
                                     # Second zone: inside the supershell #
                                     ## -------------------------------- ##
 
-                                        # For the density of gas: n(r) = ns (density is uniform)
-                                n_gas.append(ns)
-
                                         # For the particle distribution (GeV^-1): N_part = 4 * pi * int_{Rsb-hs}^Rsb Ne
-                                r_in = Rsb-hs       # in pc
+                                r_in = rmax         # in pc
                                 r_out = Rsb         # in pc
-                                N_part = shell_particles(r_in, r_out, N_E, D, deltat)
+                                N_part = shell_particles(r_in, r_out, N_E, D, deltaT)
                                 Nr.append(N_part)
 
                                     ## ------------------------ ##
                                     # Third zone: outside the SB #
                                     ## ------------------------ ##
-
-                                        # For the density of gas (cm^-3): n(r) = n0 (density is uniform)
-                                n_gas.append(n0)
-
                                         # For the particle distribution (GeV^-1): N_part = 4 * pi * int_Rsb^inf Ne r^2 dr
-                                N_part = inf_particles(Rsb, N_E, D, deltat)
+                                N_part = inf_particles(Rsb, N_E, D, deltaT)
                                 Nr.append(N_part)
 
                                     # --------- #
                                     # Recording
                                 Ntot.append(Nr)
-                                ngas.append(n_gas)
 
-                        #Ntot = numpy.asarray(Ntot)
+
+
                         Ntotsn.append(Ntot)
-                        ngassn.append(ngas)
-                        distancesn.append(distance)
 
                     Ntotsn = numpy.asarray(Ntotsn)
-                    Ntot_unit = 1/(units.GeV)   # units of Ntot (GeV^-1)
-                    pickle.dump(Ntotsn, data_write)       # Recording the number of particles for each SN explosion time, each time, each zone and each energy
+                    Ntot_unit = 1/(units.GeV)               # units of Ntot (GeV^-1)
+                    pickle.dump(Ntotsn, data_write)         # Recording the number of particles for each SN explosion time, each time, each zone and each energy
                     pickle.dump(Ntot_unit, data_write)
 
-                    distancesn = numpy.asarray(distancesn)  # Recording the r array for each SN explosion time, each time, each zone
-                    pickle.dump(distancesn, distance_write)
+                    distance = numpy.asarray(distance)      # Recording the r array for each SN explosion time, each time, each zone
+                    pickle.dump(distance, distance_write)
 
-                    ngassn = numpy.asarray(ngassn)
-                    ngas_unit = 1/units.cm**3       # units of ngas (cm^-3)
-                    pickle.dump(ngassn, gas_write)    # Recording the density of gas for each SN explosion, each time and each zone
+                    ngastot = numpy.asarray(ngastot)
+                    ngas_unit = 1/units.cm**3           # units of ngas (cm^-3)
+                    pickle.dump(ngastot, gas_write)     # Recording the density of gas for each SN explosion, each time and each zone
                     pickle.dump(ngas_unit, gas_write)
-
+"""
     # Number of particles at one time for each energy and each radius
 
         # Choosen one time
@@ -324,7 +327,7 @@ figure_number += 1
 ## ======================================== ##
 # VERIFICATION OF THE PARTICLES DISTRIBUTION #
 ## ======================================== ##
-
+"""
 """
     # Initialization
 indr = 7   # choosen one radius
@@ -338,7 +341,7 @@ for i in range (nt):
     # plot
 log_plot(figure_number, 1, t, Nin, 'none', 'Number of particles at %.2f pc' %r[indr], 'Time [{0}]'.format(t_unit.to_string('latex_inline')), r'$N_{tot, r}$', '-', pathfigure,)
 """
-
+"""
 ## ==================================================== ##
 # VERIFICATION OF THE ESCAPE TIME SCALE OF THE PARTICLES #
 ## ==================================================== ##
@@ -420,3 +423,4 @@ log_plot(figure_number, nE, t[indSN], Nout, label_name, 'Time evolution of the n
 plt.savefig(pathfigure+'Escape_out_t0%d.eps'%indt0)
 
 plt.show()
+"""
