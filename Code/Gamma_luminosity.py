@@ -18,7 +18,8 @@ from Conversion_factors import *
 # Path for files #
 ##--------------##
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/n_SN/')
+os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/n_SN')
+#os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/n_SN')
 
 ##-----------##
 # Computation #
@@ -33,21 +34,21 @@ with open('spectra', 'wb') as spectra_write:
 
                             # Loading of data: ngas, energy, nCR, radius and time
 
-                        ngas = pickle.load(gas_load)
+                        ngassn = pickle.load(gas_load)
                         ngas_unit = pickle.load(gas_load)
-                        ngas = ngas * ngas_unit
 
                         ECR = pickle.load(energy_load)
                         ECR_unit = pickle.load(energy_load)
                         ECR = ECR * ECR_unit
 
-                        Ntot = pickle.load(data_load)
+                        Ntotsn = pickle.load(data_load)
                         Ntot_unit = pickle.load(data_load)
-                        Ntot = Ntot * Ntot_unit
 
-                        r = pickle.load(distance_load)
+                        rsn = pickle.load(distance_load)
 
+                        t0 = pickle.load(time_load)
                         t = pickle.load(time_load)
+                        t_unit = pickle.load(time_load)
 
                             # Energy spectrum (GeV)
                         Emin = 100 * MeV2GeV            # 100 MeV = 0.1 GeV
@@ -55,67 +56,86 @@ with open('spectra', 'wb') as spectra_write:
                         number_bin_E = 20
                         spectrum_energy = numpy.logspace(numpy.log10(Emin), numpy.log10(Emax), number_bin_E) * units.GeV
 
-                        n = len(t)
+                        nt = len(t)
+                        nt0 = len(t0)
 
-                        spectrum = []
-                        sed = []
+                        sedsn = []
 
-                        for i in range (n):         # for each time step
-                            m = len(r[i])+2
-                            spectrum_r = []
-                            sed_r = []
+                        for k in range (nt0):       # for each SN explosion
+                            r = rsn[k]
+                            ngas = ngassn[k] * ngas_unit
+                            Ntot = Ntotsn[k] * Ntot_unit
 
-                            for j in range (m):     # for each radius step
-                                model = TableModel(ECR, Ntot[i, j, :], amplitude = 1)
-                                PD = PionDecay(model, nh = ngas[i,j], nuclear_enhancement = True)
+                            sed = []
+                            l = 0
 
-                                sed_PD = PD.sed(spectrum_energy, distance = 0 * units.kpc)
-                                sed_r.append(sed_PD)
+                            for i in range (nt):    # for each time step
 
-                                """
-                                if ((i == 2) and (j == 20)):
+                                if t[i] < t0[k]:
+                                    #l = 0
+                                    continue
 
-                                        # Computation of the Pion Decay
-                                    model = TableModel(E * units.GeV, Ntot[i, j, :] * 1/units.GeV, amplitude = 1)
-                                    PD = PionDecay(model, nh = ngas[i,j] * 1/units.cm**3, nuclear_enhancement = True)
+                                else:
+                                    print(l)
+                                    nr = len(r[l])+2
+                                    spectrum_r = []
+                                    sed_r = []
 
-                                    spectrum_energy = numpy.logspace(numpy.log10(Emin), numpy.log10(Emax), number_bin_E) * units.GeV
-                                    sed_PD = PD.sed(spectrum_energy, distance = 0 * units.kpc)
-                                    Lum = numpy.asarray(sed_PD)
-                                    unit_luminosity = units.erg*1/units.s*1/units.GeV
+                                    for j in range (nr):     # for each radius step
+                                        model = TableModel(ECR, Ntot[l, j], amplitude = 1)
+                                        PD = PionDecay(model, nh = ngas[l,j], nuclear_enhancement = True)
 
-                                        # Plot
-                                    plt.figure(figsize=(8,5))
-                                    plt.rc('font', family='sans')
-                                    plt.rc('mathtext', fontset='custom')
-                                    plt.loglog(spectrum_energy,sed_PD,lw=2,c=naima.plot.color_cycle[0])
-                                    plt.title('Production of photons by Pion Decay')
-                                    plt.xlabel('Photon energy [{0}]'.format(spectrum_energy.unit.to_string('latex_inline')))
-                                    plt.ylabel('$L_E$ [{0}]'.format(unit_luminosity.unit.to_string('latex_inline')))
-                                    #plt.ylabel('$E^2 dN/dE$ [{0}]'.format(sed_PD.unit.to_string('latex_inline')))
-                                    plt.tight_layout()
+                                        sed_PD = PD.sed(spectrum_energy, distance = 0 * units.kpc)
+                                        sed_r.append(sed_PD)
 
-                                    # Flux
-                                        # First zone
-                                    E1 = 100        # 100 GeV (GeV)
-                                    ind1 = numpy.where(E <= E1)[0]
-                                    Flux1 = integration_log(E[ind1], Lum[ind1])
-                                    print('Photon flux for the first zone (100 MeV to 100 GeV): %.5e'%Flux1)
+                                        """
+                                        if ((i == 2) and (j == 20)):
 
-                                        # Second zone
-                                    ind2 = numpy.where(E > E1)[0]
-                                    Flux2 = integration_log(E[ind2], Lum[ind2])
-                                    print('Photon flux for the second zone (100 GeV to 100 TeV): %.5e'%Flux2)
+                                                # Computation of the Pion Decay
+                                            model = TableModel(E * units.GeV, Ntot[i, j, :] * 1/units.GeV, amplitude = 1)
+                                            PD = PionDecay(model, nh = ngas[i,j] * 1/units.cm**3, nuclear_enhancement = True)
 
-                                    plt.show()
-                            """
-                            sed.append(sed_r)
+                                            spectrum_energy = numpy.logspace(numpy.log10(Emin), numpy.log10(Emax), number_bin_E) * units.GeV
+                                            sed_PD = PD.sed(spectrum_energy, distance = 0 * units.kpc)
+                                            Lum = numpy.asarray(sed_PD)
+                                            unit_luminosity = units.erg*1/units.s*1/units.GeV
+
+                                                # Plot
+                                            plt.figure(figsize=(8,5))
+                                            plt.rc('font', family='sans')
+                                            plt.rc('mathtext', fontset='custom')
+                                            plt.loglog(spectrum_energy,sed_PD,lw=2,c=naima.plot.color_cycle[0])
+                                            plt.title('Production of photons by Pion Decay')
+                                            plt.xlabel('Photon energy [{0}]'.format(spectrum_energy.unit.to_string('latex_inline')))
+                                            plt.ylabel('$L_E$ [{0}]'.format(unit_luminosity.unit.to_string('latex_inline')))
+                                            #plt.ylabel('$E^2 dN/dE$ [{0}]'.format(sed_PD.unit.to_string('latex_inline')))
+                                            plt.tight_layout()
+
+                                            # Flux
+                                                # First zone
+                                            E1 = 100        # 100 GeV (GeV)
+                                            ind1 = numpy.where(E <= E1)[0]
+                                            Flux1 = integration_log(E[ind1], Lum[ind1])
+                                            print('Photon flux for the first zone (100 MeV to 100 GeV): %.5e'%Flux1)
+
+                                                # Second zone
+                                            ind2 = numpy.where(E > E1)[0]
+                                            Flux2 = integration_log(E[ind2], Lum[ind2])
+                                            print('Photon flux for the second zone (100 GeV to 100 TeV): %.5e'%Flux2)
+
+                                            plt.show()
+                                    """
+                                    sed.append(sed_r)
+                                    l += 1
+                                    
+                            sedsn.append(sed)
 
                         spectrum = numpy.asarray(spectrum_energy)
                         spectrum_unit = spectrum_energy.unit
-                        sed = numpy.asarray(sed)
+                        sedsn = numpy.asarray(sedsn)
+                        print(sedsn.shape)
                         sed_unit = sed_PD.unit
                         pickle.dump(spectrum, spectra_write)
                         pickle.dump(spectrum_unit, spectra_write)
-                        pickle.dump(sed, spectra_write)
+                        pickle.dump(sedsn, spectra_write)
                         pickle.dump(sed_unit, spectra_write)

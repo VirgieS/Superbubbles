@@ -20,12 +20,16 @@ from Parameters_SB import *
 # Path for files #
 ##--------------##
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/n_SN/')
+os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/n_SN')
+#os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/n_SN')
+#pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/n_SN/CR/'
+pathfigure = '/home/vivi/Documents/Master_2/Superbubbles/figures/n_SN/CR/'
+
 
 ##-----------##
 # Computation #
 ##-----------##
-pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/n_SN/Gamma_emission/'
+#pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/n_SN/Gamma_emission/'
 
 with open('time', 'rb') as time_load:
     with open('distance', 'rb') as distance_load:
@@ -33,6 +37,7 @@ with open('time', 'rb') as time_load:
 
                 # Loading data
                     # time
+            t0 = pickle.load(time_load)
             t = pickle.load(time_load)
             t_unit = pickle.load(time_load)
             time = t * t_unit
@@ -54,7 +59,8 @@ with open('time', 'rb') as time_load:
 
                 # Initialization
             figure_number = 1
-            n = len(t)
+            nt0 = len(t0)
+            nt = len(t)
             Esep = 100          # The separation of the two spectral zones (GeV)
 
                 ##================##
@@ -85,148 +91,157 @@ with open('time', 'rb') as time_load:
             Fluxtott2 = []      # 100 GeV to 100 TeV
             Fluxtott = []       # 100 MeV to 100 TeV
 
-            for i in range (n):         # for each time step
+            for k in range (nt0):
+                l = 0
 
-                    ##------------------------------------##
-                    # First zone: in the cavity (erg s^-1) #
-                    ##------------------------------------##
-                Fluxsb1 = []
-                Fluxsb2 = []
-                Fluxsb = []
-                m = len(rsb[i])
-                """
-                fig = plt.figure(figsize=(8,5))
-                plt.rc('font', family='sans')
-                plt.rc('mathtext', fontset='custom')
-                plt.loglog(spectrum, sed_PD[i,2], lw=2, c=naima.plot.color_cycle[0])
-                plt.title('Production of photons by Pion Decay')
-                plt.xlabel('Photon energy [{0}]'.format(spectrum.unit.to_string('latex_inline')))
-                #plt.ylabel('$E L_E$ [{0}]'.format(spectrum_unit.unit.to_string('latex_inline')))
-                plt.ylabel('$E dN/dE$ [{0}]'.format(sed_PD.unit.to_string('latex_inline')))
-                plt.tight_layout()
-                fig.savefig(pathfigure+'T%d.eps'%i)
-                figure_number += 1
-                """
+                for i in range (nt):         # for each time step
 
-                for j in range (m):     # for each radius step
+                    if t[i] < t0[k]:
+                        l += 1
+                        continue
 
-                        # From 100 MeV to 100 GeV
-                    Flux1= integrate.trapz(lum_gamma[i, j, ind1], spectrum_energy[ind1])
-                    Flux1 = numpy.nan_to_num(Flux1)
-                    Fluxsb1.append(Flux1)
+                    else:
 
-                        # From 100 GeV to 100 TeV
-                    Flux2 = integrate.trapz(lum_gamma[i, j, ind2], spectrum_energy[ind2])
-                    Flux2 = numpy.nan_to_num(Flux2)
-                    Fluxsb2.append(Flux2)
+                            ##------------------------------------##
+                            # First zone: in the cavity (erg s^-1) #
+                            ##------------------------------------##
+                        Fluxsb1 = []
+                        Fluxsb2 = []
+                        Fluxsb = []
+                        m = len(rsb[l])
+                        """
+                        fig = plt.figure(figsize=(8,5))
+                        plt.rc('font', family='sans')
+                        plt.rc('mathtext', fontset='custom')
+                        plt.loglog(spectrum, sed_PD[i,2], lw=2, c=naima.plot.color_cycle[0])
+                        plt.title('Production of photons by Pion Decay')
+                        plt.xlabel('Photon energy [{0}]'.format(spectrum.unit.to_string('latex_inline')))
+                        #plt.ylabel('$E L_E$ [{0}]'.format(spectrum_unit.unit.to_string('latex_inline')))
+                        plt.ylabel('$E dN/dE$ [{0}]'.format(sed_PD.unit.to_string('latex_inline')))
+                        plt.tight_layout()
+                        fig.savefig(pathfigure+'T%d.eps'%i)
+                        figure_number += 1
+                        """
 
-                        # From 100 MeV to 100 TeV
-                    Flux = integrate.trapz(lum_gamma[i,j], spectrum_energy)
-                    Flux = numpy.nan_to_num(Flux)
-                    Fluxsb.append(Flux)
+                        for j in range (m):     # for each radius step
 
-                        # Total contribution in the SB (erg s^-1)
-                Lumsb1 = numpy.sum(Fluxsb1)
-                Lumsb2 = numpy.sum(Fluxsb2)
-                Lumsb = numpy.sum(Fluxsb)
+                                # From 100 MeV to 100 GeV
+                            Flux1= integrate.trapz(lum_gamma[i, j, ind1], spectrum_energy[ind1])
+                            Flux1 = numpy.nan_to_num(Flux1)
+                            Fluxsb1.append(Flux1)
 
-                Fluxsbt1.append(Lumsb1)
-                Fluxsbt2.append(Lumsb2)
-                Fluxsbt.append(Lumsb)
+                                # From 100 GeV to 100 TeV
+                            Flux2 = integrate.trapz(lum_gamma[i, j, ind2], spectrum_energy[ind2])
+                            Flux2 = numpy.nan_to_num(Flux2)
+                            Fluxsb2.append(Flux2)
 
-                    ##-----------------------------------------##
-                    # Second zone: in the supershell (erg s^-1) #
-                    ##-----------------------------------------##
+                                # From 100 MeV to 100 TeV
+                            Flux = integrate.trapz(lum_gamma[i,j], spectrum_energy)
+                            Flux = numpy.nan_to_num(Flux)
+                            Fluxsb.append(Flux)
 
-                        # From 100 MeV to 100 GeV
-                Fluxshell1 = integrate.trapz(lum_gamma[i, m, ind1], spectrum_energy[ind1])
-                Fluxshell1 = numpy.nan_to_num(Fluxshell1)
-                Fluxshellt1.append(Fluxshell1)
+                                # Total contribution in the SB (erg s^-1)
+                        Lumsb1 = numpy.sum(Fluxsb1)
+                        Lumsb2 = numpy.sum(Fluxsb2)
+                        Lumsb = numpy.sum(Fluxsb)
 
-                        # From 100 GeV to 100 TeV
-                Fluxshell2 = integrate.trapz(lum_gamma[i, m, ind2], spectrum_energy[ind2])
-                Fluxshell2 = numpy.nan_to_num(Fluxshell2)
-                Fluxshellt2.append(Fluxshell2)
+                        Fluxsbt1.append(Lumsb1)
+                        Fluxsbt2.append(Lumsb2)
+                        Fluxsbt.append(Lumsb)
 
-                        # From 100 MeV to 100 TeV
-                Fluxshell = integrate.trapz(lum_gamma[i, m], spectrum_energy)
-                Fluxshell = numpy.nan_to_num(Fluxshell)
-                Fluxshellt.append(Fluxshell)
+                            ##-----------------------------------------##
+                            # Second zone: in the supershell (erg s^-1) #
+                            ##-----------------------------------------##
 
-                    ##-------------------------------------##
-                    # Third zone: outside the SB (erg s^-1) #
-                    ##-------------------------------------##
+                                # From 100 MeV to 100 GeV
+                        Fluxshell1 = integrate.trapz(lum_gamma[i, m, ind1], spectrum_energy[ind1])
+                        Fluxshell1 = numpy.nan_to_num(Fluxshell1)
+                        Fluxshellt1.append(Fluxshell1)
 
-                        # From 100 MeV to 100 GeV
-                Fluxout1 = integrate.trapz(lum_gamma[i, m+1, ind1], spectrum_energy[ind1])
-                Fluxout1 = numpy.nan_to_num(Fluxout1)
-                Fluxoutt1.append(Fluxout1)
+                                # From 100 GeV to 100 TeV
+                        Fluxshell2 = integrate.trapz(lum_gamma[i, m, ind2], spectrum_energy[ind2])
+                        Fluxshell2 = numpy.nan_to_num(Fluxshell2)
+                        Fluxshellt2.append(Fluxshell2)
 
-                        # From 100 GeV to 100 TeV
-                Fluxout2 = integrate.trapz(lum_gamma[i, m+1, ind2], spectrum_energy[ind2])
-                Fluxout2 = numpy.nan_to_num(Fluxout2)
-                Fluxoutt2.append(Fluxout2)
+                                # From 100 MeV to 100 TeV
+                        Fluxshell = integrate.trapz(lum_gamma[i, m], spectrum_energy)
+                        Fluxshell = numpy.nan_to_num(Fluxshell)
+                        Fluxshellt.append(Fluxshell)
 
-                        # From 100 MeV to 100 TeV
-                Fluxout = integrate.trapz(lum_gamma[i, m+1], spectrum_energy)
-                Fluxout = numpy.nan_to_num(Fluxout)
-                Fluxoutt.append(Fluxout)
+                            ##-------------------------------------##
+                            # Third zone: outside the SB (erg s^-1) #
+                            ##-------------------------------------##
 
-                    # Total gamma luminosity (erg s^-1)
-                Fluxtot1 = numpy.sum([Lumsb1, Fluxshell1, Fluxout1])
-                Fluxtot2 = numpy.sum([Lumsb2, Fluxshell2, Fluxout2])
-                Fluxtot = numpy.sum([Lumsb, Fluxshell, Fluxout])
+                                # From 100 MeV to 100 GeV
+                        Fluxout1 = integrate.trapz(lum_gamma[i, m+1, ind1], spectrum_energy[ind1])
+                        Fluxout1 = numpy.nan_to_num(Fluxout1)
+                        Fluxoutt1.append(Fluxout1)
 
-                Fluxtott1.append(Fluxtot1)
-                Fluxtott2.append(Fluxtot2)
-                Fluxtott.append(Fluxtot)
+                                # From 100 GeV to 100 TeV
+                        Fluxout2 = integrate.trapz(lum_gamma[i, m+1, ind2], spectrum_energy[ind2])
+                        Fluxout2 = numpy.nan_to_num(Fluxout2)
+                        Fluxoutt2.append(Fluxout2)
 
-                    # Unit
-            Flux_unit = lum_gamma_unit * spectrum.unit
+                                # From 100 MeV to 100 TeV
+                        Fluxout = integrate.trapz(lum_gamma[i, m+1], spectrum_energy)
+                        Fluxout = numpy.nan_to_num(Fluxout)
+                        Fluxoutt.append(Fluxout)
 
-                    # Plot
-            log_plot(figure_number, 4, t, [Fluxsbt1, Fluxshellt1, Fluxoutt1, Fluxtott1], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Flux_unit.unit.to_string('latex_inline')), ['+', '+', '+', '-'])
-            plt.savefig(pathfigure+'Gamma_luminosity_range1.eps')
-            figure_number += 1
-            log_plot(figure_number, 4, t, [Fluxsbt2, Fluxshellt2, Fluxoutt2, Fluxtott2], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (100-100 000 GeV) [{0}]'.format(Flux_unit.unit.to_string('latex_inline')), ['+', '+', '+', '-'])
-            plt.savefig(pathfigure+'Gamma_luminosity_range2.eps')
-            figure_number += 1
-            log_plot(figure_number, 4, t, [Fluxsbt, Fluxshellt, Fluxoutt, Fluxtott], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (100 MeV - 100 TeV) [{0}]'.format(Flux_unit.unit.to_string('latex_inline')), ['+', '+', '+', '-'])
-            plt.savefig(pathfigure+'Gamma_luminosity.eps')
-            figure_number += 1
+                            # Total gamma luminosity (erg s^-1)
+                        Fluxtot1 = numpy.sum([Lumsb1, Fluxshell1, Fluxout1])
+                        Fluxtot2 = numpy.sum([Lumsb2, Fluxshell2, Fluxout2])
+                        Fluxtot = numpy.sum([Lumsb, Fluxshell, Fluxout])
 
-                ##===========================================##
-                # Energy released by the gamma emission (erg) #
-                ##===========================================##
+                        Fluxtott1.append(Fluxtot1)
+                        Fluxtott2.append(Fluxtot2)
+                        Fluxtott.append(Fluxtot)
 
-                    # Initialization
-            ts = t * yr2s
-            Energysb = numpy.zeros(n-1)
-            Energyshell = numpy.zeros(n-1)
-            Energyout = numpy.zeros(n-1)
-            Energytot = numpy.zeros(n-1)
-
-                    # Computation
-            for i in range (1,n):
-                Energysb[i-1] = integrate.trapz(Fluxsbt[0:i], ts[0:i])
-                Energyshell[i-1] = integrate.trapz(Fluxshellt[0:i], ts[0:i])
-                Energyout[i-1] = integrate.trapz(Fluxoutt[0:i], ts[0:i])
-                Energytot[i-1] = integrate.trapz(Fluxtott[0:i], ts[0:i])
-
-                    # Plot
-            log_plot(figure_number, 4, t[1:], [Energysb, Energyshell, Energyout, Energytot], ['SB', 'Shell', 'Out', 'Total'], 'Energy released by the gamma emission', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), 'E (erg)', ['+', '+', '+', '-'])
-            plt.savefig(pathfigure+'Energy_released.eps')
-            figure_number += 1
-
-                    ##-------------------------------------------------------------------------------------------------##
-                    # VERIFICATION OF THE RATIO OF EMITTED GAMMA RAY OVER THE TOTAL ENERGY OF THE ACCELERATED PARTICLES #
-                    ##-------------------------------------------------------------------------------------------------##
-
-                        # Computation
-            Esnr = eta * Esn        # in erg
-            Eratio = Energytot/Esnr * 100
+                        # Unit
+                Flux_unit = lum_gamma_unit * spectrum.unit
 
                         # Plot
-            log_plot(figure_number, 1, t[1:], Eratio, 'none', 'Percentage of emitted energy of the particles', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$E_\gamma/E_{SN,released}$ (%)', '+')
-            plt.savefig(pathfigure+'Ratio.eps')
-            plt.show()
+                log_plot(figure_number, 4, t, [Fluxsbt1, Fluxshellt1, Fluxoutt1, Fluxtott1], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Flux_unit.unit.to_string('latex_inline')), ['+', '+', '+', '-'])
+                plt.savefig(pathfigure+'Gamma_luminosity_range1.eps')
+                figure_number += 1
+                log_plot(figure_number, 4, t, [Fluxsbt2, Fluxshellt2, Fluxoutt2, Fluxtott2], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (100-100 000 GeV) [{0}]'.format(Flux_unit.unit.to_string('latex_inline')), ['+', '+', '+', '-'])
+                plt.savefig(pathfigure+'Gamma_luminosity_range2.eps')
+                figure_number += 1
+                log_plot(figure_number, 4, t, [Fluxsbt, Fluxshellt, Fluxoutt, Fluxtott], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (100 MeV - 100 TeV) [{0}]'.format(Flux_unit.unit.to_string('latex_inline')), ['+', '+', '+', '-'])
+                plt.savefig(pathfigure+'Gamma_luminosity.eps')
+                figure_number += 1
+
+                    ##===========================================##
+                    # Energy released by the gamma emission (erg) #
+                    ##===========================================##
+
+                        # Initialization
+                ts = t * yr2s
+                Energysb = numpy.zeros(n-1)
+                Energyshell = numpy.zeros(n-1)
+                Energyout = numpy.zeros(n-1)
+                Energytot = numpy.zeros(n-1)
+
+                        # Computation
+                for i in range (1,n):
+                    Energysb[i-1] = integrate.trapz(Fluxsbt[0:i], ts[0:i])
+                    Energyshell[i-1] = integrate.trapz(Fluxshellt[0:i], ts[0:i])
+                    Energyout[i-1] = integrate.trapz(Fluxoutt[0:i], ts[0:i])
+                    Energytot[i-1] = integrate.trapz(Fluxtott[0:i], ts[0:i])
+
+                        # Plot
+                log_plot(figure_number, 4, t[1:], [Energysb, Energyshell, Energyout, Energytot], ['SB', 'Shell', 'Out', 'Total'], 'Energy released by the gamma emission', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), 'E (erg)', ['+', '+', '+', '-'])
+                plt.savefig(pathfigure+'Energy_released.eps')
+                figure_number += 1
+
+                        ##-------------------------------------------------------------------------------------------------##
+                        # VERIFICATION OF THE RATIO OF EMITTED GAMMA RAY OVER THE TOTAL ENERGY OF THE ACCELERATED PARTICLES #
+                        ##-------------------------------------------------------------------------------------------------##
+
+                            # Computation
+                Esnr = eta * Esn        # in erg
+                Eratio = Energytot/Esnr * 100
+
+                            # Plot
+                log_plot(figure_number, 1, t[1:], Eratio, 'none', 'Percentage of emitted energy of the particles', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$E_\gamma/E_{SN,released}$ (%)', '+')
+                plt.savefig(pathfigure+'Ratio.eps')
+                plt.show()
