@@ -24,14 +24,15 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
     """
     Function to plot a log-log graphic
     Inputs:
-        figure_number:      define the number of the figure
-        number_of_plot:     define how many plot do you want on one figure (with the same axis)
-        x:                  x-vector
-        y:                  y-array (line = one y-array and row = each different y-plot)
-        label_name:         legend of one plots
-        title:              title of the plot
-        xlabel:             label of the x-axis
-        ylabel:             label of the y-axis
+        figure_number   :       define the number of the figure
+        number_of_plot  :       define how many plot do you want on one figure (with the same axis)
+        x               :       x-vector
+        y               :       y-array (line = one y-array and row = each different y-plot)
+        label_name      :       legend of one plots
+        title           :       title of the plot
+        xlabel          :       label of the x-axis
+        ylabel          :       label of the y-axis
+        symbol          :       symbol
     """
     plt.figure(figure_number, figsize=(10,7))
 
@@ -67,14 +68,15 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
     """
     Function to plot a linear graphic
     Inputs:
-        figure_number:      define the number of the figure
-        number_of_plot:     define how many plot do you want on one figure (with the same axis)
-        x:                  x-vector
-        y:                  y-array (line = one y-array and row = each different y-plot)
-        label_name:         legend of one plots
-        title:              title of the plot
-        xlabel:             label of the x-axis
-        ylabel:             label of the y-axis
+        figure_number   :       define the number of the figure
+        number_of_plot  :       define how many plot do you want on one figure (with the same axis)
+        x               :       x-vector
+        y               :       y-array (line = one y-array and row = each different y-plot)
+        label_name      :       legend of one plots
+        title           :       title of the plot
+        xlabel          :       label of the x-axis
+        ylabel          :       label of the y-axis
+        symbol          :       symbol
     """
     plt.figure(figure_number, figsize = (10,7))
 
