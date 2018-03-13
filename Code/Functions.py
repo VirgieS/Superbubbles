@@ -102,7 +102,7 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
         plt.plot(x, y, symbol, label = label_name)
         plt.legend(loc = 'best')
 
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)

@@ -21,8 +21,8 @@ from Parameters_SB import *
 ##--------------##
 
     # At IRAP
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/n_SN')
-pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/n_SN/CR/'
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/2_SN/')
+pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/2_SN/CR/'
 
     # At home
 #os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/n_SN')
@@ -88,14 +88,13 @@ with open('gas', 'wb') as gas_write:                                            
                             # SN explosion: time (yr)
                     t0 = [3e6, 4e6]      # in yr
                     nt0 = len(t0)
-                    print(nt0)
 
                     pickle.dump(t0, time_write)     # Recording the SN explosion time (yr)
 
                             # time vector (yr)
                     tmin = t0[0]       # nothing happens before the first SN explosion (yr)
                     tmax = t0[nt0-1] + 1e6
-                    number_bin_t = 1000
+                    number_bin_t = 200
                     t = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)
                     nt = len(t)
                     t_unit = units.yr
@@ -153,6 +152,8 @@ with open('gas', 'wb') as gas_write:                                            
                         for j in range (nt0):       # for each SN explosion
 
                             if t[i] < t0[j]:
+                                n = numpy.zeros((number_bin_r + 2, number_bin_E))
+                                Ntot.append(n)
                                 continue
                             else:
 
@@ -194,6 +195,7 @@ with open('gas', 'wb') as gas_write:                                            
                                     r_out = r[k]
                                     N_part = shell_particles(r_in, r_out, N_E, D, deltaT)
                                     Nr.append(N_part)
+
                                 """
                                 Nverife = []
                                 for k in range (len(E)):
@@ -246,8 +248,6 @@ with open('gas', 'wb') as gas_write:                                            
                                     # Recording
                                 Ntot.append(Nr)
 
-
-
                         Ntotsn.append(Ntot)
 
                     Ntotsn = numpy.asarray(Ntotsn)
@@ -262,73 +262,138 @@ with open('gas', 'wb') as gas_write:                                            
                     ngas_unit = 1/units.cm**3           # units of ngas (cm^-3)
                     pickle.dump(ngastot, gas_write)     # Recording the density of gas for each SN explosion, each time and each zone
                     pickle.dump(ngas_unit, gas_write)
-"""
-    # Number of particles at one time for each energy and each radius
 
-        # Choosen one time
-indt0 = 1             # choosen one SN explosion
-indSN = numpy.where(t >= t0[indt0])[0]
-indt = len(t[indSN])-1        # chosen time (yr)
-nt = len(t[indSN])
+# Important quantities
+Ninit = numpy.sum(N_E)      # total number of particles injected in the SB (particles)
 
-ntot = Ntotsn[indt0]
-ntot = numpy.asarray(ntot)
-#print(ntot.shape)
+    ## ============================================================= ##
+    # Number of particles at one time for each energy and each radius #
+    ## ============================================================= ##
+
+        # Choosen one time and one SN explosion
+for j in range (nt0):
 
         # Initialization
-nr = len(Nr)     # length of Nr
-nE = len(E)      # length of E
-y = numpy.zeros((nr, nE))
-deltat = t[indt] - t0[indt0]
+    indSN = numpy.where(t >= t0[j])[0]
+
+        # Parameters
+    indt = len(t)-1        # chosen time (yr)
+
+    ntot = Ntotsn[indt, j]
+    ntot = numpy.asarray(ntot)
+
+            # Initialization
+    nr = len(Nr)     # length of Nr
+    nE = len(E)      # length of E
+    delta_t = t[indt] - t0[j]
+
+            # Computation
+    sum = numpy.zeros(nE)
+
+    for k in range (nE):                # sum on the energy
+        sum[k] = numpy.sum(ntot[:,k])
+
+            # Plot
+    log_plot(figure_number, nr, E, ntot, 'none', 'Number of CR in the SB at %.2e yr after the SN explosion' %delta_t , 'E [{0}]'.format(E_unit.to_string('latex_inline')), 'N(E) [{0}]'.format(Ntot_unit.unit.to_string('latex_inline')), '+')
+    log_plot(figure_number, 1, E, sum, 'Sum', 'Number of CR in the SB at %.2e yr after the SN explosion'%delta_t , 'E [{0}]'.format(E_unit.to_string('latex_inline')), 'N(E) [{0}]'.format(Ntot_unit.unit.to_string('latex_inline')), 'x')
+    log_plot(figure_number, 1, E, N_E, 'Injected', 'Number of CR in the SB at %.2e yr after the SN explosion'%delta_t , 'E [{0}]'.format(E_unit.to_string('latex_inline')), 'N(E) [{0}]'.format(Ntot_unit.unit.to_string('latex_inline')), '-')
+    plt.savefig(pathfigure+'Particles_T%d_t0%d.eps'%(t[indt],j))
+    figure_number +=1
+
+        ## ========================================================= ##
+        # VERIFICATION OF THE CONSERVATION OF THE NUMBER OF PARTICLES #
+        ## ========================================================= ##
+
+            # Initialization
+    Nratio = []                 # ratio of remained particles in time
 
         # Computation
-for i in range (nr):
+    for i in (indSN):            # index for time
 
-    for j in range (nE):
-        y[i, j] = ntot[indt, i, j]
+        ntotSN = Ntotsn[i, j]
+        ntotSN = numpy.asarray(ntotSN)
+        Nremain = numpy.sum(ntotSN)
+        #print(Nremain/Ninit)
+        Nratio.append(Nremain/Ninit)
 
-sum = numpy.zeros(nE)
-for k in range (nE):
-    sum[k] = numpy.sum(y[:,k])
+            # Plot
+    plot(figure_number, 1, t[indSN], Nratio, 'none', 'Ratio of remained particles in the considered volume', 'Time [{0}]'.format(t_unit.to_string('latex_inline')), '$N_{tot, t}/N_{tot, 0}$', '-')
+    plt.savefig(pathfigure+'Conservation_particles_t0%d.eps'%j)
+    figure_number += 1
 
-        # Plot
-log_plot(figure_number, nr, E, y, 'none', 'Number of CR in the SB at %.2e yr after the SN explosion' %deltat , 'E [{0}]'.format(E_unit.to_string('latex_inline')), 'N(E) [{0}]'.format(Ntot_unit.unit.to_string('latex_inline')), '+', 'none')
-log_plot(figure_number, 1, E, sum, 'Sum', 'Number of CR in the SB at %.2e yr after the SN explosion'%deltat , 'E [{0}]'.format(E_unit.to_string('latex_inline')), 'N(E) [{0}]'.format(Ntot_unit.unit.to_string('latex_inline')), 'x', 'none')
-log_plot(figure_number, 1, E, N_E, 'Injected', 'Number of CR in the SB at %.2e yr after the SN explosion'%deltat , 'E [{0}]'.format(E_unit.to_string('latex_inline')), 'N(E) [{0}]'.format(Ntot_unit.unit.to_string('latex_inline')), '-', 'none')
-plt.savefig(pathfigure+'Particles_T%d_t0%d.eps'%(t[indt],indt0))
-figure_number +=1
+    ## ==================================================== ##
+    # VERIFICATION OF THE ESCAPE TIME SCALE OF THE PARTICLES #
+    ## ==================================================== ##
 
-    ## ========================================================= ##
-    # VERIFICATION OF THE CONSERVATION OF THE NUMBER OF PARTICLES #
-    ## ========================================================= ##
+    # Initialization
+    nr = len(r)
+    label_name = []
+    symbol = []
 
-        # Initialization
-Ninit = numpy.sum(N_E)      # total number of particles injected in the SB (particles)
-Nratio = []                 # ratio of remained particles in time
-#l = 0
+        # Superbubble
+    NSB = numpy.zeros((nE, nt))
 
-    # Computation
-for i in range (nt):            # index for time
+        # Supershell
+    indshell = 15       # supershell zone
+    Nshell = numpy.zeros((nE, nt))
 
-    z = numpy.zeros((nE, nr))
 
-    for j in range (nr):         # index for distance
-        for k in range (nE):     # index for energy
-            z[k, j] = ntot[i, j, k]
+        # Outside
+    indout = 15       # supershell zone
+    Nout = numpy.zeros((nE, nt))
 
-    Nremain = numpy.sum(z)
-    Nratio.append(Nremain/Ninit)
 
-        # Plot
-plot(figure_number, 1, t[indSN], Nratio, 'none', 'Ratio of remained particles in the considered volume', 'Time [{0}]'.format(t_unit.to_string('latex_inline')), '$N_{tot, t}/N_{tot, 0}$', '-')
-plt.savefig(pathfigure+'Conservation_particles_t0%d.eps'%indt0)
-figure_number += 1
+        # Computation
+    for i in (indSN):          # for each time
 
-## ======================================== ##
-# VERIFICATION OF THE PARTICLES DISTRIBUTION #
-## ======================================== ##
+        ntot_es = Ntotsn[i, j]
+        ntot_es = numpy.asarray(ntot_es)
+
+        for l in range (nE):         # for each energy
+            Nsum = 0
+
+            ## ----------- ##
+            # Inside the SB #
+            ## ----------- ##
+
+            for k in range (nr):    # sum over each radius inside the SB
+                Nsum += ntot_es[k, l]
+
+            NSB[l, i] = Nsum/N_E[l]
+            NSB[l, i] = numpy.nan_to_num(NSB[l, i])
+
+            ## ------------------- ##
+            # Inside the supershell #
+            ## ------------------- ##
+
+            Nshell[l, i] = ntot_es[indshell, l]/N_E[l]
+            Nshell[l, i] = numpy.nan_to_num(Nshell[l, i])
+
+            ## ------------ ##
+            # Outside the SB #
+            ## ------------ ##
+            Nout[l, i] = ntot_es[indout, l]/N_E[l]
+            Nout[l, i] = numpy.nan_to_num(Nout[l, i])
+
+            label_name.append('%.2e GeV'%E[l])
+            symbol.append('+')
+
+                # Plot
+    log_plot(figure_number, nE, t[indSN], NSB[:,indSN], label_name, 'Time evolution of the number of particles inside the SB', 'Time [{0}]'.format(t_unit.to_string('latex_inline')), r'$N_{tot, r}/N_E$', symbol)
+    plt.savefig(pathfigure+'Escape_SB_t0%d.eps'%j)
+    figure_number +=1
+    log_plot(figure_number, nE, t[indSN], Nshell[:, indSN], label_name, 'Time evolution of the number of particles inside the supershell', 'Time [{0}]'.format(t_unit.to_string('latex_inline')), r'$N_{tot, r}/N_E$', symbol)
+    plt.savefig(pathfigure+'Escape_shell_t0%d.eps'%j)
+    figure_number += 1
+    log_plot(figure_number, nE, t[indSN], Nout[:, indSN], label_name, 'Time evolution of the number of particles outside the SB', 'Time [{0}]'.format(t_unit.to_string('latex_inline')), r'$N_{tot, r}/N_E$', symbol)
+    plt.savefig(pathfigure+'Escape_out_t0%d.eps'%j)
+    figure_number += 1
+
 """
-"""
+    ## ======================================== ##
+    # VERIFICATION OF THE PARTICLES DISTRIBUTION #
+    ## ======================================== ##
+
     # Initialization
 indr = 7   # choosen one radius
 nt = len(t)
@@ -341,86 +406,5 @@ for i in range (nt):
     # plot
 log_plot(figure_number, 1, t, Nin, 'none', 'Number of particles at %.2f pc' %r[indr], 'Time [{0}]'.format(t_unit.to_string('latex_inline')), r'$N_{tot, r}$', '-', pathfigure,)
 """
-"""
-## ==================================================== ##
-# VERIFICATION OF THE ESCAPE TIME SCALE OF THE PARTICLES #
-## ==================================================== ##
-
-    ## ----------- ##
-    # Inside the SB #
-    ## ----------- ##
-
-        # Initialization
-nr = len(r)
-NSB = numpy.zeros((nE, nt))
-label_name = []
-symbol = []
-
-        # Computation
-for i in range (1,nt):          # for each time
-
-    for j in range (nE):         # for each energy
-        Nsum = 0
-
-        for k in range (nr):    # sum over each radius inside the SB
-            Nsum += ntot[i, k, j]
-
-        NSB[j, i] = Nsum/N_E[j]
-        NSB[j, i] = numpy.nan_to_num(NSB[j, i])
-        label_name.append('%.2e GeV'%E[j])
-        symbol.append('+')
-
-            # Plot
-log_plot(figure_number, nE, t[indSN], NSB, label_name, 'Time evolution of the number of particles inside the SB', 'Time [{0}]'.format(t_unit.to_string('latex_inline')), r'$N_{tot, r}/N_E$', symbol)
-plt.savefig(pathfigure+'Escape_SB_t0%d.eps'%indt0)
-figure_number +=1
-
-    ## ------------------- ##
-    # Inside the supershell #
-    ## ------------------- ##
-
-        # Initialization
-indr = 15       # supershell zone
-Nshell = numpy.zeros((nE, nt))
-label_name = []
-symbol = []
-
-        # Computation
-for i in range (1,nt):          # for each time
-
-    for j in range (nE):         # for each energy
-        Nshell[j, i] = ntot[i, indr, j]/N_E[j]
-        Nshell[j, i] = numpy.nan_to_num(Nshell[j, i])
-        label_name.append('%.2e GeV'%E[j])
-        symbol.append('+')
-
-        # Plot
-log_plot(figure_number, nE, t[indSN], Nshell, label_name, 'Time evolution of the number of particles inside the supershell', 'Time [{0}]'.format(t_unit.to_string('latex_inline')), r'$N_{tot, r}/N_E$', symbol)
-plt.savefig(pathfigure+'Escape_shell_t0%d.eps'%indt0)
-figure_number += 1
-
-    ## ------------ ##
-    # Outside the SB #
-    ## ------------ ##
-
-        # Initialization
-indr = 16       # outside the SB zone
-Nout = numpy.zeros((nE, nt))
-label_name = []
-symbol = []
-
-        # Computation
-for i in range (1,nt):          # for each time
-
-    for j in range (nE):         # for each energy
-        Nout[j, i] = ntot[i, indr, j]/N_E[j]
-        Nout[j, i] = numpy.nan_to_num(Nout[j, i])
-        label_name.append('%.2e GeV'%E[j])
-        symbol.append('+')
-
-        # Plot
-log_plot(figure_number, nE, t[indSN], Nout, label_name, 'Time evolution of the number of particles outside the SB', 'Time [{0}]'.format(t_unit.to_string('latex_inline')), r'$N_{tot, r}/N_E$', symbol)
-plt.savefig(pathfigure+'Escape_out_t0%d.eps'%indt0)
 
 plt.show()
-"""
