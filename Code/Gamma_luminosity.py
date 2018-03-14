@@ -9,6 +9,7 @@ import naima
 import astropy.units as units
 from naima.models import PionDecay, TableModel
 from Functions import *
+from Functions_CR import *
 
 # Physical constants and conversion factors
 from Physical_constants import *

@@ -10,6 +10,8 @@ import pickle
 import naima
 from naima.models import PionDecay, TableModel
 from Functions import *
+from Functions_gamma import *
+from Functions_CR import *
 
 # Physical constants and conversion factors
 from Physical_constants import *
@@ -151,18 +153,15 @@ with open('time', 'rb') as time_load:
                     for k in range (nr):     # for each radius step
 
                             # From 100 MeV to 100 GeV
-                        Flux1= integrate.trapz(lum_gamma[j, k, ind1], spectrum_energy[ind1])
-                        Flux1 = numpy.nan_to_num(Flux1)
+                        Flux1 = luminosity(lum_gamma[j, k, ind1], spectrum_energy[ind1])
                         Fluxsb1.append(Flux1)
 
                             # From 100 GeV to 100 TeV
-                        Flux2 = integrate.trapz(lum_gamma[j, k, ind2], spectrum_energy[ind2])
-                        Flux2 = numpy.nan_to_num(Flux2)
+                        Flux2 = luminosity(lum_gamma[j, k, ind2], spectrum_energy[ind2])
                         Fluxsb2.append(Flux2)
 
                             # From 100 MeV to 100 TeV
-                        Flux = integrate.trapz(lum_gamma[j,k], spectrum_energy)
-                        Flux = numpy.nan_to_num(Flux)
+                        Flux = luminosity(lum_gamma[j,k], spectrum_energy)
                         Fluxsb.append(Flux)
 
                             # Total contribution in the SB (erg s^-1)
@@ -179,18 +178,15 @@ with open('time', 'rb') as time_load:
                         ##-----------------------------------------##
 
                             # From 100 MeV to 100 GeV
-                    Fluxshell1 = integrate.trapz(lum_gamma[j, nr, ind1], spectrum_energy[ind1])
-                    Fluxshell1 = numpy.nan_to_num(Fluxshell1)
+                    Fluxshell1 = luminosity(lum_gamma[j, nr, ind1], spectrum_energy[ind1])
                     Fluxshellt1.append(Fluxshell1)
 
                             # From 100 GeV to 100 TeV
-                    Fluxshell2 = integrate.trapz(lum_gamma[j, nr, ind2], spectrum_energy[ind2])
-                    Fluxshell2 = numpy.nan_to_num(Fluxshell2)
+                    Fluxshell2 = luminosity(lum_gamma[j, nr, ind2], spectrum_energy[ind2])
                     Fluxshellt2.append(Fluxshell2)
 
                             # From 100 MeV to 100 TeV
-                    Fluxshell = integrate.trapz(lum_gamma[j, nr], spectrum_energy)
-                    Fluxshell = numpy.nan_to_num(Fluxshell)
+                    Fluxshell = luminosity(lum_gamma[j, nr], spectrum_energy)
                     Fluxshellt.append(Fluxshell)
 
                         ##-------------------------------------##
@@ -198,8 +194,7 @@ with open('time', 'rb') as time_load:
                         ##-------------------------------------##
 
                             # From 100 MeV to 100 GeV
-                    Fluxout1 = integrate.trapz(lum_gamma[j, nr+1, ind1], spectrum_energy[ind1])
-                    Fluxout1 = numpy.nan_to_num(Fluxout1)
+                    Fluxout1 = luminosity(lum_gamma[j, nr+1, ind1], spectrum_energy[ind1])
                     Fluxoutt1.append(Fluxout1)
 
                             # From 100 GeV to 100 TeV
@@ -208,8 +203,7 @@ with open('time', 'rb') as time_load:
                     Fluxoutt2.append(Fluxout2)
 
                             # From 100 MeV to 100 TeV
-                    Fluxout = integrate.trapz(lum_gamma[j, nr+1], spectrum_energy)
-                    Fluxout = numpy.nan_to_num(Fluxout)
+                    Fluxout = luminosity(lum_gamma[j, nr+1], spectrum_energy)
                     Fluxoutt.append(Fluxout)
 
                         # Total gamma luminosity (erg s^-1)

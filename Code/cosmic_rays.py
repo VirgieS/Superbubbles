@@ -10,6 +10,7 @@ import astropy.units as units
 import os
 import pickle
 from Functions import *
+from Functions_CR import *
 
 # Physical constants, conversion factors and parameters fot the SB
 from Physical_constants import *
