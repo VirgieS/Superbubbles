@@ -21,8 +21,8 @@ from Parameters_SB import *
 ##--------------##
 
     # At IRAP
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/2_SN/')
-pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/2_SN/Gamma_emission/'
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/5_SN/')
+pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/5_SN/Gamma_emission/'
 
     # At home
 #os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/n_SN')
@@ -32,7 +32,6 @@ pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/2_SN/Gamma_em
 ##-----------##
 # Computation #
 ##-----------##
-#pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/n_SN/Gamma_emission/'
 
 with open('time', 'rb') as time_load:
     with open('distance', 'rb') as distance_load:

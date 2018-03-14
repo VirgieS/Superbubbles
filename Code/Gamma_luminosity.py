@@ -19,7 +19,7 @@ from Conversion_factors import *
 ##--------------##
 
     # At IRAP
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/2_SN/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/5_SN/')
 
     # At home
 #os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/n_SN')

@@ -21,8 +21,8 @@ from Parameters_SB import *
 ##--------------##
 
     # At IRAP
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/2_SN/')
-pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/2_SN/CR/'
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/5_SN/')
+pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/5_SN/CR/'
 
     # At home
 #os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/n_SN')
@@ -86,7 +86,7 @@ with open('gas', 'wb') as gas_write:                                            
                         ## ====================================================== ##
 
                             # SN explosion: time (yr)
-                    t0 = [3e6, 4e6]      # in yr
+                    t0 = [3e6, 4e6, 5e6, 4.5e6]      # in yr
                     nt0 = len(t0)
 
                     pickle.dump(t0, time_write)     # Recording the SN explosion time (yr)
