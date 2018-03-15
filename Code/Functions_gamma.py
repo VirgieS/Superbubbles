@@ -96,7 +96,7 @@ def data(Emin_CR, Emax_CR, p0, alpha, D0, delta, t0):
                                 # time vector (yr)
                         tmin = t0[0]       # nothing happens before the first SN explosion (yr)
                         tmax = t0[nt0-1] + 1e6
-                        number_bin_t = 200
+                        number_bin_t = 100*nt0
                         t = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)
                         nt = len(t)
                         t_unit = units.yr

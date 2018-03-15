@@ -70,12 +70,7 @@ with open('spectra', 'wb') as spectra_write:
                             sed = []
 
                             for j in range (nt):    # for each time step
-                                """
-                                if t[j] < t0[i]:
-                                    #sed.append(0)
-                                    continue
-                                else:
-                                """
+
                                     # Initialization
                                 distance = r[j]
                                 nr = len(distance) + 2
@@ -91,7 +86,6 @@ with open('spectra', 'wb') as spectra_write:
                                 for k in range (nr):     # for each radius step
                                     model = TableModel(ECR, ntot[k], amplitude = 1)
                                     PD = PionDecay(model, nh = ngas[k], nuclear_enhancement = True)
-
                                     sed_PD = PD.sed(spectrum_energy, distance = 0 * units.pc)
                                     sed_r.append(sed_PD)
 
