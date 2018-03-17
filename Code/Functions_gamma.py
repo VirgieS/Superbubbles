@@ -311,7 +311,7 @@ def spectrum(Emin_gamma, Emax_gamma):#, t0, ECR, ECR_unit, t, t_unit, Ntotsn, Nt
                                 pickle.dump(spectrum_unit, spectra_write)
                                 pickle.dump(sed_PD_sn, spectra_write)
                                 pickle.dump(sed_unit, spectra_write)
-    return spectrum, spectrum_unit, sed_PD_sn, sed_unit
+    return #spectrum, spectrum_unit, sed_PD_sn, sed_unit
 
 def luminosity(lum_energy, energy):
 
@@ -327,7 +327,7 @@ def luminosity(lum_energy, energy):
 
     return lum
 
-def gamma_luminosity(Esep, pathfigure, t0, t, t_unit, r, spectrum, spectrum_unit, sed_PD_sn, sed_PD_unit):
+def gamma_luminosity(Esep, pathfigure):#, t0, t, t_unit, r, spectrum, spectrum_unit, sed_PD_sn, sed_PD_unit):
 
     """
     Return the gamma luminosity in the ranges of energy
@@ -336,246 +336,245 @@ def gamma_luminosity(Esep, pathfigure, t0, t, t_unit, r, spectrum, spectrum_unit
         Esep        :       limit of the two ranges of energy (GeV)
         pathfigure  :       path to save figures
     """
+    with open('SN', 'rb') as t0_load:
+        with open('time', 'rb') as time_load:
+            with open('radius', 'rb') as radius_load:
+                with open('spectra', 'rb') as spectra_read:
 
-    with open('time', 'rb') as time_load:
-        with open('radius', 'rb') as radius_load:
-            with open('spectra', 'rb') as spectra_read:
-                """
-                    # Loading data
-                        # time
-                t0 = pickle.load(time_load)
-                t = pickle.load(time_load)
-                t_unit = pickle.load(time_load)
-                time = t * t_unit
+                        # Loading data
+                            # time
+                    t0 = pickle.load(t0_load)
+                    t = pickle.load(time_load)
+                    t_unit = pickle.load(time_load)
+                    time = t * t_unit
 
-                        # radius
-                r = pickle.load(radius_load)
+                            # radius
+                    r = pickle.load(radius_load)
 
-                        # Energy (GeV)
-                spectrum = pickle.load(spectra_read)
-                spectrum_unit = pickle.load(spectra_read)
-                spectrum_energy = spectrum * spectrum_unit
+                            # Energy (GeV)
+                    spectrum = pickle.load(spectra_read)
+                    spectrum_unit = pickle.load(spectra_read)
+                    spectrum_energy = spectrum * spectrum_unit
 
-                         # spectal energy distribution (erg s^-1): E^2 dN/dE = E L_gamma
-                sed_PD_sn = pickle.load(spectra_read)
-                sed_PD_unit = pickle.load(spectra_read)
-                """
+                             # spectal energy distribution (erg s^-1): E^2 dN/dE = E L_gamma
+                    sed_PD_sn = pickle.load(spectra_read)
+                    sed_PD_unit = pickle.load(spectra_read)
 
-                spectrum_energy = spectrum * spectrum_unit
-                        # For recording
-                            # Within the SB
-                Lumsb_sn_1 = []         # 100 MeV to 100 GeV
-                Lumsb_sn_2 = []         # 100 GeV to 100 TeV
-                Lumsb_sn = []           # 100 MeV to 100 TeV
+                    #spectrum_energy = spectrum * spectrum_unit
+                            # For recording
+                                # Within the SB
+                    Lumsb_sn_1 = []         # 100 MeV to 100 GeV
+                    Lumsb_sn_2 = []         # 100 GeV to 100 TeV
+                    Lumsb_sn = []           # 100 MeV to 100 TeV
 
-                            # Within the supershell
-                Lumshell_sn_1 = []      # 100 MeV to 100 GeV
-                Lumshell_sn_2 = []      # 100 GeV to 100 TeV
-                Lumshell_sn = []        # 100 MeV to 100 TeV
+                                # Within the supershell
+                    Lumshell_sn_1 = []      # 100 MeV to 100 GeV
+                    Lumshell_sn_2 = []      # 100 GeV to 100 TeV
+                    Lumshell_sn = []        # 100 MeV to 100 TeV
 
-                            # Outside the SB
-                Lumout_sn_1 = []       # 100 MeV to 100 GeV
-                Lumout_sn_2 = []       # 100 GeV to 100 TeV
-                Lumout_sn = []         # 100 MeV to 100 TeV
+                                # Outside the SB
+                    Lumout_sn_1 = []       # 100 MeV to 100 GeV
+                    Lumout_sn_2 = []       # 100 GeV to 100 TeV
+                    Lumout_sn = []         # 100 MeV to 100 TeV
 
-                            # Total
-                Lumtot_sn_1 = []       # 100 MeV to 100 GeV
-                Lumtot_sn_2 = []       # 100 GeV to 100 TeV
-                Lumtot_sn = []         # 100 MeV to 100 TeV
-
-                    # Initialization
-                figure_number = 1
-                nt0 = len(t0)
-                nt = len(t)
-
-                    ##================##
-                    # Gamma luminosity #
-                    ##================##
-
-                ind1 = numpy.where(spectrum_energy < Esep)[0]         # for the first range
-                ind2 = numpy.where(spectrum_energy >= Esep)[0]        # for the second range
-
-                for i in range (nt0):           # for each SN explosion
-
-                    lum_energy = sed_PD_sn[i]/spectrum
-                    lum_energy_unit = sed_PD_unit/spectrum_unit
-
-                        # For recording
-                            # Within the SB
-                    Lumsb_t_1 = []          # 100 MeV to 100 GeV
-                    Lumsb_t_2 = []          # 100 GeV to 100 TeV
-                    Lumsb_t = []            # 100 MeV to 100 TeV
-
-                            # Within the supershell
-                    Lumshell_t_1 = []       # 100 MeV to 100 GeV
-                    Lumshell_t_2 = []       # 100 GeV to 100 TeV
-                    Lumshell_t = []         # 100 MeV to 100 TeV
-
-                            # Outside the SB
-                    Lumout_t_1 = []         # 100 MeV to 100 GeV
-                    Lumout_t_2 = []         # 100 GeV to 100 TeV
-                    Lumout_t = []           # 100 MeV to 100 TeV
-
-                            # Total
-                    Lumtot_t_1 = []         # 100 MeV to 100 GeV
-                    Lumtot_t_2 = []         # 100 GeV to 100 TeV
-                    Lumtot_t = []           # 100 MeV to 100 TeV
+                                # Total
+                    Lumtot_sn_1 = []       # 100 MeV to 100 GeV
+                    Lumtot_sn_2 = []       # 100 GeV to 100 TeV
+                    Lumtot_sn = []         # 100 MeV to 100 TeV
 
                         # Initialization
-                    indSN = numpy.where(t >= t0[i])[0]     # only time where the SN already explodes
+                    figure_number = 1
+                    nt0 = len(t0)
+                    nt = len(t)
 
-                    for j in range (nt):         # for each time step
+                        ##================##
+                        # Gamma luminosity #
+                        ##================##
 
+                    ind1 = numpy.where(spectrum < Esep)[0]         # for the first range
+                    ind2 = numpy.where(spectrum >= Esep)[0]        # for the second range
 
-                            ##------------------------------------##
-                            # First zone: in the cavity (erg s^-1) #
-                            ##------------------------------------##
-                                # Initialization
-                        radius = r[j]
-                        nr = len(radius)
+                    for i in range (nt0):           # for each SN explosion
 
-                                # Recording
-                        Lumsb_1_r = []
-                        Lumsb_2_r = []
-                        Lumsb_r = []
+                        lum_energy = sed_PD_sn[i]/spectrum
+                        lum_energy_unit = sed_PD_unit/spectrum_unit
 
-                        for k in range (nr):     # for each radius step
+                            # For recording
+                                # Within the SB
+                        Lumsb_t_1 = []          # 100 MeV to 100 GeV
+                        Lumsb_t_2 = []          # 100 GeV to 100 TeV
+                        Lumsb_t = []            # 100 MeV to 100 TeV
 
-                                # From 100 MeV to 100 GeV
-                            Lum_1 = luminosity(lum_energy[j, k, ind1], spectrum[ind1])
-                            Lumsb_1_r.append(Lum_1)
+                                # Within the supershell
+                        Lumshell_t_1 = []       # 100 MeV to 100 GeV
+                        Lumshell_t_2 = []       # 100 GeV to 100 TeV
+                        Lumshell_t = []         # 100 MeV to 100 TeV
 
-                                # From 100 GeV to 100 TeV
-                            Lum_2 = luminosity(lum_energy[j, k, ind2], spectrum[ind2])
-                            Lumsb_2_r.append(Lum_2)
+                                # Outside the SB
+                        Lumout_t_1 = []         # 100 MeV to 100 GeV
+                        Lumout_t_2 = []         # 100 GeV to 100 TeV
+                        Lumout_t = []           # 100 MeV to 100 TeV
 
-                                # From 100 MeV to 100 TeV
-                            Lum = luminosity(lum_energy[j,k], spectrum)
-                            Lumsb_r.append(Lum)
+                                # Total
+                        Lumtot_t_1 = []         # 100 MeV to 100 GeV
+                        Lumtot_t_2 = []         # 100 GeV to 100 TeV
+                        Lumtot_t = []           # 100 MeV to 100 TeV
 
-                                # Total contribution in the SB (erg s^-1)
-                        Lumsb_1 = numpy.sum(Lumsb_1_r)
-                        Lumsb_2 = numpy.sum(Lumsb_2_r)
-                        Lumsb = numpy.sum(Lumsb_r)
+                            # Initialization
+                        indSN = numpy.where(t >= t0[i])[0]     # only time where the SN already explodes
 
-                        Lumsb_t_1.append(Lumsb_1)
-                        Lumsb_t_2.append(Lumsb_2)
-                        Lumsb_t.append(Lumsb)
-
-                            ##-----------------------------------------##
-                            # Second zone: in the supershell (erg s^-1) #
-                            ##-----------------------------------------##
-
-                                # From 100 MeV to 100 GeV
-                        Lumshell_1 = luminosity(lum_energy[j, nr, ind1], spectrum[ind1])
-                        Lumshell_t_1.append(Lumshell_1)
-
-                                # From 100 GeV to 100 TeV
-                        Lumshell_2 = luminosity(lum_energy[j, nr, ind2], spectrum[ind2])
-                        Lumshell_t_2.append(Lumshell_2)
-
-                                # From 100 MeV to 100 TeV
-                        Lumshell = luminosity(lum_energy[j, nr], spectrum)
-                        Lumshell_t.append(Lumshell)
-
-                            ##-------------------------------------##
-                            # Third zone: outside the SB (erg s^-1) #
-                            ##-------------------------------------##
-
-                                # From 100 MeV to 100 GeV
-                        Lumout_1 = luminosity(lum_energy[j, nr+1, ind1], spectrum[ind1])
-                        Lumout_t_1.append(Lumout_1)
-
-                                # From 100 GeV to 100 TeV
-                        Lumout_2 = luminosity(lum_energy[j, nr+1, ind2], spectrum[ind2])
-                        Lumout_t_2.append(Lumout_2)
-
-                                # From 100 MeV to 100 TeV
-                        Lumout = luminosity(lum_energy[j, nr+1], spectrum)
-                        Lumout_t.append(Lumout)
-
-                            # Total gamma luminosity (erg s^-1)
-                        #Lumtot1 = numpy.sum([Lumsb_1, Lumshell_1, Lumout_1])
-                        #Lumtot2 = numpy.sum([Lumsb_2, Lumshell_2, Lumout_2])
-                        #Lumtot = numpy.sum([Lumsb, Lumshell, Lumout])
-                        Lumtot1 = numpy.sum([Lumsb_1, Lumshell_1])
-                        Lumtot2 = numpy.sum([Lumsb_2, Lumshell_2])
-                        Lumtot = numpy.sum([Lumsb, Lumshell])
+                        for j in range (nt):         # for each time step
 
 
-                        Lumtot_t_1.append(Lumtot1)
-                        Lumtot_t_2.append(Lumtot2)
-                        Lumtot_t.append(Lumtot)
+                                ##------------------------------------##
+                                # First zone: in the cavity (erg s^-1) #
+                                ##------------------------------------##
+                                    # Initialization
+                            radius = r[j]
+                            nr = len(radius)
 
-                        # Total for each SN explosions
+                                    # Recording
+                            Lumsb_1_r = []
+                            Lumsb_2_r = []
+                            Lumsb_r = []
 
-                            # In the SB
-                    Lumsb_sn_1.append(Lumsb_t_1)
-                    Lumsb_sn_2.append(Lumsb_t_2)
-                    Lumsb_sn.append(Lumsb_t)
+                            for k in range (nr):     # for each radius step
 
-                            # In the shell
-                    Lumshell_sn_1.append(Lumshell_t_1)
-                    Lumshell_sn_2.append(Lumshell_t_2)
-                    Lumshell_sn.append(Lumshell_t)
+                                    # From 100 MeV to 100 GeV
+                                Lum_1 = luminosity(lum_energy[j, k, ind1], spectrum[ind1])
+                                Lumsb_1_r.append(Lum_1)
 
-                            # Outside the SB
-                    Lumout_sn_1.append(Lumout_t_1)
-                    Lumout_sn_2.append(Lumout_t_2)
-                    Lumout_sn.append(Lumout_t)
+                                    # From 100 GeV to 100 TeV
+                                Lum_2 = luminosity(lum_energy[j, k, ind2], spectrum[ind2])
+                                Lumsb_2_r.append(Lum_2)
 
-                            # Sum of each contribution
-                    Lumtot_sn_1.append(Lumtot_t_1)
-                    Lumtot_sn_2.append(Lumtot_t_2)
-                    Lumtot_sn.append(Lumtot_t)
+                                    # From 100 MeV to 100 TeV
+                                Lum = luminosity(lum_energy[j,k], spectrum)
+                                Lumsb_r.append(Lum)
 
-                        # Unit
-                    Lum_unit = lum_energy_unit * spectrum.unit
+                                    # Total contribution in the SB (erg s^-1)
+                            Lumsb_1 = numpy.sum(Lumsb_1_r)
+                            Lumsb_2 = numpy.sum(Lumsb_2_r)
+                            Lumsb = numpy.sum(Lumsb_r)
 
-                        # Plot
-                    log_plot(figure_number, 4, t, [Lumsb_t_1, Lumshell_t_1, Lumout_t_1, Lumtot_t_1], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble ($t_{0}$ = %.2e yr)'%t0[i], 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_\gamma$ (100 MeV - 100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), ['+', '+', '+', '-'])
-                    plt.savefig(pathfigure+'Gamma_luminosity_range1_t0-%d.eps' %i)
-                    figure_number += 1
-                    log_plot(figure_number, 4, t, [Lumsb_t_2, Lumshell_t_2, Lumout_t_2, Lumtot_t_2], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble ($t_{0}$ = %.2e yr)'%t0[i], 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_\gamma$ (100 GeV - 100 TeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), ['+', '+', '+', '-'])
-                    plt.savefig(pathfigure+'Gamma_luminosity_range2_t0-%d.eps' %i)
-                    figure_number += 1
-                    log_plot(figure_number, 4, t, [Lumsb_t, Lumshell_t, Lumout_t, Lumtot_t], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble ($t_{0}$ = %.2e yr)'%t0[i], 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_\gamma$ (100 MeV - 100 TeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), ['+', '+', '+', '-'])
-                    plt.savefig(pathfigure+'Gamma_luminosity_t0-%d.eps' %i)
-                    figure_number += 1
+                            Lumsb_t_1.append(Lumsb_1)
+                            Lumsb_t_2.append(Lumsb_2)
+                            Lumsb_t.append(Lumsb)
 
-    Lumtot_sn_1 = numpy.asarray(Lumtot_sn_1)
-    Lumtot_sn_2 = numpy.asarray(Lumtot_sn_2)
-    Lumtot_sn = numpy.asarray(Lumtot_sn)
+                                ##-----------------------------------------##
+                                # Second zone: in the supershell (erg s^-1) #
+                                ##-----------------------------------------##
 
-    # Plot for all SN explosions
+                                    # From 100 MeV to 100 GeV
+                            Lumshell_1 = luminosity(lum_energy[j, nr, ind1], spectrum[ind1])
+                            Lumshell_t_1.append(Lumshell_1)
 
-    Lum_sn_1_tot = numpy.zeros_like(t)
-    Lum_sn_2_tot = numpy.zeros_like(t)
-    Lum_sn_tot = numpy.zeros_like(t)
+                                    # From 100 GeV to 100 TeV
+                            Lumshell_2 = luminosity(lum_energy[j, nr, ind2], spectrum[ind2])
+                            Lumshell_t_2.append(Lumshell_2)
 
-    for i in range (nt0):
+                                    # From 100 MeV to 100 TeV
+                            Lumshell = luminosity(lum_energy[j, nr], spectrum)
+                            Lumshell_t.append(Lumshell)
 
-        indSN = numpy.where(t >= t0[i])[0]  # consider only time when there is already the SN explosion
+                                ##-------------------------------------##
+                                # Third zone: outside the SB (erg s^-1) #
+                                ##-------------------------------------##
 
-        for j in (indSN):
+                                    # From 100 MeV to 100 GeV
+                            Lumout_1 = luminosity(lum_energy[j, nr+1, ind1], spectrum[ind1])
+                            Lumout_t_1.append(Lumout_1)
 
-            Lum_sn_1_tot[j] += Lumtot_sn_1[i, j]
-            Lum_sn_2_tot[j] += Lumtot_sn_2[i, j]
-            Lum_sn_tot[j] += Lumtot_sn[i, j]
+                                    # From 100 GeV to 100 TeV
+                            Lumout_2 = luminosity(lum_energy[j, nr+1, ind2], spectrum[ind2])
+                            Lumout_t_2.append(Lumout_2)
 
-        sym = ['-', '--', ':', '-']
+                                    # From 100 MeV to 100 TeV
+                            Lumout = luminosity(lum_energy[j, nr+1], spectrum)
+                            Lumout_t.append(Lumout)
 
-            # Plot
-        log_plot(figure_number, 4, t, [Lumsb_sn_1[i], Lumshell_sn_1[i], Lumout_sn_1[i], Lumtot_sn_1[i]], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), sym)
-        log_plot(figure_number + 1, 4, t, [Lumsb_sn_2[i], Lumshell_sn_2[i], Lumout_sn_2[i], Lumtot_sn_2[i]], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (100-100 000 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), sym)
-        log_plot(figure_number + 2, 4, t, [Lumsb_sn[i], Lumshell_sn[i], Lumout_sn[i], Lumtot_sn[i]], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (100 MeV - 100 TeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), sym)
+                                # Total gamma luminosity (erg s^-1)
+                            #Lumtot1 = numpy.sum([Lumsb_1, Lumshell_1, Lumout_1])
+                            #Lumtot2 = numpy.sum([Lumsb_2, Lumshell_2, Lumout_2])
+                            #Lumtot = numpy.sum([Lumsb, Lumshell, Lumout])
+                            Lumtot1 = numpy.sum([Lumsb_1, Lumshell_1])
+                            Lumtot2 = numpy.sum([Lumsb_2, Lumshell_2])
+                            Lumtot = numpy.sum([Lumsb, Lumshell])
 
-    log_plot(figure_number, 1, t, Lum_sn_1_tot, 'Total SN', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '-')
-    plt.savefig(pathfigure+'Gamma_luminosity_all_range1.eps')
-    log_plot(figure_number + 1, 1, t, Lum_sn_2_tot, 'Total SN', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (100-100 000 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '-')
-    plt.savefig(pathfigure+'Gamma_luminosity_all_range2.eps')
-    log_plot(figure_number + 2, 1, t, Lum_sn_tot, 'Total SN', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (100 MeV - 100 TeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '-')
-    plt.savefig(pathfigure+'Gamma_luminosity_all.eps')
 
-    plt.show()
+                            Lumtot_t_1.append(Lumtot1)
+                            Lumtot_t_2.append(Lumtot2)
+                            Lumtot_t.append(Lumtot)
+
+                            # Total for each SN explosions
+
+                                # In the SB
+                        Lumsb_sn_1.append(Lumsb_t_1)
+                        Lumsb_sn_2.append(Lumsb_t_2)
+                        Lumsb_sn.append(Lumsb_t)
+
+                                # In the shell
+                        Lumshell_sn_1.append(Lumshell_t_1)
+                        Lumshell_sn_2.append(Lumshell_t_2)
+                        Lumshell_sn.append(Lumshell_t)
+
+                                # Outside the SB
+                        Lumout_sn_1.append(Lumout_t_1)
+                        Lumout_sn_2.append(Lumout_t_2)
+                        Lumout_sn.append(Lumout_t)
+
+                                # Sum of each contribution
+                        Lumtot_sn_1.append(Lumtot_t_1)
+                        Lumtot_sn_2.append(Lumtot_t_2)
+                        Lumtot_sn.append(Lumtot_t)
+
+                            # Unit
+                        Lum_unit = lum_energy_unit * spectrum_energy.unit
+
+                            # Plot
+                        log_plot(figure_number, 4, t, [Lumsb_t_1, Lumshell_t_1, Lumout_t_1, Lumtot_t_1], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble ($t_{0}$ = %.2e yr)'%t0[i], 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_\gamma$ (100 MeV - 100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), ['+', '+', '+', '-'])
+                        plt.savefig(pathfigure+'Gamma_luminosity_range1_t0-%d.eps' %i)
+                        figure_number += 1
+                        log_plot(figure_number, 4, t, [Lumsb_t_2, Lumshell_t_2, Lumout_t_2, Lumtot_t_2], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble ($t_{0}$ = %.2e yr)'%t0[i], 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_\gamma$ (100 GeV - 100 TeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), ['+', '+', '+', '-'])
+                        plt.savefig(pathfigure+'Gamma_luminosity_range2_t0-%d.eps' %i)
+                        figure_number += 1
+                        log_plot(figure_number, 4, t, [Lumsb_t, Lumshell_t, Lumout_t, Lumtot_t], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble ($t_{0}$ = %.2e yr)'%t0[i], 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_\gamma$ (100 MeV - 100 TeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), ['+', '+', '+', '-'])
+                        plt.savefig(pathfigure+'Gamma_luminosity_t0-%d.eps' %i)
+                        figure_number += 1
+
+        Lumtot_sn_1 = numpy.asarray(Lumtot_sn_1)
+        Lumtot_sn_2 = numpy.asarray(Lumtot_sn_2)
+        Lumtot_sn = numpy.asarray(Lumtot_sn)
+
+        # Plot for all SN explosions
+
+        Lum_sn_1_tot = numpy.zeros_like(t)
+        Lum_sn_2_tot = numpy.zeros_like(t)
+        Lum_sn_tot = numpy.zeros_like(t)
+
+        for i in range (nt0):
+
+            indSN = numpy.where(t >= t0[i])[0]  # consider only time when there is already the SN explosion
+
+            for j in (indSN):
+
+                Lum_sn_1_tot[j] += Lumtot_sn_1[i, j]
+                Lum_sn_2_tot[j] += Lumtot_sn_2[i, j]
+                Lum_sn_tot[j] += Lumtot_sn[i, j]
+
+            sym = ['-.', '--', ':', '-']
+
+                # Plot
+            log_plot(figure_number, 4, t, [Lumsb_sn_1[i], Lumshell_sn_1[i], Lumout_sn_1[i], Lumtot_sn_1[i]], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), sym)
+            log_plot(figure_number + 1, 4, t, [Lumsb_sn_2[i], Lumshell_sn_2[i], Lumout_sn_2[i], Lumtot_sn_2[i]], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (100-100 000 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), sym)
+            log_plot(figure_number + 2, 4, t, [Lumsb_sn[i], Lumshell_sn[i], Lumout_sn[i], Lumtot_sn[i]], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (100 MeV - 100 TeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), sym)
+
+        log_plot(figure_number, 1, t, Lum_sn_1_tot, 'Total SN', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '-')
+        plt.savefig(pathfigure+'Gamma_luminosity_all_range1.eps')
+        log_plot(figure_number + 1, 1, t, Lum_sn_2_tot, 'Total SN', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (100-100 000 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '-')
+        plt.savefig(pathfigure+'Gamma_luminosity_all_range2.eps')
+        log_plot(figure_number + 2, 1, t, Lum_sn_tot, 'Total SN', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (100 MeV - 100 TeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '-')
+        plt.savefig(pathfigure+'Gamma_luminosity_all.eps')
+
+        plt.show()
     return
