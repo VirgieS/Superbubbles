@@ -261,7 +261,9 @@ def spectrum(Emin_gamma, Emax_gamma):#, t0, ECR, ECR_unit, t, t_unit, Ntotsn, Nt
                                 r = pickle.load(radius_load)
 
                                 t0 = pickle.load(t0_load)
+                                print(max(t0) - min(t0))
                                 t = pickle.load(time_load)
+                                print(len(t))
                                 t_unit = pickle.load(time_load)
 
                                 #ECR = ECR * ECR_unit
@@ -344,6 +346,7 @@ def gamma_luminosity(Esep, pathfigure):#, t0, t, t_unit, r, spectrum, spectrum_u
                         # Loading data
                             # time
                     t0 = pickle.load(t0_load)
+                    print(t0)
                     t = pickle.load(time_load)
                     t_unit = pickle.load(time_load)
                     time = t * t_unit
@@ -532,13 +535,14 @@ def gamma_luminosity(Esep, pathfigure):#, t0, t, t_unit, r, spectrum, spectrum_u
                         Lum_unit = lum_energy_unit * spectrum_energy.unit
 
                             # Plot
-                        log_plot(figure_number, 4, t, [Lumsb_t_1, Lumshell_t_1, Lumout_t_1, Lumtot_t_1], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble ($t_{0}$ = %.2e yr)'%t0[i], 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_\gamma$ (100 MeV - 100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), ['+', '+', '+', '-'])
+                        sym = ['-.', '--', ':', '-']
+                        log_plot(figure_number, 4, t, [Lumsb_t_1, Lumshell_t_1, Lumout_t_1, Lumtot_t_1], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble ($t_{0}$ = %.2e yr)'%t0[i], 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_\gamma$ (100 MeV - 100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), sym)
                         plt.savefig(pathfigure+'Gamma_luminosity_range1_t0-%d.eps' %i)
                         figure_number += 1
-                        log_plot(figure_number, 4, t, [Lumsb_t_2, Lumshell_t_2, Lumout_t_2, Lumtot_t_2], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble ($t_{0}$ = %.2e yr)'%t0[i], 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_\gamma$ (100 GeV - 100 TeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), ['+', '+', '+', '-'])
+                        log_plot(figure_number, 4, t, [Lumsb_t_2, Lumshell_t_2, Lumout_t_2, Lumtot_t_2], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble ($t_{0}$ = %.2e yr)'%t0[i], 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_\gamma$ (100 GeV - 100 TeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), sym)
                         plt.savefig(pathfigure+'Gamma_luminosity_range2_t0-%d.eps' %i)
                         figure_number += 1
-                        log_plot(figure_number, 4, t, [Lumsb_t, Lumshell_t, Lumout_t, Lumtot_t], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble ($t_{0}$ = %.2e yr)'%t0[i], 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_\gamma$ (100 MeV - 100 TeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), ['+', '+', '+', '-'])
+                        log_plot(figure_number, 4, t, [Lumsb_t, Lumshell_t, Lumout_t, Lumtot_t], ['SB', 'Shell', 'Out', 'Total'], 'Gamma emission of a superbubble ($t_{0}$ = %.2e yr)'%t0[i], 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_\gamma$ (100 MeV - 100 TeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), sym)
                         plt.savefig(pathfigure+'Gamma_luminosity_t0-%d.eps' %i)
                         figure_number += 1
 
@@ -565,9 +569,23 @@ def gamma_luminosity(Esep, pathfigure):#, t0, t, t_unit, r, spectrum, spectrum_u
             sym = ['-.', '--', ':', '-']
 
                 # Plot
-            log_plot(figure_number, 4, t, [Lumsb_sn_1[i], Lumshell_sn_1[i], Lumout_sn_1[i], Lumtot_sn_1[i]], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), sym)
-            log_plot(figure_number + 1, 4, t, [Lumsb_sn_2[i], Lumshell_sn_2[i], Lumout_sn_2[i], Lumtot_sn_2[i]], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (100-100 000 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), sym)
-            log_plot(figure_number + 2, 4, t, [Lumsb_sn[i], Lumshell_sn[i], Lumout_sn[i], Lumtot_sn[i]], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (100 MeV - 100 TeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), sym)
+                    # First range
+            log_plot(figure_number, 1, t, Lumsb_sn_1[i], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '-.')
+            log_plot(figure_number, 1, t, Lumshell_sn_1[i], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '--')
+            log_plot(figure_number, 1, t, Lumout_sn_1[i], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), ':')
+            log_plot(figure_number, 1, t, Lumtot_sn_1[i], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '-')
+
+                    # Second range
+            log_plot(figure_number + 1, 1, t, Lumsb_sn_2[i], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '-.')
+            log_plot(figure_number + 1, 1, t, Lumshell_sn_2[i], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '--')
+            log_plot(figure_number + 1, 1, t, Lumout_sn_2[i], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), ':')
+            log_plot(figure_number + 1, 1, t, Lumtot_sn_2[i], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '-')
+
+                    # All energy
+            log_plot(figure_number + 2, 1, t, Lumsb_sn[i], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '-.')
+            log_plot(figure_number + 2, 1, t, Lumshell_sn[i], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '--')
+            log_plot(figure_number + 2, 1, t, Lumout_sn[i], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), ':')
+            log_plot(figure_number + 2, 1, t, Lumtot_sn[i], 'none', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '-')
 
         log_plot(figure_number, 1, t, Lum_sn_1_tot, 'Total SN', 'Gamma emission of a superbubble', 'Time [{0}]'.format(time.unit.to_string('latex_inline')), '$L_E$ (0.1-100 GeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '-')
         plt.savefig(pathfigure+'Gamma_luminosity_all_range1.eps')
