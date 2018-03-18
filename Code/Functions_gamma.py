@@ -35,7 +35,6 @@ def data(Emin_CR, Emax_CR, p0, alpha, D0, delta):
         alpha       :       exponent of the power-law distribution of the cosmic rays
         D0          :       diffusion coefficient at p0 (cm^2 s^-1)
         delta       :       exponent of the power-law distribution of the diffusion coefficient
-        t0          :       array of the Sn explosion time (yr)
 
     Outputs:
         gas         :       file with the density of gas for all time step and radius step (cm^-3)
@@ -93,118 +92,147 @@ def data(Emin_CR, Emax_CR, p0, alpha, D0, delta):
                             t0 = pickle.load(t0_load)
                             nt0 = len(t0)
 
-                            #pickle.dump(t0, time_write)     # Recording the SN explosion time (yr)
+                                    # recording
+                            Ntotsn = []                 # particles distribution for each time, radius and energy: the matrix of dimension len(t0)xlen(t)x(len(r)+2)xlen(E)
+                            ngastot = []                # density of gas for each time and radius : matrix of dimension len(t)x(len(r)+2)
+                            radius = []                 # radius array for each time: array of dimension len(t)x(len(r))
+                            t = []                      # time array (yr): array of dimension len(t)
+
+                            for i in range (nt0):
+
+                                tmin = t0[i]    # only when the SN occurs
 
                                     # time vector (yr)
-                            tmin = min(t0)       # nothing happens before the first SN explosion (yr)
-                            tmax = max(t0) + 1e6
-                            deltat_max = tmax - tmin
+                                if i != nt0-1:
 
-                            number_bin_t = int(deltat_max/1e6 * 200)
+                                    delta_t0 = t0[i+1] - t0[i]
 
-                            t = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)
-                            t_unit = units.yr
+                                    if delta_t0 <= 1e6:
 
-                            pickle.dump(t, time_write)      # Recording the time array (yr)
-                            pickle.dump(t_unit, time_write)
+                                        tmax = t0[i+1]
+                                        number_bin_t = 200
+                                        dt = (tmax - tmin)/number_bin_t
+                                        tmax = tmax - dt
 
-                                # Initialization
-                            figure_number = 1
+                                        time = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)
 
-                                # Recording
-                            Ntotsn = []                 # particles distribution for each time, radius and energy: the matrix of dimension len(t0)xlen(t)x(len(r)+2)xlen(E)
-                            ngastot = []                # density of gas for each time and radius : matrix of dimension len(t0)xlen(t)x(len(r)+2)
-                            radius = []                 # radius array for each time: array of dimension len(t0)xlen(t)x(len(r))
+                                        for l in range (number_bin_t):
+                                            t.append(time[l])
 
-                                # For verification
-                            #Nverift = []
+                                    else:
+                                        tmax = tmin + 1e6
+                                        number_bin_t = 200
+                                        time = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)
+                                        for l in range (number_bin_t):
+                                            t.append(time[l])
 
-                            for i in range (number_bin_t):        # for each time step
-                                Ntot = []               # particles distribution for each time, radius and energy: the matrix of dimension len(t)x(len(r)+1)xlen(E)
-                                ngas = []               # density of gas for each time and radius : matrix of dimension len(t)x(len(r)+1)
+                                        tmin = tmax + 1e3
+                                        tmax = t0[i+1] - 1e3
+                                        number_bin_t = 10
+                                        time = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)
+                                        for l in range (number_bin_t):
+                                            t.append(time[l])
+
+                                else:
+                                    tmax = tmin + 1e6
+                                    number_bin_t = 200
+                                    time = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)
+                                    for l in range (number_bin_t):
+                                        t.append(time[l])
+
+                                indSN = numpy.where(t>= t0[i]-1e3)[0]
 
                                     # Initialization
-                                t6 = t[i] * yr26yr      # 10^6 yr
-                                t7 = t6 * s6yr27yr      # 10^7 yr
+                                figure_number = 1
 
-                                    # r array
-                                Rsb, Vsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)           # radius and velocity of the SB
-                                Msb, Mswept = masses(an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu)   # swept-up and inner masses (solar masses)
-                                hs, ns = density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb)            # thickness and density of the shell (pc)
+                                    # Recording
+                                Ntot = []                   # particles distribution for each time, radius and energy: the matrix of dimension len(t)x(len(r)+1)xlen(E)
+                                ngas = []                   # density of gas for each time and radius : matrix of dimension len(t)x(len(r)+1)
 
-                                rmin = 0.01                 # minimum radius (pc)
-                                rmax = Rsb-hs               # maximum radius (pc)
-                                number_bin_r = 15           # number of bin for r from 0 to Rsb-hs
-                                r = numpy.logspace(numpy.log10(rmin), numpy.log10(rmax), number_bin_r)    # position (pc)
+                                    # For verification
+                                #Nverift = []
 
-                                radius.append(r)
+                                for j in (indSN):        # for each time step
 
-                                    # Density of gas (cm^-3)
-                                        # First zone: in the cavity
+                                        # Initialization
+                                    t6 = t[j] * yr26yr      # 10^6 yr
+                                    t7 = t6 * s6yr27yr      # 10^7 yr
 
-                                nsb = profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, r, Rsb)[1]
-                                n_gas = nsb
-                                n_gas = n_gas.tolist()
+                                        # r array
+                                    Rsb, Vsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)           # radius and velocity of the SB
+                                    Msb, Mswept = masses(an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu)   # swept-up and inner masses (solar masses)
+                                    hs, ns = density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb)            # thickness and density of the shell (pc)
 
-                                        # Second zone: in the supershell
-                                n_gas.append(ns)
+                                    rmin = 0.01                 # minimum radius (pc)
+                                    rmax = Rsb-hs               # maximum radius (pc)
+                                    number_bin_r = 15           # number of bin for r from 0 to Rsb-hs
+                                    r = numpy.logspace(numpy.log10(rmin), numpy.log10(rmax), number_bin_r)    # position (pc)
 
-                                        # Third zone: outside the superbubble
-                                n_gas.append(n0)
+                                    radius.append(r)
 
-                                        # Recording for each time step
-                                ngastot.append(n_gas)
+                                        # Density of gas (cm^-3)
+                                            # First zone: in the cavity
 
-                                for j in range (nt0):       # for each SN explosion
+                                    nsb = profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, r, Rsb)[1]
+                                    n_gas = nsb
+                                    n_gas = n_gas.tolist()
 
-                                    if t[i] < t0[j]:
-                                        n = numpy.zeros((number_bin_r + 2, number_bin_E))
-                                        Ntot.append(n)
-                                        continue
-                                    else:
+                                            # Second zone: in the supershell
+                                    n_gas.append(ns)
 
-                                        deltaT = t[i]-t0[j]
+                                            # Third zone: outside the superbubble
+                                    n_gas.append(n0)
 
-                                            ## --------------------------------- ##
-                                            # First zone: in the cavity of the SB #
-                                            ## --------------------------------- ##
+                                            # Recording for each time step
+                                    ngastot.append(n_gas)
 
-                                                # For recording the distribution of particles for each time
-                                        Nr = []         # (GeV^-1) : matrix of dimension (len(r)-1) x len(E))
+                                    deltaT = t[j]-t0[i]
+                                    if deltaT < 1e-8:
+                                        deltaT = 0
+
+                                        ## --------------------------------- ##
+                                        # First zone: in the cavity of the SB #
+                                        ## --------------------------------- ##
+
+                                            # For recording the distribution of particles for each time
+                                    Nr = []         # (GeV^-1) : matrix of dimension (len(r)-1) x len(E))
 
                                                 # r array (pc)
-                                        r_in = 0
-                                        r_out = r[0]
+                                    r_in = 0
+                                    r_out = r[0]
+                                    N_part = shell_particles(r_in, r_out, N_E, D, deltaT)
+                                    Nr.append(N_part)
+
+                                    for k in range (1, number_bin_r):   # for each radius inside the SB
+
+                                        r_in = r_out
+                                        r_out = r[k]
                                         N_part = shell_particles(r_in, r_out, N_E, D, deltaT)
+                                        N_part = numpy.nan_to_num(N_part)
                                         Nr.append(N_part)
 
-                                        for k in range (1, number_bin_r):   # for each radius inside the SB
+                                        ## -------------------------------- ##
+                                        # Second zone: inside the supershell #
+                                        ## -------------------------------- ##
 
-                                            r_in = r_out
-                                            r_out = r[k]
-                                            N_part = shell_particles(r_in, r_out, N_E, D, deltaT)
-                                            Nr.append(N_part)
+                                            # For the particle distribution (GeV^-1): N_part = 4 * pi * int_{Rsb-hs}^Rsb Ne
+                                    r_in = rmax         # in pc
+                                    r_out = Rsb         # in pc
+                                    N_part = shell_particles(r_in, r_out, N_E, D, deltaT)
+                                    Nr.append(N_part)
 
-                                            ## -------------------------------- ##
-                                            # Second zone: inside the supershell #
-                                            ## -------------------------------- ##
+                                        ## ------------------------ ##
+                                        # Third zone: outside the SB #
+                                        ## ------------------------ ##
+                                            # For the particle distribution (GeV^-1): N_part = 4 * pi * int_Rsb^inf Ne r^2 dr
+                                    N_part = inf_particles(Rsb, N_E, D, deltaT)
+                                    Nr.append(N_part)
 
-                                                # For the particle distribution (GeV^-1): N_part = 4 * pi * int_{Rsb-hs}^Rsb Ne
-                                        r_in = rmax         # in pc
-                                        r_out = Rsb         # in pc
-                                        N_part = shell_particles(r_in, r_out, N_E, D, deltaT)
-                                        Nr.append(N_part)
+                                        # --------- #
+                                        # Recording
 
-                                            ## ------------------------ ##
-                                            # Third zone: outside the SB #
-                                            ## ------------------------ ##
-                                                # For the particle distribution (GeV^-1): N_part = 4 * pi * int_Rsb^inf Ne r^2 dr
-                                        N_part = inf_particles(Rsb, N_E, D, deltaT)
-                                        Nr.append(N_part)
+                                    Ntot.append(Nr)
 
-                                            # --------- #
-                                            # Recording
-                                        Ntot.append(Nr)
 
                                 Ntotsn.append(Ntot)
 
@@ -221,6 +249,10 @@ def data(Emin_CR, Emax_CR, p0, alpha, D0, delta):
                             pickle.dump(ngastot, gas_write)         # Recording the density of gas for each SN explosion, each time and each zone
                             pickle.dump(ngas_unit, gas_write)
 
+                        t = numpy.asarray(t)
+                        t_unit = units.yr
+                        pickle.dump(t, time_write)
+                        pickle.dump(t_unit, time_write)
 
     return #ECR, ECR_unit, t, t_unit, Ntotsn, Ntot_unit, ngastot, ngas_unit, radius
 
@@ -232,7 +264,6 @@ def spectrum(Emin_gamma, Emax_gamma):#, t0, ECR, ECR_unit, t, t_unit, Ntotsn, Nt
     Inputs:
         Emin_gamma  :       minimum energy of the gamma photon (GeV)
         Emax_gamma  :       maximum energy of the gamma photon (GeV)
-        t0          :       array of the Sn explosion time (yr)
 
     Output:
         spectra     :       file with the energy spectrum of the gamma photons and the spectral energy distribution for each SN explosions, time step and zones
@@ -256,14 +287,15 @@ def spectrum(Emin_gamma, Emax_gamma):#, t0, ECR, ECR_unit, t, t_unit, Ntotsn, Nt
                                 ECR = ECR * ECR_unit
 
                                 Ntotsn = pickle.load(data_load)
+                                print(numpy.asarray(Ntotsn[1]).shape)
                                 Ntot_unit = pickle.load(data_load)
 
                                 r = pickle.load(radius_load)
 
                                 t0 = pickle.load(t0_load)
-                                print(max(t0) - min(t0))
+                                print(t0)
                                 t = pickle.load(time_load)
-                                print(len(t))
+                                print(t)
                                 t_unit = pickle.load(time_load)
 
                                 #ECR = ECR * ECR_unit
@@ -271,7 +303,6 @@ def spectrum(Emin_gamma, Emax_gamma):#, t0, ECR, ECR_unit, t, t_unit, Ntotsn, Nt
                                 number_bin_E = 20
                                 spectrum_energy = numpy.logspace(numpy.log10(Emin_gamma), numpy.log10(Emax_gamma), number_bin_E) * units.GeV
 
-                                nt = len(t)
                                 nt0 = len(t0)
 
                                 sed_PD_sn = []
@@ -279,8 +310,11 @@ def spectrum(Emin_gamma, Emax_gamma):#, t0, ECR, ECR_unit, t, t_unit, Ntotsn, Nt
                                 for i in range (nt0):       # for each SN explosion
 
                                     sed = []
+                                    indSN = numpy.where(t>= t0[i] - 1e3)[0]
+                                    nt = len(t[indSN])
+                                    print(nt)
 
-                                    for j in range (nt):    # for each time step
+                                    for j in range(nt):    # for each time step when the SN explosion occurs or after the SN explosion
 
                                             # Initialization
                                         radius = r[j]
@@ -288,7 +322,9 @@ def spectrum(Emin_gamma, Emax_gamma):#, t0, ECR, ECR_unit, t, t_unit, Ntotsn, Nt
 
                                             # Important quantities
                                         ngas = ngassn[j] * ngas_unit
-                                        ntot = numpy.asarray(Ntotsn[j, i]) * Ntot_unit
+                                        ntot = Ntotsn[i]
+                                        ntot = numpy.asarray(ntot)
+                                        ntot = ntot[j] * Ntot_unit
 
                                             # Recording
                                         spectrum_r = []
@@ -346,7 +382,6 @@ def gamma_luminosity(Esep, pathfigure):#, t0, t, t_unit, r, spectrum, spectrum_u
                         # Loading data
                             # time
                     t0 = pickle.load(t0_load)
-                    print(t0)
                     t = pickle.load(time_load)
                     t_unit = pickle.load(time_load)
                     time = t * t_unit

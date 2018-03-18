@@ -96,12 +96,16 @@ def shell_particles(r_in, r_out, NE, D, deltat):
     r_in = r_in * pc2cm     # in cm
     deltat = deltat * yr2s            # in s
 
-    a = r_in/(numpy.sqrt(4 * D * deltat))
-    b = r_out/(numpy.sqrt(4 * D * deltat))
+    if deltat == 0:
+        N = NE
 
-    #N = NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * (erf(b) - erf(a)) + 2 * numpy.exp(-a**2) * a - 2 * numpy.exp(-b**2) * b)
+    else:
+        a = r_in/(numpy.sqrt(4 * D * deltat))
+        b = r_out/(numpy.sqrt(4 * D * deltat))
 
-    return NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * (erf(b) - erf(a)) + 2 * numpy.exp(-a**2) * a - 2 * numpy.exp(-b**2) * b)
+        N = NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * (erf(b) - erf(a)) + 2 * numpy.exp(-a**2) * a - 2 * numpy.exp(-b**2) * b)
+
+    return N
 
 def inf_particles(Rsb, NE, D, deltat):
     """
