@@ -97,6 +97,7 @@ def data(Emin_CR, Emax_CR, p0, alpha, D0, delta):
                             ngastot = []                # density of gas for each time and radius : matrix of dimension len(t)x(len(r)+2)
                             radius = []                 # radius array for each time: array of dimension len(t)x(len(r))
                             t = []                      # time array (yr): array of dimension len(t)
+                            j = 0
 
                             for i in range (nt0):
 
@@ -140,8 +141,6 @@ def data(Emin_CR, Emax_CR, p0, alpha, D0, delta):
                                     for l in range (number_bin_t):
                                         t.append(time[l])
 
-                                indSN = numpy.where(t>= t0[i]-1e3)[0]
-
                                     # Initialization
                                 figure_number = 1
 
@@ -151,8 +150,9 @@ def data(Emin_CR, Emax_CR, p0, alpha, D0, delta):
 
                                     # For verification
                                 #Nverift = []
+                                nt = len(t)
 
-                                for j in (indSN):        # for each time step
+                                while j < nt:        # for each time step
 
                                         # Initialization
                                     t6 = t[j] * yr26yr      # 10^6 yr
@@ -169,6 +169,7 @@ def data(Emin_CR, Emax_CR, p0, alpha, D0, delta):
                                     r = numpy.logspace(numpy.log10(rmin), numpy.log10(rmax), number_bin_r)    # position (pc)
 
                                     radius.append(r)
+                                    #print(numpy.asarray(radius).shape)
 
                                         # Density of gas (cm^-3)
                                             # First zone: in the cavity
@@ -186,9 +187,11 @@ def data(Emin_CR, Emax_CR, p0, alpha, D0, delta):
                                             # Recording for each time step
                                     ngastot.append(n_gas)
 
+
+
                                     deltaT = t[j]-t0[i]
                                     if deltaT < 1e-8:
-                                        deltaT = 0
+                                            deltaT = 0
 
                                         ## --------------------------------- ##
                                         # First zone: in the cavity of the SB #
@@ -232,11 +235,12 @@ def data(Emin_CR, Emax_CR, p0, alpha, D0, delta):
                                         # Recording
 
                                     Ntot.append(Nr)
-
+                                    j += 1
 
                                 Ntotsn.append(Ntot)
 
                             Ntotsn = numpy.asarray(Ntotsn)
+                            print(numpy.asarray(Ntotsn[0]).shape)
                             Ntot_unit = 1/(units.GeV)               # units of Ntot (GeV^-1)
                             pickle.dump(Ntotsn, data_write)         # Recording the number of particles for each SN explosion time, each time, each zone and each energy
                             pickle.dump(Ntot_unit, data_write)
@@ -287,15 +291,12 @@ def spectrum(Emin_gamma, Emax_gamma):#, t0, ECR, ECR_unit, t, t_unit, Ntotsn, Nt
                                 ECR = ECR * ECR_unit
 
                                 Ntotsn = pickle.load(data_load)
-                                print(numpy.asarray(Ntotsn[1]).shape)
                                 Ntot_unit = pickle.load(data_load)
 
                                 r = pickle.load(radius_load)
 
                                 t0 = pickle.load(t0_load)
-                                print(t0)
                                 t = pickle.load(time_load)
-                                print(t)
                                 t_unit = pickle.load(time_load)
 
                                 #ECR = ECR * ECR_unit
@@ -306,15 +307,25 @@ def spectrum(Emin_gamma, Emax_gamma):#, t0, ECR, ECR_unit, t, t_unit, Ntotsn, Nt
                                 nt0 = len(t0)
 
                                 sed_PD_sn = []
+                                j = 0
 
                                 for i in range (nt0):       # for each SN explosion
 
                                     sed = []
-                                    indSN = numpy.where(t>= t0[i] - 1e3)[0]
-                                    nt = len(t[indSN])
-                                    print(nt)
 
-                                    for j in range(nt):    # for each time step when the SN explosion occurs or after the SN explosion
+                                    if i !=nt0 - 1:
+                                        tmax = t0[i+1]
+                                        indSN = numpy.where(t < tmax)[0]
+                                        nt = len(t[indSN])
+
+                                    else:
+                                        nt = len(t)
+
+                                    print(nt)
+                                    n = j
+
+                                    while j < nt:    # for each time step when the SN explosion occurs or after the SN explosion
+                                        print(j, n)
 
                                             # Initialization
                                         radius = r[j]
@@ -324,7 +335,7 @@ def spectrum(Emin_gamma, Emax_gamma):#, t0, ECR, ECR_unit, t, t_unit, Ntotsn, Nt
                                         ngas = ngassn[j] * ngas_unit
                                         ntot = Ntotsn[i]
                                         ntot = numpy.asarray(ntot)
-                                        ntot = ntot[j] * Ntot_unit
+                                        ntot = ntot[j-n] * Ntot_unit
 
                                             # Recording
                                         spectrum_r = []
@@ -338,6 +349,9 @@ def spectrum(Emin_gamma, Emax_gamma):#, t0, ECR, ECR_unit, t, t_unit, Ntotsn, Nt
                                             sed_r.append(sed_PD)
 
                                         sed.append(sed_r)
+
+                                        j += 1
+                                        #print(j)
 
                                     sed_PD_sn.append(sed)
 
@@ -459,7 +473,8 @@ def gamma_luminosity(Esep, pathfigure):#, t0, t, t_unit, r, spectrum, spectrum_u
                         Lumtot_t = []           # 100 MeV to 100 TeV
 
                             # Initialization
-                        indSN = numpy.where(t >= t0[i])[0]     # only time where the SN already explodes
+                        if i != nt0 - 1:
+                            indSN = numpy.where(t < t0[i+1])[0]     # only time where the SN already explodes
 
                         for j in range (nt):         # for each time step
 

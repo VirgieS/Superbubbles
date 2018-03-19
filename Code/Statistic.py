@@ -19,11 +19,15 @@ from Physical_constants import *
 from Conversion_factors import *
 from Parameters_SB import *
 
-os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/stat_SN/3/')
-#os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/stat_SN/1/')
-#pathfigure_CR = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/CR/5/'
-#pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/Gamma_emission/1/'
-pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/stat_SN/Gamma_emission/2/'
+    # IRAP
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/stat_SN/Test/')
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/Gamma_emission/Test/'
+#pathfigure_CR = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/CR/1/'
+
+    # Home
+#os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/stat_SN/3/')
+#pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/stat_SN/Gamma_emission/2/'
+#pathfigure_CR = '/home/vivi/Documents/Master_2/Superbubbles/figures/stat_SN/CR/2/'
 
 ## ======= ##
 # Statistic #
@@ -44,9 +48,9 @@ delta = 1.0/3       # exponent of the power-law of the diffusion coefficient
 D0 = 1e28           # diffusion coefficient at 10 GeV/c in cm^2 s^-1
 
         # SN explosion time
-"""
+
 with open('SN', 'wb') as t0_write:
-    n = 1               # number of massive stars in the OB association
+    n = 3               # number of massive stars in the OB association
     t0min = 3           # 3 Myr
     t0max = 37          # 37 Myr
     t0 = random_SN(3, 37, n)/yr26yr     # Sn explosions time (yr)
@@ -62,7 +66,7 @@ Emax_gamma = 100 * TeV2GeV            # 100 TeV = 100 000 GeV
 
 spectrum(Emin_gamma, Emax_gamma)#, t0, ECR, ECR_unit, t, t_unit, Ntotsn, Ntot_unit, ngastot, ngas_unit, radius)
 print('spectrum done')
-"""
+
 Esep = 100      # in GeV
 gamma_luminosity(Esep, pathfigure_gamma)#, t0, t, t_unit, radius, spectrum, spectrum_unit, sed_PD_sn, sed_PD_unit)
 print('gamma emission done')
