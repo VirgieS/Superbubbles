@@ -96,7 +96,7 @@ def shell_particles(r_in, r_out, NE, D, deltat):
     r_in = r_in * pc2cm     # in cm
     deltat = deltat * yr2s            # in s
 
-    if deltat == 0:
+    if deltat == 0 and r_in == 0:
         N = NE
 
     else:
@@ -117,9 +117,13 @@ def inf_particles(Rsb, NE, D, deltat):
         deltat      :       time after the SN explosion (yr)
     """
 
-    a = (Rsb*pc2cm)/(numpy.sqrt(4 * D * deltat * yr2s))
+    if delta < 1e-8:
+        N = numpy.zeros_like(NE)
+    else:
+        a = (Rsb*pc2cm)/(numpy.sqrt(4 * D * deltat * yr2s))
+        N = NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * erfc(a) + 2 * numpy.exp(-a**2) * a)
 
-    return NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * erfc(a) + 2 * numpy.exp(-a**2) * a)
+    return N
 
 def gauss(x, A, Dt):
     """
