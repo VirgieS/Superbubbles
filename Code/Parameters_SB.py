@@ -5,7 +5,7 @@ Here are all the free parameters for the system!
 # Parameters for the system
 
     # OB asociation
-Nob = 100           # number of OB-stars in the association
+Nob = 50           # number of OB-stars in the association
 Lob = 1e36          # mean luminosity of an OB-star (erg/s)
 Pob = Nob*Lob       # mean power of the association (erg/s)
 lifetime = 30e6     # average lifetime of the lowest B star (yr)
