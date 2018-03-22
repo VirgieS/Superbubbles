@@ -62,13 +62,8 @@ def diffusion_spherical(t, r, t0, NE, D):
         NE      :       initial density of the population of CR (GeV^-1)
         D       :       diffusion coefficient (cm^2 s^-1)
     """
-    #rmin = 0                    # minimum radius (pc)
-    #rmax = R_max                # maximum radius (pc)
-    #number_bin_r = (rmax-rmin)/dr + 1
-    #r = numpy.linspace(rmin, rmax, number_bin_r)    # position in pc
 
     delta_t = t - t0            # time after the SN explosion (yr)
-    #delta_t = delta_t * yr2s    # in s
 
         # density of the particles in time and position (GeV^-1)
     N = numpy.zeros(len(r))
@@ -94,12 +89,12 @@ def shell_particles(r_in, r_out, NE, D, deltat):
 
     r_out = r_out * pc2cm   # in cm
     r_in = r_in * pc2cm     # in cm
-    deltat = deltat * yr2s            # in s
 
-    if deltat == 0 and r_in == 0:
+    if deltat < 1e-8 and r_in == 0:
         N = NE
 
     else:
+        deltat = deltat * yr2s            # in s
         a = r_in/(numpy.sqrt(4 * D * deltat))
         b = r_out/(numpy.sqrt(4 * D * deltat))
 
@@ -117,9 +112,9 @@ def inf_particles(Rsb, NE, D, deltat):
         deltat      :       time after the SN explosion (yr)
     """
 
-    if delta < 1e-8:
+    N = numpy.zeros_like(NE)
+    if deltat > 1e-8:
         N = numpy.zeros_like(NE)
-    else:
         a = (Rsb*pc2cm)/(numpy.sqrt(4 * D * deltat * yr2s))
         N = NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * erfc(a) + 2 * numpy.exp(-a**2) * a)
 
