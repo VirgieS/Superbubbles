@@ -26,8 +26,8 @@ from Parameters_SB import *
 #pathfigure_CR = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/CR/1/'
 
     # Home
-os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/stat_SN/iterations/Test/')
-pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/stat_SN/Gamma_emission/iterations/Test/'
+os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/stat_SN/iterations/3/')
+pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/stat_SN/Gamma_emission/iterations/3/'
 #pathfigure_CR = '/home/vivi/Documents/Master_2/Superbubbles/figures/stat_SN/CR/2/'
 
 ## ======= ##
@@ -51,37 +51,33 @@ alpha = 2.0         # exponent of the power-law distribution
 delta = 1.0/3       # exponent of the power-law of the diffusion coefficient
 D0 = 1e28           # diffusion coefficient at 10 GeV/c in cm^2 s^-1
 
+    # Which zone for the Computation
+zones = [2]
+
 for i in range (nit):
 
             # SN explosion time
     with open('SN', 'wb') as t0_write:
-        with open('time', 'wb') as time_write:
-                # Sn explosion time (yr)
-            n = 3             # number of massive stars in the OB association
-            t0min = 3           # 3 Myr
-            t0max = 37          # 37 Myr
-            number_bin_t = 34*200
-            t0 = random_SN(3, 37, n)/yr26yr
-            pickle.dump(t0, t0_write)
-
-                # Time array (yr)
-            tmin = t0min/yr26yr
-            tmax = t0max/yr26yr
-            t = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)
-            pickle.dump(t, time_write)
+            # Sn explosion time (yr)
+        n = 3             # number of massive stars in the OB association
+        t0min = 3           # 3 Myr
+        t0max = 37          # 37 Myr
+        number_bin_t = 34*200
+        t0 = random_SN(3, 37, n)/yr26yr
+        t0 = sorted(t0)
+        pickle.dump(t0, t0_write)
 
         # Data computation
-    zone = [2]
-    data_zone(Emin_CR, Emax_CR, p0, alpha, D0, delta, zone)
-    """
+    data(Emin_CR, Emax_CR, p0, alpha, D0, delta, zones)
+
         # Spectral energy distribution computation
     Emin_gamma = 100 * MeV2GeV            # 100 MeV = 0.1 GeV
     Emax_gamma = 100 * TeV2GeV            # 100 TeV = 100 000 GeV
 
-    spectrum_zone(Emin_gamma, Emax_gamma, zone)#, t0, ECR, ECR_unit, t, t_unit, Ntotsn, Ntot_unit, ngastot, ngas_unit, radius)
+    spectrum(Emin_gamma, Emax_gamma, zones)#, t0, ECR, ECR_unit, t, t_unit, Ntotsn, Ntot_unit, ngastot, ngas_unit, radius)
 
         # gamma luminosity computation
     Esep = 100      # in GeV
-    gamma_luminosity_it(Esep, pathfigure_gamma, i)#, t0, t, t_unit, radius, spectrum, spectrum_unit, sed_PD_sn, sed_PD_unit)
-    """
+    gamma_luminosity_it(Esep, pathfigure_gamma, zones, i)#, t0, t, t_unit, radius, spectrum, spectrum_unit, sed_PD_sn, sed_PD_unit)
+
     print('end of the iteration')
