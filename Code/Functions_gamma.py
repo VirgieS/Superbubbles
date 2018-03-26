@@ -287,251 +287,7 @@ def data(Emin_CR, Emax_CR, p0, alpha, D0, delta, zones):
                             pickle.dump(ngastot, gas_write)         # Recording the density of gas for each SN explosion, each time and each zone
                             pickle.dump(ngas_unit, gas_write)
 
-    return #ECR, ECR_unit, t, t_unit, Ntotsn, Ntot_unit, ngastot, ngas_unit, radius
-
-def data_zone(Emin_CR, Emax_CR, p0, alpha, D0, delta, zones):
-
-    """
-    Return 5 files with differents quantities.
-    Inputs:
-        Emin_CR     :       minimum kinetic energy of the relativistic particles (GeV)
-        Emax_CR     :       maximum kinetic energy of the relativistic particles (GeV)
-        p0          :       normalization constant of the power-law distribution of the cosmic rays (GeV/c)
-        alpha       :       exponent of the power-law distribution of the cosmic rays
-        D0          :       diffusion coefficient at p0 (cm^2 s^-1)
-        delta       :       exponent of the power-law distribution of the diffusion coefficient
-        zones       :       which zone do you want to compute (1: cavity of the SB, 2: supershell and 3: outside)
-
-    Outputs:
-        gas         :       file with the density of gas for all time step and radius step (cm^-3)
-        energy      :       file with the energy of the relativistic particles (GeV)
-        radius      :       file with the radius array for each time step (pc)
-        data        :       file with the distribution of relativistic particles for each time step, each SN explosion and each zones (GeV^-1)
-    """
-
-    # Parameters for the system
-
-        # luminosity
-    L36 = Pob * erg236erg     # mechanical energy expressed in 10^36 erg/s
-    L38 = L36 * t36erg238erg  # mechanical energy expressed in 10^38 erg/s
-
-        # in the ISM
-    pISM = n0 * kb * TISM               # pressure in the ISM (dyne cm^-2)
-    C02 = kb*TISM/(mu*mpg)/(km2cm)**2   # isothermal sound speed in the ambiant gas (km/s)
-
-    with open('SN', 'rb') as t0_load:
-        with open('time', 'rb') as time_load:
-            with open('gas', 'wb') as gas_write:                                        # for the density of gas (cm^-3)
-                with open('energy', 'wb') as energy_write:                              # for the energy of the particles (GeV)
-                    with open('radius', 'wb') as radius_write:                          # for the radius array (pc)
-                        with open('data', 'wb') as data_write:                          # for the particles distribution (GeV^-1)
-
-                                # Energy
-                            number_bin_E = 10
-                            ECR = numpy.logspace(numpy.log10(Emin_CR), numpy.log10(Emax_CR), number_bin_E)  # GeV
-                            ECR_unit = units.GeV      # recording the unit of the energy array
-
-                            pickle.dump(ECR, energy_write)
-                            pickle.dump(ECR_unit, energy_write)
-
-                                ## ====================================================== ##
-                                # power-law distribution of the cosmic rays (GeV^-1 cm^-3) #
-                                ## ====================================================== ##
-                                    # N(p) = N0 * (p/p0)^(-alpha)
-                                    # N(E) = N0/c * ((E^2 + 2*mp*c^2*E)^(-(1+alpha)/2) * (E + mp*c^2)/((E0^2 + 2*mp*E0)^(-alpha/2)) d^3(r)
-                            Esng = Esn*erg2GeV  # in GeV
-                            N_E = power_law_distribution(Emin_CR, Emax_CR, ECR, alpha, eta, Esng, p0)
-
-                                ## =============================== ##
-                                # diffusion coefficient (cm^2 s^-1) #
-                                ## =============================== ##
-                                    # D(p) = D0 * (p/p0)^(-delta)
-                                    # D(E) = D0 * (E^2 + 2*mpg*E)^(delta/2) * 1/p0^delta
-                            D = diffusion_coefficient(p0, D0, ECR, delta)
-
-                                ## ====================================================== ##
-                                # Computation of N(E,t,r), particles distribution (GeV^-1) #
-                                ## ====================================================== ##
-
-                                    # SN explosion: time (yr)
-                            t0 = pickle.load(t0_load)
-                            nt0 = len(t0)
-
-                                # time array (yr)
-                            t = pickle.load(time_load)
-                            nt = len(t)
-
-                                # recording
-                                    # particles distribution
-                            Ntotsn_SB = []              # in the SB
-                            Ntotsn_shell = []           # in the shell
-                            Ntotsn_out = []             # outside the SB
-
-                                    # gas density
-                            ngastot_SB = []             # in the SB
-                            ngastot_shell = []          # in the supershell
-                            ngastot_out = []            # outside the SB
-
-                                    # distance in the SB
-                            radius = []
-
-                            for i in range (nt0):
-
-                                    # Initialization
-                                figure_number = 1
-
-                                    # Recording
-                                    # particles distribution
-                                Ntot_SB = []                # in the SB
-                                Ntot_shell = []             # in the shell
-                                Ntot_out = []               # outside the SB
-
-                                        # gas density
-                                ngas_SB = []                # in the SB
-                                ngas_shell = []             # in the shell
-                                ngas_out = []               # outside the SB
-
-                                    # For verification
-                                #Nverift = []
-                                n = 0
-
-                                for j in range (nt):        # for each time step
-
-                                    if t[j] <= t0[i]:
-                                        continue
-
-                                    else:
-
-                                            # Initialization
-                                        t6 = t[j] * yr26yr      # 10^6 yr
-                                        t7 = t6 * s6yr27yr      # 10^7 yr
-
-                                            # r array
-                                        Rsb, Vsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)           # radius and velocity of the SB
-                                        Msb, Mswept = masses(an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu)   # swept-up and inner masses (solar masses)
-                                        hs, ns = density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb)            # thickness and density of the shell (pc)
-
-                                        if i == 0:
-                                            for zone in (zones):
-
-                                                n_gas_SB = []
-                                                n_gas_shell = []
-                                                n_gas_out = []
-
-                                                if zone == 1:                   # in the cavity
-
-                                                        # Radius (pc)
-                                                    rmin = 0.01                 # minimum radius (pc)
-                                                    rmax = Rsb-hs               # maximum radius (pc)
-                                                    number_bin_r = 15           # number of bin for r from 0 to Rsb-hs
-                                                    r = numpy.logspace(numpy.log10(rmin), numpy.log10(rmax), number_bin_r)    # position (pc)
-
-                                                    radius.append(r)
-
-                                                        # Density of gas (cm^-3)
-
-                                                    nsb = profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, r, Rsb)[1]
-                                                    for l in range (number_bin_r):
-                                                        n_gas_SB.append(nsb[l])
-
-                                                    ngastot_SB.append(n_gas_SB)
-
-                                                elif zone == 2:                 # in the supershell
-
-                                                        # Density of gas (cm^-3)
-                                                    n_gas_shell.append(ns)
-
-                                                    ngastot_shell.append(n_gas_shell)
-
-                                                else:                           # outside the SB
-
-                                                        # Density of gas (cm^-3)
-                                                    n_gas_out.append(n0)
-
-                                                    ngastot_out.append(n_gas_out)
-
-                                        delta_t = t[j]-t0[i]
-
-                                        for zone in (zones):
-
-
-                                                # For recording the distribution of particles for each time
-                                            Nr_SB = []         # (GeV^-1) : matrix of dimension len(r) x len(E)
-                                            Nr_shell = []      # (GeV^-1) : matrix of dimension len(E)
-                                            Nr_out = []        # (GeV^-1) : matrix of dimension len(E)
-
-                                            if zone == 1:                       # in the cavity
-
-                                                    # r array (pc)
-                                                r = radius[n]
-                                                r_in = 0
-                                                r_out = r[0]
-                                                N_part = shell_particles(r_in, r_out, N_E, D, delta_t)
-                                                Nr_SB.append(N_part)
-                                                nr = len(r)
-
-                                                for k in range (1, nr):   # for each radius inside the SB
-
-                                                    r_in = r_out
-                                                    r_out = r[k]
-                                                    N_part = shell_particles(r_in, r_out, N_E, D, delta_t)
-                                                    N_part = numpy.nan_to_num(N_part)
-                                                    Nr_SB.append(N_part)
-
-                                            elif zone == 2:                     # in the supershell
-
-                                                    # For the particle distribution (GeV^-1): N_part = 4 * pi * int_{Rsb-hs}^Rsb Ne
-                                                r_in = Rsb - hs     # in pc
-                                                r_out = Rsb         # in pc
-                                                N_part = shell_particles(r_in, r_out, N_E, D, delta_t)
-                                                Nr_shell.append(N_part)
-
-                                            else:                               # outside the SB
-
-                                                    # For the particle distribution (GeV^-1): N_part = 4 * pi * int_Rsb^inf Ne r^2 dr
-                                                N_part = inf_particles(Rsb, N_E, D, delta_t)
-                                                Nr_out.append(N_part)
-
-                                        n += 1
-
-                                        # --------- #
-                                        # Recording
-
-                                    Ntot_SB.append(Nr_SB)
-                                    Ntot_shell.append(Nr_shell)
-                                    Ntot_out.append(Nr_out)
-
-                                Ntotsn_SB.append(Ntot_SB)
-                                Ntotsn_shell.append(Ntot_shell)
-                                Ntotsn_out.append(Ntot_out)
-
-
-                                # Recording
-                                    # r array in the SB
-                            radius = numpy.asarray(radius)
-                            pickle.dump(radius, radius_write)
-
-                                    # particles distribution (GeV^-1)
-                            Ntotsn_SB = numpy.asarray(Ntotsn_SB)
-                            Ntotsn_shell = numpy.asarray(Ntotsn_shell)
-                            Ntotsn_out = numpy.asarray(Ntotsn_out)
-                            Ntot_unit = 1/(units.GeV)                           # units of Ntot (GeV^-1)
-                            pickle.dump(Ntotsn_SB, data_write)
-                            pickle.dump(Ntotsn_shell, data_write)
-                            pickle.dump(Ntotsn_out, data_write)
-                            pickle.dump(Ntot_unit, data_write)
-
-                                    # gas density (cm^-3)
-                            ngastot_SB = numpy.asarray(ngastot_SB)
-                            ngastot_shell = numpy.asarray(ngastot_shell)
-                            ngastot_out = numpy.asarray(ngastot_out)
-                            ngas_unit = 1/units.cm**3                           # units of ngas (cm^-3)
-                            pickle.dump(ngastot_SB, gas_write)
-                            pickle.dump(ngastot_shell, gas_write)
-                            pickle.dump(ngastot_out, gas_write)
-                            pickle.dump(ngas_unit, gas_write)
-
-    return #ECR, ECR_unit, t, t_unit, Ntotsn, Ntot_unit, ngastot, ngas_unit, radius
+    return t
 
 def spectrum(Emin_gamma, Emax_gamma, zones):
 
@@ -642,151 +398,6 @@ def spectrum(Emin_gamma, Emax_gamma, zones):
                                 pickle.dump(sed_PD_sn, spectra_write)
                                 pickle.dump(sed_unit, spectra_write)
     return
-
-def spectrum_zone(Emin_gamma, Emax_gamma, zones):
-
-    """
-    Return one file
-
-    Inputs:
-        Emin_gamma  :       minimum energy of the gamma photon (GeV)
-        Emax_gamma  :       maximum energy of the gamma photon (GeV)
-        zones       :       which zone do you want to compute (1: cavity of the SB, 2: supershell and 3: outside)
-
-    Output:
-        spectra     :       file with the energy spectrum of the gamma photons and the spectral energy distribution for each SN explosions, time step and zones
-    """
-
-    with open('spectra', 'wb') as spectra_write:
-        with open('gas', 'rb') as gas_load:
-            with open('energy', 'rb') as energy_load:
-                with open('data', 'rb') as data_load:
-                    with open('radius', 'rb') as radius_load:
-                        with open('time', 'rb') as time_load:
-                            with open('SN', 'rb') as t0_load:
-
-                                    # Loading of data: ngas, energy, nCR, radius and time
-
-                                        # gas density (cm^-3)
-                                ngassn_SB = pickle.load(gas_load)
-                                ngassn_shell = pickle.load(gas_load)
-                                ngassn_out = pickle.load(gas_load)
-                                ngas_unit = pickle.load(gas_load)
-
-                                        # energy of the particles (GeV)
-                                ECR = pickle.load(energy_load)
-                                ECR_unit = pickle.load(energy_load)
-                                ECR = ECR * ECR_unit
-
-                                        # particles distribution (GeV^-1)
-                                Ntotsn_SB = pickle.load(data_load)
-                                Ntotsn_shell = pickle.load(data_load)
-                                Ntotsn_out = pickle.load(data_load)
-                                Ntot_unit = pickle.load(data_load)
-
-                                        # distance in the SB (pc)
-                                radius = pickle.load(radius_load)
-
-                                        # SN time explosion (yr)
-                                t0 = pickle.load(t0_load)
-
-                                        # time array (yr)
-                                t = pickle.load(time_load)
-
-                                    # Energy spectrum of the cosmic rqys (GeV)
-                                number_bin_E = 20
-                                spectrum_energy = numpy.logspace(numpy.log10(Emin_gamma), numpy.log10(Emax_gamma), number_bin_E) * units.GeV
-
-                                    # Initialization
-                                nt0 = len(t0)
-
-                                    # recording
-                                        # spectral energy distribution
-                                sed_PD_sn_SB = []       # in the SB
-                                sed_PD_sn_shell = []    # in the shell
-                                sed_PD_sn_out = []      # outside the SB
-
-                                for i in range (nt0):       # for each SN explosion
-
-                                    sed_SB = []
-                                    sed_shell = []
-                                    sed_out = []
-
-                                    indSN = numpy.where(t > t0[i])
-                                    nt = len(numpy.asarray(t)[indSN])
-
-                                    for j in range (nt):    # for each time step when the SN explosion occurs or after the SN explosion
-
-                                        for zone in (zones):
-
-                                            if zone == 1:                       # in the cavity
-
-                                                    # Initialization
-                                                r = radius[j]
-                                                nr = len(r)
-
-                                                ngas_SB = ngassn_SB[j] * ngas_unit
-                                                ntot_SB = numpy.asarray(Ntotsn_SB)[i] * Ntot_unit
-
-                                                    # Recording
-                                                spectrum_r = []
-                                                sed_r = []
-
-                                                for k in range (nr):     # for each radius step
-                                                    model = TableModel(ECR, ntot_SB[k], amplitude = 1)
-                                                    PD = PionDecay(model, nh = ngas_SB[k], nuclear_enhancement = True)
-                                                    sed_PD = PD.sed(spectrum_energy, distance = 0 * units.pc)
-
-                                                    sed_r.append(sed_PD)
-
-                                                sed_SB.append(sed_r)
-
-                                            elif zone == 2:                     # in the supershell
-
-                                                ngas_shell = ngassn_shell[j] * ngas_unit
-                                                ntot_shell = numpy.asarray(Ntotsn_shell)[i] * Ntot_unit
-
-                                                model = TableModel(ECR, ntot_shell, amplitude = 1)
-                                                PD = PionDecay(model, nh = ngas_shell, nuclear_enhancement = True)
-                                                sed_PD = PD.sed(spectrum_energy, distance = 0 * units.pc)
-
-                                                sed_shell.append(sed_PD)
-
-                                            else:                               # outside the SB
-
-                                                ngas_out = ngassn_out[j] * ngas_unit
-                                                ntot_out = numpy.asarray(Ntotsn_out)[i] * Ntot_unit
-
-                                                model = TableModel(ECR, ntot_shell, amplitude = 1)
-                                                PD = PionDecay(model, nh = ngas_shell, nuclear_enhancement = True)
-                                                sed_PD = PD.sed(spectrum_energy, distance = 0 * units.pc)
-
-                                                sed_out.append(sed_PD)
-
-                                    sed_PD_sn_SB.append(sed_SB)
-                                    sed_PD_sn_shell.append(sed_shell)
-                                    sed_PD_sn_out.append(sed_out)
-
-                                    ##---------##
-                                    # Recording #
-                                    ##---------##
-
-                                        # energy spectrum of the cosmic rays (GeV)
-                                spectrum = numpy.asarray(spectrum_energy)
-                                spectrum_unit = spectrum_energy.unit
-                                pickle.dump(spectrum, spectra_write)
-                                pickle.dump(spectrum_unit, spectra_write)
-
-                                        # spectral energy distribution (erg s^-1 = E^2 dN/dE)
-                                sed_PD_sn_SB = numpy.asarray(sed_PD_sn_SB)
-                                sed_PD_sn_shell = numpy.asarray(sed_PD_sn_shell)
-                                sed_PD_sn_out = numpy.asarray(sed_PD_sn_out)
-                                sed_unit = sed_PD.unit
-                                pickle.dump(sed_PD_sn_SB, spectra_write)
-                                pickle.dump(sed_PD_sn_shell, spectra_write)
-                                pickle.dump(sed_PD_sn_out, spectra_write)
-                                pickle.dump(sed_unit, spectra_write)
-    return #spectrum, spectrum_unit, sed_PD_sn, sed_unit
 
 def luminosity(lum_energy, energy):
 
@@ -1078,7 +689,7 @@ def gamma_luminosity(Esep, pathfigure):
         plt.show()
     return
 
-def gamma_luminosity_it(Esep, pathfigure, zones, iteration):
+def gamma_luminosity_it(Esep, pathfigure, zones, iteration, figure_number):
 
     """
     Return the gamma luminosity in the ranges of energy
@@ -1088,6 +699,7 @@ def gamma_luminosity_it(Esep, pathfigure, zones, iteration):
         pathfigure  :       path to save figures
         zones       :       which zone do you want to compute (1: cavity of the SB, 2: supershell and 3: outside)
         iteration   :       number of the iteration
+        figure_number:      number of the figure
     """
     with open('SN', 'rb') as t0_load:
         with open('time', 'rb') as time_load:
@@ -1147,7 +759,6 @@ def gamma_luminosity_it(Esep, pathfigure, zones, iteration):
                     Lumtot_sn = []         # 100 MeV to 100 TeV
 
                         # Initialization
-                    figure_number = 1
                     nt0 = len(t0)
 
                         ##================##
@@ -1457,4 +1068,158 @@ def gamma_luminosity_it(Esep, pathfigure, zones, iteration):
         log_plot(figure_tot, 1, t[ind0] * yr26yr, Lum_sn_tot[ind0], 'Total SN', 'Gamma emission of a superbubble', 'Time [{0}]'.format(t_sn_unit.to_string('latex_inline')), '$L_E$ (100 MeV - 100 TeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '-')
         plt.savefig(pathfigure+'Gamma_luminosity_all_it%d.eps'%iteration)
         plt.show()
+
+        figure_number = figure_tot + 1
+
+    return Lum_sn_1_tot, Lum_sn_2_tot, Lum_sn_tot, figure_number
+
+def spectral_index(indE, zones, pathfigure, iteration, figure_number):
+
+    """
+    Return the spectral index at a precise energy_load
+
+    Inputs:
+        indE        :       which energy the spectral index is compute (GeV)
+        zones       :       which zone do you want to compute (1: cavity of the SB, 2: supershell and 3: outside)
+        pathfigure  :       path to save figures
+        iteration   :       number of the iteration
+        figure_number:      number of the figure
+    """
+
+    with open('SN', 'rb') as t0_load:
+        with open('time', 'rb') as time_load:
+            with open('spectra', 'rb') as spectra_load:
+                with open('radius', 'rb') as radius_load:
+
+                        # Sn explosions time (yr)
+                    t0 = pickle.load(t0_load)
+                    nt0 = len(t0)
+
+                        # time array (yr)
+                    t = pickle.load(time_load)
+                    t_sn_unit = units.Myr
+
+                        # radius (pc)
+                    radius = pickle.load(radius_load)
+
+                        # Energy of the gamma photon (GeV)
+                    E_gamma = pickle.load(spectra_load)
+                    E_gamma_unit = pickle.load(spectra_load)
+                    nE = len(E_gamma)
+
+                        # Spectral distribution of the gamma photons (erg s^-1)
+                    sed = pickle.load(spectra_load)          # E^2 dN/dE (erg s^-1)
+                    sed_unit = pickle.load(spectra_load)
+                    lum_gamma = sed/E_gamma                             # E dN/dE (erg s^- GeV^-1)
+
+                    alpha_t0 = []
+
+                    for i in range (nt0):
+
+                        indSN = numpy.where(t > t0[i])[0]
+                        nt = len(t[indSN])
+
+                        Lum_t0 = numpy.asarray(lum_gamma[i])
+
+                            # spectral index for each time and energy
+                        alpha_t = []
+
+                        for j in range (nt):
+
+                            Lum_t = numpy.asarray(Lum_t0[j])
+                            n = 0
+                            alpha_zone = []
+
+                            for zone in (zones):
+
+                                if zone == 1:                                   # in the SB
+
+                                    r = radius[j]
+                                    nr = len(radius)
+
+                                    for k in range (nr):
+                                        Lum_r = Lum_t[k]
+
+                                        if indE < nE-1:
+
+                                            alpha = -(numpy.log(Lum_r[indE + 1]) - numpy.log(Lum_r[indE]))/(numpy.log(E_gamma[indE + 1]) - numpy.log(E_gamma[indE]))
+                                        else:
+                                            alpha = -(numpy.log(Lum_r[indE]) - numpy.log(Lum_r[indE - 1]))/(numpy.log(E_gamma[indE]) - numpy.log(E_gamma[indE - 1]))
+
+                                    alpha_zone.append(alpha)
+                                    n = nr
+
+                                elif zone == 2:                                 # in the supershell
+
+                                    Lum_r = Lum_t[n]
+
+                                    if indE < nE-1:
+
+                                        alpha = -(numpy.log(Lum_r[indE + 1]) - numpy.log(Lum_r[indE]))/(numpy.log(E_gamma[indE + 1]) - numpy.log(E_gamma[indE]))
+                                    else:
+                                        alpha = -(numpy.log(Lum_r[indE]) - numpy.log(Lum_r[indE - 1]))/(numpy.log(E_gamma[indE]) - numpy.log(E_gamma[indE - 1]))
+
+                                    alpha_zone.append(alpha)
+                                    n += 1
+
+                                else:                                           # outside the SB
+
+                                    Lum_r = Lum_t[n]
+
+                                    if indE < nE-1:
+
+                                        alpha = -(numpy.log(Lum_r[indE + 1]) - numpy.log(Lum_r[indE]))/(numpy.log(E_gamma[indE + 1]) - numpy.log(E_gamma[indE]))
+                                    else:
+                                        alpha = -(numpy.log(Lum_r[indE]) - numpy.log(Lum_r[indE - 1]))/(numpy.log(E_gamma[indE]) - numpy.log(E_gamma[indE - 1]))
+
+                                    alpha_zone.append(alpha)
+
+                            alpha_t.append(alpha_zone)
+
+                        alpha_t0.append(alpha_t)
+
+                            # Plot
+
+                        for zone in (zones):
+
+                            n = 0
+
+                            if zone == 1:                                           # in the SB
+
+                                label = 'SB'
+                                sym = '-.'
+
+                                for k in range (nr):
+                                    alpha = numpy.asarray(alpha_t)[:,k]
+                                    log_plot(figure_number, 1, t[indSN] * yr26yr, alpha, label, u'Spectral index of the gamma emission at 'r'$E_\gamma$'u' = %.2e {0}'.format(E_gamma_unit.to_string('latex_inline')) %E_gamma[indE], 'Time [{0}]'.format(t_sn_unit.to_string('latex_inline')), r'$\alpha$', sym)
+                                    plt.savefig(pathfigure+'spectral_index_SB_%dit.eps'%iteration)
+
+                                n = nr
+                                figure_number += 1
+
+                            elif zone == 2:                                         # in the supershell
+
+                                label = 'Shell'
+                                sym = '--'
+
+                                alpha = numpy.asarray(alpha_t)[:, n]
+
+                                log_plot(figure_number, 1, t[indSN] * yr26yr, alpha, label, u'Spectral index of the gamma emission at 'r'$E_\gamma$'u' = %.2e {0}'.format(E_gamma_unit.to_string('latex_inline')) %E_gamma[indE], 'Time [{0}]'.format(t_sn_unit.to_string('latex_inline')), r'$\alpha$', sym)
+                                plt.savefig(pathfigure+'spectral_index_shell_%dit.eps'%iteration)
+
+                                n += 1
+                                figure_number += 1
+
+                            else:                                                   # outside the SB
+
+                                label = 'Out'
+                                sym = ':'
+
+                                alpha = numpy.asarray(alpha_t)[:, n]
+
+                                og_plot(figure_number, 1, t[indSN] * yr26yr, alpha, label, u'Spectral index of the gamma emission at 'r'$E_\gamma$'u' = %.2e {0}'.format(E_gamma_unit.to_string('latex_inline')) %E_gamma[indE], 'Time [{0}]'.format(t_sn_unit.to_string('latex_inline')), r'$\alpha$', sym)
+                                plt.savefig(pathfigure+'spectral_index_out_%dit_E%d.eps'%(iteration, E_gamma[indE]))
+
+                    alpha_t0 = numpy.asarray(alpha_t0)
+                    plt.show()
     return
