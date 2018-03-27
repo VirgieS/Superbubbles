@@ -34,7 +34,21 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
         ylabel          :       label of the y-axis
         symbol          :       symbol
     """
+        # figure
     plt.figure(figure_number, figsize=(10,7))
+    plt.subplot(1,1,1)
+
+        # axes
+    xmin = min(x)
+    xmax = max(x)
+    plt.xlim(xmin, xmax)
+    plt.xticks(numpy.logspace(numpy.log10(xmin), numpy.log10(xmax), 10, endpoint = True))
+
+    #ymin = min(y)
+    #ymax = max(y)
+    #plt.ylim(ymin, ymax)
+    #plt.yticks(numpy.logspace(numpy.log10(ymin), numpy.log10(ymax), 10, endpoint = True))
+
 
     if number_of_plot > 1:
 
@@ -78,7 +92,20 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
         ylabel          :       label of the y-axis
         symbol          :       symbol
     """
-    plt.figure(figure_number, figsize = (10,7))
+        # figure
+    plt.figure(figure_number, figsize=(10,7))
+    plt.subplot(1,1,1)
+
+        # axes
+    xmin = min(x)
+    xmax = max(x)
+    plt.xlim(xmin, xmax)
+    plt.xticks(numpy.linspace(xmin, xmax, 10, endpoint = True))
+
+    #ymin = min(y)
+    #ymax = max(y)
+    #plt.ylim(ymin, ymax)
+    #plt.yticks(numpy.linspace(ymin, ymax, 10, endpoint = True))
 
     if number_of_plot > 1:
 
@@ -189,3 +216,30 @@ def random_SN(xmin, xmax, size = 1):
     y = numpy.random.random(size = size)
 
     return xmax * y + xmin
+
+def linear_regression(x1, y1, x2, y2, y):
+    """
+    Return the x-value associated to the y-value.
+    Inputs:
+        x1      :       x value associated to the y value y1
+        y1      :       y value lower than the y expected
+        x2      :       x value associated to the y value y2
+        y2      :       y value upper than the y expected
+        y       :       y ai which the x value would be computed
+
+    Output:
+        x       :       x value associated to the y value
+    """
+
+    logx1 = numpy.log10(x1)
+    logx2 = numpy.log10(x2)
+    logy1 = numpy.log10(y1)
+    logy2 = numpy.log10(y2)
+    logy = numpy.log10(y)
+
+    b = (logy1 - logy2)/(logx1 - logx2)
+    print(b)
+    loga = logy1 - b * logx1
+    print(10**loga)
+
+    return 10**(loga + b * logy), b, 10**loga

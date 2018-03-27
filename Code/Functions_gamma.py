@@ -686,7 +686,7 @@ def gamma_luminosity(Esep, pathfigure):
         log_plot(figure_number + 2, 1, t[ind0] * yr26yr, Lum_sn_tot[ind0], 'Total SN', 'Gamma emission of a superbubble', 'Time [{0}]'.format(t_sn_unit.to_string('latex_inline')), '$L_E$ (100 MeV - 100 TeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '-')
         plt.savefig(pathfigure+'Gamma_luminosity_all.eps')
 
-        plt.show()
+        #plt.show()
     return
 
 def gamma_luminosity_it(Esep, pathfigure, zones, iteration, figure_number):
@@ -1067,7 +1067,7 @@ def gamma_luminosity_it(Esep, pathfigure, zones, iteration, figure_number):
         plt.savefig(pathfigure+'Gamma_luminosity_all_range2_it%d.eps' %iteration)
         log_plot(figure_tot, 1, t[ind0] * yr26yr, Lum_sn_tot[ind0], 'Total SN', 'Gamma emission of a superbubble', 'Time [{0}]'.format(t_sn_unit.to_string('latex_inline')), '$L_E$ (100 MeV - 100 TeV) [{0}]'.format(Lum_unit.to_string('latex_inline')), '-')
         plt.savefig(pathfigure+'Gamma_luminosity_all_it%d.eps'%iteration)
-        plt.show()
+        #plt.show()
 
         figure_number = figure_tot + 1
 
@@ -1109,8 +1109,9 @@ def spectral_index(indE, zones, pathfigure, iteration, figure_number):
 
                         # Spectral distribution of the gamma photons (erg s^-1)
                     sed = pickle.load(spectra_load)          # E^2 dN/dE (erg s^-1)
+                    print(sed.shape)
                     sed_unit = pickle.load(spectra_load)
-                    lum_gamma = sed/E_gamma                             # E dN/dE (erg s^- GeV^-1)
+
 
                     alpha_t0 = []
 
@@ -1118,15 +1119,14 @@ def spectral_index(indE, zones, pathfigure, iteration, figure_number):
 
                         indSN = numpy.where(t > t0[i])[0]
                         nt = len(t[indSN])
-
-                        Lum_t0 = numpy.asarray(lum_gamma[i])
+                        lum_gamma = sed[i]/E_gamma                             # E dN/dE (erg s^- GeV^-1)
 
                             # spectral index for each time and energy
                         alpha_t = []
 
                         for j in range (nt):
 
-                            Lum_t = numpy.asarray(Lum_t0[j])
+                            Lum_t = numpy.asarray(lum_gamma[j])
                             n = 0
                             alpha_zone = []
 
@@ -1217,9 +1217,9 @@ def spectral_index(indE, zones, pathfigure, iteration, figure_number):
 
                                 alpha = numpy.asarray(alpha_t)[:, n]
 
-                                og_plot(figure_number, 1, t[indSN] * yr26yr, alpha, label, u'Spectral index of the gamma emission at 'r'$E_\gamma$'u' = %.2e {0}'.format(E_gamma_unit.to_string('latex_inline')) %E_gamma[indE], 'Time [{0}]'.format(t_sn_unit.to_string('latex_inline')), r'$\alpha$', sym)
+                                log_plot(figure_number, 1, t[indSN] * yr26yr, alpha, label, u'Spectral index of the gamma emission at 'r'$E_\gamma$'u' = %.2e {0}'.format(E_gamma_unit.to_string('latex_inline')) %E_gamma[indE], 'Time [{0}]'.format(t_sn_unit.to_string('latex_inline')), r'$\alpha$', sym)
                                 plt.savefig(pathfigure+'spectral_index_out_%dit_E%d.eps'%(iteration, E_gamma[indE]))
 
                     alpha_t0 = numpy.asarray(alpha_t0)
-                    plt.show()
+                    #plt.show()
     return

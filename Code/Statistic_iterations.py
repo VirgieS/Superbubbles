@@ -21,8 +21,8 @@ from Conversion_factors import *
 from Parameters_SB import *
 
     # IRAP
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/stat_SN/iterations/1/')
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/Gamma_emission/iterations/1/'
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/stat_SN/iterations/3/')
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/Gamma_emission/iterations/3/'
 #pathfigure_CR = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/CR/1/'
 
     # Home
@@ -74,7 +74,7 @@ with open('Statistic', 'wb') as stat_write:
         with open('SN', 'wb') as t0_write:
 
                 # SN explosion time
-            n = 1             # number of massive stars in the OB association
+            n = 3             # number of massive stars in the OB association
             t0min = 3           # 3 Myr
             t0max = 37          # 37 Myr
             number_bin_t = 34*200
@@ -118,14 +118,21 @@ with open('Statistic', 'wb') as stat_write:
 with open('Statistic', 'rb') as stat_load:
 
     time = pickle.load(stat_load)
+    print(time.shape)
     Lum_it_1 = pickle.load(stat_load)
+    print(Lum_it_1.shape)
     Lum_it_2 = pickle.load(stat_load)
+    print(Lum_it_2.shape)
     Lum_it = pickle.load(stat_load)
+    print(Lum_it.shape)
 
     t_tot = []
     Lum_tot_1 = []
     Lum_tot_2 = []
     Lum_tot = []
+    index_it = []
+    n = 0
+    index.append(n)
 
     for i in range (nit):
 
@@ -141,12 +148,16 @@ with open('Statistic', 'rb') as stat_load:
             Lum_tot_1.append(Lum_t0_1[j])
             Lum_tot_2.append(Lum_t0_2[j])
             Lum_tot.append(Lum_t0[j])
+            n += 1
+
+        if i != nit - 1:
+            index_it.append(n)  # recording the index of each iteration
 
     sort_index = numpy.argsort(t_tot)
     t_tot = sorted(t_tot)
-    Lum_tot_1 = numpy.asarray(Lum_tot_1)
-    Lum_tot_2 = numpy.asarray(Lum_tot_2)
-    Lum_tot = numpy.asarray(Lum_tot)
-    Lum_tot_1 = Lum_tot_1[sort_index]
-    Lum_tot_2 = Lum_tot_2[sort_index]
-    Lum_tot = Lum_tot[sort_index]
+    #Lum_tot_1 = numpy.asarray(Lum_tot_1)
+    #Lum_tot_2 = numpy.asarray(Lum_tot_2)
+    #Lum_tot = numpy.asarray(Lum_tot)
+    #Lum_tot_1 = Lum_tot_1[sort_index]
+    #Lum_tot_2 = Lum_tot_2[sort_index]
+    #Lum_tot = Lum_tot[sort_index]
