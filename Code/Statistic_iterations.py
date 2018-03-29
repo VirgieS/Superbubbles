@@ -21,13 +21,13 @@ from Conversion_factors import *
 from Parameters_SB import *
 
     # IRAP
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/stat_SN/iterations/3/')
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/Gamma_emission/iterations/3/'
+#os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/stat_SN/iterations/Test/')
+#pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/Gamma_emission/iterations/Test/'
 #pathfigure_CR = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/CR/1/'
 
     # Home
-#os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/stat_SN/iterations/3/')
-#pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/stat_SN/Gamma_emission/iterations/3/'
+os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/stat_SN/iterations/Test/')
+pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/stat_SN/Gamma_emission/iterations/Test/'
 #pathfigure_CR = '/home/vivi/Documents/Master_2/Superbubbles/figures/stat_SN/CR/2/'
 
 ## ======= ##
@@ -35,7 +35,7 @@ pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN
 ## ======= ##
 
     # Number of iterations
-nit = 3
+nit = 100
 
     # Parameters for the cosmic rays
 
@@ -62,29 +62,27 @@ time = []           # total time array for each iteration
 
     # Initialization
 figure_number = 1
-"""
+
 with open('Statistic', 'wb') as stat_write:
+
+    t0min = 3           # Myr
+    t0max = 37          # Myr
 
     ##----------##
     # Iterations #
     ##----------##
-
     for i in range (nit):
 
         with open('SN', 'wb') as t0_write:
 
                 # SN explosion time
             n = 3             # number of massive stars in the OB association
-            t0min = 3           # 3 Myr
-            t0max = 37          # 37 Myr
-            number_bin_t = 34*200
             t0 = random_SN(3, 37, n)/yr26yr
             t0 = sorted(t0)
             pickle.dump(t0, t0_write)
 
             # data computation
-        t = data(Emin_CR, Emax_CR, p0, alpha, D0, delta, zones)
-        time.append(t)
+        data(Emin_CR, Emax_CR, p0, alpha, D0, delta, zones)
 
             # spectral energy distribution
         Emin_gamma = 100 * MeV2GeV            # 100 MeV = 0.1 GeV
@@ -98,15 +96,11 @@ with open('Statistic', 'wb') as stat_write:
         flux_it_1.append(flux_1)
         flux_it_2.append(flux_2)
         flux_it.append(flux)
-
             # spectral index
         indE = 10       # which energy that the spectral index would be computed
-        spectral_index(10, zones, pathfigure_gamma, i, figure_number)
+        spectral_index(indE, zones, pathfigure_gamma, i, figure_number)
 
         print('end of the iteration')
-
-    time = numpy.asarray(time)
-    pickle.dump(time, stat_write)
 
     flux_it_1 = numpy.asarray(flux_it_1)
     flux_it_2 = numpy.asarray(flux_it_2)
@@ -161,3 +155,4 @@ with open('Statistic', 'rb') as stat_load:
     #Lum_tot_1 = Lum_tot_1[sort_index]
     #Lum_tot_2 = Lum_tot_2[sort_index]
     #Lum_tot = Lum_tot[sort_index]
+    """

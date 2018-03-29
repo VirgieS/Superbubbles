@@ -8,7 +8,7 @@ Here are all functions needed for the superbubble model
 import matplotlib.pyplot as plt
 import numpy
 import scipy.integrate as integrate
-from scipy.special import erf, erfc
+from scipy.special import erf, erfc, interp1d
 
 ##-----------------------------------------##
 # Physical constants and Conversion factors #
@@ -217,29 +217,12 @@ def random_SN(xmin, xmax, size = 1):
 
     return xmax * y + xmin
 
-def linear_regression(x1, y1, x2, y2, y):
+def interpolation(x, y):
     """
-    Return the x-value associated to the y-value.
+    Return the interpolation of a function
     Inputs:
-        x1      :       x value associated to the y value y1
-        y1      :       y value lower than the y expected
-        x2      :       x value associated to the y value y2
-        y2      :       y value upper than the y expected
-        y       :       y ai which the x value would be computed
-
-    Output:
-        x       :       x value associated to the y value
+        x       :       x-axis of the function
+        y       :       y-axis of the function
     """
 
-    logx1 = numpy.log10(x1)
-    logx2 = numpy.log10(x2)
-    logy1 = numpy.log10(y1)
-    logy2 = numpy.log10(y2)
-    logy = numpy.log10(y)
-
-    b = (logy1 - logy2)/(logx1 - logx2)
-    print(b)
-    loga = logy1 - b * logx1
-    print(10**loga)
-
-    return 10**(loga + b * logy), b, 10**loga
+    return itp(x, y,kind='linear', bounds_error = False, fill_value = 0.0)
