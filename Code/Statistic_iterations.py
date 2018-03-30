@@ -21,13 +21,13 @@ from Conversion_factors import *
 from Parameters_SB import *
 
     # IRAP
-#os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/stat_SN/iterations/Test/')
-#pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/Gamma_emission/iterations/Test/'
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/stat_SN/Test/')
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/Gamma_emission/Test/'
 #pathfigure_CR = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/CR/1/'
 
     # Home
-os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/stat_SN/iterations/Test/')
-pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/stat_SN/Gamma_emission/iterations/Test/'
+#os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/stat_SN/Test/')
+#pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/stat_SN/Gamma_emission/Test/'
 #pathfigure_CR = '/home/vivi/Documents/Master_2/Superbubbles/figures/stat_SN/CR/2/'
 
 ## ======= ##
@@ -35,7 +35,7 @@ pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/stat_SN/G
 ## ======= ##
 
     # Number of iterations
-nit = 100
+nit = 1
 
     # Parameters for the cosmic rays
 
@@ -65,37 +65,37 @@ figure_number = 1
 
 with open('Statistic', 'wb') as stat_write:
 
-    t0min = 3           # Myr
-    t0max = 37          # Myr
+        # Fix time array (yr)
+    t0min = 3                   # Myr
+    t0max = 37                  # Myr
 
-    ##----------##
-    # Iterations #
-    ##----------##
+    tmin = t0min/yr26yr         # yr
+    tmax = (t0max + 1)/yr26yr    # yr
+    number_bin_t = 300000
+    time = numpy.linspace(tmin, tmax, number_bin_t)
+
+        # Energy of the gamma photons (GeV)
+    Emin_gamma = 100 * MeV2GeV            # 100 MeV (GeV)
+    Emax_gamma = 100 * TeV2GeV            # 100 TeV (GeV)
+    Esep = 100      # in GeV
+
+        ##----------##
+        # Iterations #
+        ##----------##
+
     for i in range (nit):
 
-        with open('SN', 'wb') as t0_write:
+            # SN explosion time
+        n = 3             # number of massive stars in the OB association
+        t0 = random_SN(3, 37, n)/yr26yr
+        t0 = sorted(t0)
 
-                # SN explosion time
-            n = 3             # number of massive stars in the OB association
-            t0 = random_SN(3, 37, n)/yr26yr
-            t0 = sorted(t0)
-            pickle.dump(t0, t0_write)
-
-            # data computation
-        data(Emin_CR, Emax_CR, p0, alpha, D0, delta, zones)
-
-            # spectral energy distribution
-        Emin_gamma = 100 * MeV2GeV            # 100 MeV = 0.1 GeV
-        Emax_gamma = 100 * TeV2GeV            # 100 TeV = 100 000 GeV
-
-        spectrum(Emin_gamma, Emax_gamma, zones)
-
-            # gamma luminosity
-        Esep = 100      # in GeV
-        flux_1, flux_2, flux, figure_number = gamma_luminosity_it(Esep, pathfigure_gamma, zones, i, figure_number)
+        flux_1, flux_2, flux, flux_units = data(t0, time, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, delta, zones)
+        """
         flux_it_1.append(flux_1)
         flux_it_2.append(flux_2)
         flux_it.append(flux)
+
             # spectral index
         indE = 10       # which energy that the spectral index would be computed
         spectral_index(indE, zones, pathfigure_gamma, i, figure_number)
@@ -108,6 +108,7 @@ with open('Statistic', 'wb') as stat_write:
     pickle.dump(flux_it_1, stat_write)
     pickle.dump(flux_it_2, stat_write)
     pickle.dump(flux_it, stat_write)
+"""
 """
 with open('Statistic', 'rb') as stat_load:
 

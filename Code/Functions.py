@@ -8,7 +8,8 @@ Here are all functions needed for the superbubble model
 import matplotlib.pyplot as plt
 import numpy
 import scipy.integrate as integrate
-from scipy.special import erf, erfc, interp1d
+from scipy.special import erf, erfc
+from scipy.interpolate import interp1d
 
 ##-----------------------------------------##
 # Physical constants and Conversion factors #
@@ -225,4 +226,4 @@ def interpolation(x, y):
         y       :       y-axis of the function
     """
 
-    return itp(x, y,kind='linear', bounds_error = False, fill_value = 0.0)
+    return interp1d(x, y, kind='linear', bounds_error = False, fill_value = 0.0)
