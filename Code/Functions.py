@@ -58,9 +58,12 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
 
             if len(symbol) > 1:
                 sym = symbol[i]
+                
+            else:
+                sym = symbol
 
             if label_name == 'none':
-                plt.loglog(x, y_plot, symbol)
+                plt.loglog(x, y_plot, sym)
 
             else:
                 plt.loglog(x, y_plot, sym, label = label_name[i])

@@ -38,7 +38,7 @@ def luminosity(lum_energy, energy):
 
     return lum
 
-def data(t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, delta, zones):
+def data(t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, delta, zones, pathfigure, iteration, figure_number):
 
     """
     Return 5 files with differents quantities.
@@ -55,6 +55,9 @@ def data(t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, d
         D0          :       diffusion coefficient at p0 (cm^2 s^-1)
         delta       :       exponent of the power-law distribution of the diffusion coefficient
         zones       :       which zone do you want to compute (1: cavity of the SB, 2: supershell and 3: outside)
+        pathfigure  :       path of the file where to save the figure
+        iteration   :       number of the iteration
+        figure_number:      number of the figure
 
     Outputs:
         gas         :       file with the density of gas for all time step and radius step (cm^-3)
@@ -116,12 +119,6 @@ def data(t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, d
         nt0 = len(t0)
         nt = len(t)
 
-                    # time interval (yr)
-        t6 = 3                          # Myr
-        Rsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)[0]           # radius of the SB (pc)
-        epsilon = 1e2
-        dt = (Rsb*pc2cm)**2/(6*D[len(D)-1])/yr2s - epsilon        # in year
-
         for zone in (zones):
 
             if zone == 1:       # in the SB
@@ -151,22 +148,13 @@ def data(t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, d
 
                 # Time array (yr)
             tmin = t0[i]    # only when the SN occurs (yr)
-
-                    # Escape time scale (yr)
-            t6 = tmin * yr26yr      # 10^6 yr
-            Rsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)[0]     # radius of the SB (pc)
-            tau = (Rsb*pc2cm)**2/(6*D[len(D)-1])/yr2s       # in yr
-            DT = 3*tau
-
-            tmax = tmin + DT
-            #number_bin_t = int(DT/dt) + 1
-            number_bin_t = int(DT/1e3) * 200
-            print(number_bin_t)
+            tmax = tmin + 1e6
+            number_bin_t = 200
             time = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)
+            time6 = time * yr26yr   # in Myr
 
                 # Initialization
-            figure_number = 1
-            indt = numpy.where((time >= t0[i]) & (time <= tmax))[0]
+            indt = numpy.where((t >= t0[i]) & (t <= tmax))[0]
 
             for zone in (zones):
 
@@ -195,9 +183,9 @@ def data(t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, d
             for j in range (number_bin_t):        # for each time step
 
                     # Initialization
-                t6 = time[j] * yr26yr      # 10^6 yr
+                t6 = time6[j]           # 10^6 yr
                 t7 = t6 * s6yr27yr      # 10^7 yr
-                delta_t = time[j] - tmin
+                delta_t = time[j] - time[0]
                 sed_r = []
                 SB = False
 
@@ -330,10 +318,10 @@ def data(t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, d
                     Lum_t_tot[j] = Lum_t_shell[j]
 
                 # Recording + plot
-            Title_1 = 'Gamma emission from 100 MeV to 100 GeV'
-            Title_2 = 'Gamma emission from 100 GeV to 100 TeV'
-            Title = 'Gamma emission from 100 MeV to 100 TeV'
-            xlabel = 'Time [yr]'
+            Title_1 = 'Gamma emission from 100 MeV to 100 GeV (t0 = %.2e yr)'%t0[i]
+            Title_2 = 'Gamma emission from 100 GeV to 100 TeV (t0 = %.2e yr)'%t0[i]
+            Title = 'Gamma emission from 100 MeV to 100 TeV (t0 = %.2e yr)'%t0[i]
+            xlabel = 'Time [Myr]'
             ylabel = '$L_\gamma$ [erg s$^-1$]'
             figure_1 = figure_number
             figure_2 = figure_1 + 1
@@ -348,12 +336,12 @@ def data(t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, d
                     Lum_sb = interpolation(time, Lum_t_sb)
 
                         # plot
-                    label = 'SB'
-                    sym = '-.'
+                    #label = 'SB'
+                    #sym = '-.'
 
-                    log_plot(figure_1, 1, time, Lum1_t_sb, label, Title_1, xlabel, ylabel, sym)
-                    log_plot(figure_2, 1, time, Lum2_t_sb, label, Title_2, xlabel, ylabel, sym)
-                    log_plot(figure, 1, time, Lum_t_sb, label, Title, xlabel, ylabel, sym)
+                    #log_plot(figure_1, 1, time6, Lum1_t_sb, label, Title_1, xlabel, ylabel, sym)
+                    #log_plot(figure_2, 1, time6, Lum2_t_sb, label, Title_2, xlabel, ylabel, sym)
+                    #log_plot(figure, 1, time6, Lum_t_sb, label, Title, xlabel, ylabel, sym)
 
                 elif zone == 2:     # in the supershell
 
@@ -362,12 +350,12 @@ def data(t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, d
                     Lum_shell = interpolation(time, Lum_t_shell)
 
                         # plot
-                    label = 'shell'
-                    sym = '--'
+                    #label = 'shell'
+                    #sym = '--'
 
-                    log_plot(figure_1, 1, time, Lum1_t_shell, label, Title_1, xlabel, ylabel, sym)
-                    log_plot(figure_2, 1, time, Lum2_t_shell, label, Title_2, xlabel, ylabel, sym)
-                    log_plot(figure, 1, time, Lum_t_shell, label, Title, xlabel, ylabel, sym)
+                    #log_plot(figure_1, 1, time6, Lum1_t_shell, label, Title_1, xlabel, ylabel, sym)
+                    #log_plot(figure_2, 1, time6, Lum2_t_shell, label, Title_2, xlabel, ylabel, sym)
+                    #log_plot(figure, 1, time6, Lum_t_shell, label, Title, xlabel, ylabel, sym)
 
                 else:               # outside the SB
 
@@ -376,22 +364,27 @@ def data(t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, d
                     Lum_out = interpolation(time, Lum_t_out)
 
                         # plot
-                    label = 'out'
-                    sym = ':'
+                    #label = 'out'
+                    #sym = ':'
 
-                    log_plot(figure_1, 1, time, Lum1_t_out, label, Title_1, xlabel, ylabel, sym)
-                    log_plot(figure_2, 1, time, Lum2_t_out, label, Title_2, xlabel, ylabel, sym)
-                    log_plot(figure, 1, time, Lum_t_out, label, Title, xlabel, ylabel, sym)
+                    #log_plot(figure_1, 1, time6, Lum1_t_out, label, Title_1, xlabel, ylabel, sym)
+                    #log_plot(figure_2, 1, time6, Lum2_t_out, label, Title_2, xlabel, ylabel, sym)
+                    #log_plot(figure, 1, time6, Lum_t_out, label, Title, xlabel, ylabel, sym)
 
                 # plot
-            label = 'total'
-            sym = ':'
+            #label = 'total'
+            #sym = ':'
 
-            log_plot(figure_1, 1, time, Lum1_t_tot, label, Title_1, xlabel, ylabel, sym)
-            log_plot(figure_2, 1, time, Lum2_t_tot, label, Title_2, xlabel, ylabel, sym)
-            log_plot(figure, 1, time, Lum_t_tot, label, Title, xlabel, ylabel, sym)
+            #log_plot(figure_1, 1, time6, Lum1_t_tot, label, Title_1, xlabel, ylabel, sym)
+            #plt.savefig(pathfigure+'Gamma_luminosity_range1_it%d_t0%d.eps'%(iteration,i))
 
-            plt.show()
+            #log_plot(figure_2, 1, time6, Lum2_t_tot, label, Title_2, xlabel, ylabel, sym)
+            #plt.savefig(pathfigure+'Gamma_luminosity_range2_it%d_t0%d.eps'%(iteration,i))
+
+            #log_plot(figure, 1, time6, Lum_t_tot, label, Title, xlabel, ylabel, sym)
+            #plt.savefig(pathfigure+'Gamma_luminosity_all_it%d_t0%d.eps'%(iteration,i))
+            #figure_number = figure + 1
+            #plt.show()
 
             Lum1_tot = interpolation(time, Lum1_t_tot)
             Lum2_tot = interpolation(time, Lum2_t_tot)
@@ -423,7 +416,7 @@ def data(t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, d
                 Lumtot_sn_2[l] += Lum2_tot(t[l])
                 Lumtot_sn[l] += Lum_tot(t[l])
 
-    return Lumtot_sn_1, Lumtot_sn_2, Lumtot_sn, lum_units
+    return Lumtot_sn_1, Lumtot_sn_2, Lumtot_sn, lum_units, figure_number
 
 def gamma_luminosity_it(Esep, pathfigure, zones, iteration, figure_number):
 
@@ -845,7 +838,6 @@ def spectral_index(indE, zones, pathfigure, iteration, figure_number):
 
                         # Spectral distribution of the gamma photons (erg s^-1)
                     sed = pickle.load(spectra_load)          # E^2 dN/dE (erg s^-1)
-                    print(sed.shape)
                     sed_unit = pickle.load(spectra_load)
 
 

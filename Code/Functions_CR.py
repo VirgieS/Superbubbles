@@ -90,6 +90,9 @@ def shell_particles(r_in, r_out, NE, D, deltat):
     r_out = r_out * pc2cm   # in cm
     r_in = r_in * pc2cm     # in cm
 
+    if deltat < 0:
+        print('problem')
+
     if deltat < 1e-8 and r_in == 0:
         N = NE
 
