@@ -6,6 +6,7 @@ Here are all functions needed for the superbubble model
 # Librairies #
 ##----------##
 import matplotlib.pyplot as plt
+from matplotlib.ticker import AutoLocator, LogLocator
 import numpy
 import scipy.integrate as integrate
 from scipy.special import erf, erfc
@@ -36,19 +37,22 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
         symbol          :       symbol
     """
         # figure
-    plt.figure(figure_number, figsize=(10,7))
-    plt.subplot(1,1,1)
+    fig, ax = plt.subplots(figsize=(10,7))
+    fig = plt.figure(figure_number)
 
         # axes
-    xmin = min(x)
-    xmax = max(x)
-    plt.xlim(xmin, xmax)
-    plt.xticks(numpy.logspace(numpy.log10(xmin), numpy.log10(xmax), 10, endpoint = True))
+    #xmin = min(x)
+    #xmax = max(x)
+    #plt.xlim(xmin, xmax)
+    #plt.xticks(numpy.logspace(numpy.log10(xmin), numpy.log10(xmax), 10, endpoint = True))
+    #plt.xtick.minor.visible = True
+    ax.xaxis.set_minor_locator(LogLocator())
 
     #ymin = min(y)
     #ymax = max(y)
     #plt.ylim(ymin, ymax)
     #plt.yticks(numpy.logspace(numpy.log10(ymin), numpy.log10(ymax), 10, endpoint = True))
+    ax.yaxis.set_minor_locator(LogLocator())
 
 
     if number_of_plot > 1:
@@ -58,7 +62,7 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
 
             if len(symbol) > 1:
                 sym = symbol[i]
-                
+
             else:
                 sym = symbol
 
@@ -97,19 +101,21 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
         symbol          :       symbol
     """
         # figure
-    plt.figure(figure_number, figsize=(10,7))
-    plt.subplot(1,1,1)
+    fig, ax = plt.subplots(figsize=(10,7))
+    fig = plt.figure(figure_number)
 
         # axes
-    xmin = min(x)
-    xmax = max(x)
-    plt.xlim(xmin, xmax)
-    plt.xticks(numpy.linspace(xmin, xmax, 10, endpoint = True))
+    #xmin = min(x)
+    #xmax = max(x)
+    #plt.xlim(xmin, xmax)
+    #plt.xticks(numpy.linspace(xmin, xmax, 10, endpoint = True))
+    ax.xaxis.set_minor_locator(AutoLocator())
 
     #ymin = min(y)
     #ymax = max(y)
     #plt.ylim(ymin, ymax)
     #plt.yticks(numpy.linspace(ymin, ymax, 10, endpoint = True))
+    ax.yaxis.set_minor_locator(AutoLocator())
 
     if number_of_plot > 1:
 

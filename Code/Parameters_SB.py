@@ -5,13 +5,13 @@ Here are all the free parameters for the system!
 # Parameters for the system
 
     # OB asociation
-Nob = 50           # number of OB-stars in the association
+Nob = 88           # number of OB-stars in the association
 Lob = 1e36          # mean luminosity of an OB-star (erg/s)
 Pob = Nob*Lob       # mean power of the association (erg/s)
-lifetime = 30e6     # average lifetime of the lowest B star (yr)
+lifetime = 4e6 #30e6     # average lifetime of the lowest B star (yr)
 
     # Fit parameters of the model
-n0 = 1              # mean density of the interstellar medium (particle/cm^3)
+n0 = 38              # mean density of the interstellar medium (particle/cm^3)
 xH = 0.9            # mass fraction of hydrogen
 xHe = 0.1           # mass fraction of helium
 mu = xH + xHe * 4   # average molecular weight
@@ -25,7 +25,7 @@ gammar = 3.0/5
 
     # T(x) = at * n0^alphat * L38^betat * t7^gammat * (1-x)^deltat  (K)
     # Equation 4 of Mac Low and McCray (1987)
-at = 3.6e6
+at = 7.4e6 #3.6e6
 alphat = 2.0/35
 betat = 8.0/35
 gammat = -6/35
@@ -41,7 +41,7 @@ deltan = -2.0/5
 
     # p(t) = ap * n0^alphap * L_36^betap * t6^gammap               (dyne cm^-2)
     # Equation 22 of Weaver et al. (1977)
-ap = 4.12e-12
+ap = 3.3e-11 #4.12e-12
 alphap = 3.0/5
 betap = 2.0/5
 gammap = -4.0/5
