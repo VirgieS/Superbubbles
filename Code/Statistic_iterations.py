@@ -22,8 +22,8 @@ from Parameters_SB import *
 
     # IRAP
 #os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/stat_SN/Test/')
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Test/'
-pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Test/'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Gamma_emission/Test/'
+pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Remain/Test/'
 #pathfigure_CR = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/CR/1/'
 
     # Home
@@ -36,7 +36,29 @@ pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Test/'
 ## ======= ##
 
     # Number of iterations
-nit = 1000
+nit = 100
+
+    # Parameters for the SB
+        # luminosity
+L36 = Pob * erg236erg     # mechanical energy expressed in 10^36 erg/s
+L38 = L36 * t36erg238erg  # mechanical energy expressed in 10^38 erg/s
+
+        # in the ISM
+pISM = n0 * kb * TISM               # pressure in the ISM (dyne cm^-2)
+C02 = kb*TISM/(mu*mpg)/(km2cm)**2   # isothermal sound speed in the ambiant gas (km/s)
+
+    # Correction factor
+        # Observations
+t_end = 4.5e6       # time at which R = rsb
+t_end_6 = t_end * yr26yr # in Myr
+Robs = 47           # pc
+
+        # Weaver model
+Rsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)[0] # pc
+
+        # Correction factor
+correction_factor = Robs/Rsb
+ncorr = len(correction_factor)
 
     # Parameters for the cosmic rays
 
@@ -57,7 +79,7 @@ zones = [2]
 
     # Fix time array (yr)
 t0min = 3                   # Myr
-t0max = 4                  # Myr
+t0max = t_end_6             # Myr
 tmin = t0min/yr26yr         # yr
 tmax = (t0max + 1)/yr26yr   # yr
 number_bin_t = 3000
@@ -67,7 +89,7 @@ t6 = t_fix * yr26yr                                 # Myr
     # Energy of the gamma photons (GeV)
 Emin_gamma = 100 * MeV2GeV      # 100 MeV (GeV)
 Emax_gamma = 100 * TeV2GeV      # 100 TeV (GeV)
-Esep = 1*TeV2GeV                # 1 TeV (GeV)
+Esep = numpy.array([100, 1*TeV2GeV, 10*TeV2GeV]) # ranges of energy (GeV)
 
     # Initialization
 figure_number = 1
@@ -88,18 +110,22 @@ for i in range (nit):
     t0 = random_SN(t0min, t0max, n)/yr26yr
     t0 = sorted(t0)
 
-    Lum_1, Lum_2, Lum, Lum_units, figure_number, n_pwn, nob = data(t0, t_fix, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, delta, zones, pathfigure_gamma, i, figure_number)
+    Lum_
+
+    for l in range (ncorr):
+
+        Lum_1, Lum_2, Lum_3, Lum, Lum_units, figure_number, n_pwn, nob = data(correction_factor[l], t0, t_fix, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, delta, zones, pathfigure_gamma, i, figure_number)
 
     Lum_it_1.append(Lum_1)
     Lum_it_2.append(Lum_2)
     Lum_it.append(Lum)
     n_pwn_it.append(n_pwn)
     nob_it.append(nob)
-    """
+
         # spectral index
     indE = 10       # which energy that the spectral index would be computed
     spectral_index(indE, zones, pathfigure_gamma, i, figure_number)
-    """
+
     print('end of the iteration %d' %i)
 
 Lum_it_1 = numpy.asarray(Lum_it_1)
@@ -201,3 +227,4 @@ log_plot(figure_ob, 3, t6, [nob_mean, nob_pst, nob_mst], label, Title_pwn, xlabe
 plt.savefig(pathfigure_remain+'Mean_ob.eps')
 
 plt.show()
+"""

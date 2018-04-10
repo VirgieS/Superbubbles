@@ -2,16 +2,18 @@
 Here are all the free parameters for the system!
 """
 
+import numpy
+
 # Parameters for the system
 
     # OB asociation
-Nob = 88           # number of OB-stars in the association
+Nob = 88            # number of OB-stars in the association
 Lob = 1e36          # mean luminosity of an OB-star (erg/s)
-Pob = Nob*Lob       # mean power of the association (erg/s)
+Pob = Nob * Lob     # mean power of the association (erg/s)
 lifetime = 4e6 #30e6     # average lifetime of the lowest B star (yr)
 
     # Fit parameters of the model
-n0 = 38              # mean density of the interstellar medium (particle/cm^3)
+n0 = numpy.array([1, 30, 100])              # mean density of the interstellar medium (particle/cm^3)
 xH = 0.9            # mass fraction of hydrogen
 xHe = 0.1           # mass fraction of helium
 mu = xH + xHe * 4   # average molecular weight
@@ -33,7 +35,7 @@ deltat = 2.0/5
 
     # n(x) = an * n0^alphan * L38^betan * t7^gamman * (1-x)^deltan  (cm^-3)
     # Equation 5 of Mac Low and McCray (1987)
-an = 4.0e-3
+an = 1.4e-2 #4.0e-3
 alphan = 19.0/35
 betan = 6.0/35
 gamman = -22.0/35

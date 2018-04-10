@@ -38,11 +38,12 @@ def luminosity(lum_energy, energy):
 
     return lum
 
-def data(t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, delta, zones, pathfigure, iteration, figure_number):
+def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, delta, zones, pathfigure, iteration, figure_number):
 
     """
     Return 5 files with differents quantities.
     Inputs:
+        correction_factor   : correction factor for the radius of the SB
         t0          :       (sorted) array of the SN explosion times (yr)
         t           :       time array (yr)
         Emin_CR     :       minimum kinetic energy of the relativistic particles (GeV)
@@ -67,15 +68,6 @@ def data(t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, d
         data        :       file with the distribution of relativistic particles for each time step, each SN explosion and each zones (GeV^-1)
     """
 
-        # Parameters for the system
-            # luminosity
-    L36 = Pob * erg236erg     # mechanical energy expressed in 10^36 erg/s
-    L38 = L36 * t36erg238erg  # mechanical energy expressed in 10^38 erg/s
-
-            # in the ISM
-    pISM = n0 * kb * TISM               # pressure in the ISM (dyne cm^-2)
-    C02 = kb*TISM/(mu*mpg)/(km2cm)**2   # isothermal sound speed in the ambiant gas (km/s)
-
         ##===============================##
         # Energy of the cosmic rays (GeV) #
         ##===============================##
@@ -97,7 +89,6 @@ def data(t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, d
             # D(p) = D0 * (p/p0)^(-delta)
             # D(E) = D0 * (E^2 + 2*mpg*E)^(delta/2) * 1/p0^delta
     D = diffusion_coefficient(p0, D0, ECR, delta)
-    print((47*pc2cm)**2/(6*D[len(ECR)-1]*1e6*yr2s)/yr26yr)
 
         ##===========================##
         # Energy of the gamma photons #
@@ -106,8 +97,11 @@ def data(t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, d
     spectrum = numpy.logspace(numpy.log10(Emin_gamma), numpy.log10(Emax_gamma), number_bin_E)
     spectrum_energy = spectrum * units.GeV
 
-    ind1 = numpy.where(spectrum <= Esep)    # first range of energy (from 100 MeV to 100 GeV)
-    ind2 = numpy.where(spectrum > Esep)     # second range of energy (from 100 GeV to 100 TeV)
+            # range of energy for the gamma luminosity
+    ind_1 = numpy.where(spectrum <= Esep[0])[0]                         # from 100 MeV to 100 GeV
+    ind_2 = numpy.where(spectrum > Esep[0]) & (spectrum <= Esep[1]))[0] # from 100 GeV to 1 TeV
+    ind_3 = numpy.where(spectrum > Esep[1]) & (spectrum <= Esep[2]))[0] # from 1 TeV to 10 TeV
+    ind_4 = numpy.where(spectrum > Esep[3])[0]                          # from 10 TeV to 100 TeV
 
         ## =============================================================== ##
         # Computation of gamma luminosity in each range of energy(erg s^-1) #
