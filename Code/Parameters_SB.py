@@ -4,26 +4,39 @@ Here are all the free parameters for the system!
 
 import numpy
 
+# Physical constants and conversion factors
+from Physical_constants import *
+from Conversion_factors import *
+
 # Parameters for the system
 
     # OB asociation
 Nob = 88            # number of OB-stars in the association
 Lob = 1e36          # mean luminosity of an OB-star (erg/s)
 Pob = Nob * Lob     # mean power of the association (erg/s)
+L36 = Pob * erg236erg     # mechanical energy expressed in 10^36 erg/s
+L38 = L36 * t36erg238erg  # mechanical energy expressed in 10^38 erg/s
 lifetime = 4e6 #30e6     # average lifetime of the lowest B star (yr)
 
     # Fit parameters of the model
-n0 = numpy.array([1, 30, 100])              # mean density of the interstellar medium (particle/cm^3)
+n0 = 1              # ambient density (cm^-3)
 xH = 0.9            # mass fraction of hydrogen
 xHe = 0.1           # mass fraction of helium
 mu = xH + xHe * 4   # average molecular weight
 
-    # R(t) = a * n0^alphar * L36^betar * t6^gammar                  (pc)
+    # R(t) = ar * n0^alphar * L36^betar * t6^gammar                  (pc)
     # Equation 51 of Weaver et al. (1977)
 ar = 27.0
 alphar = -1.0/5
 betar = 1.0/5
 gammar = 3.0/5
+
+    # V(t) = av * n0^alphav * L36^betav * t6^gammav                  (km/s)
+    # Equation 52 of Weaver et al. (1977)
+av = 16.0
+alphav = -1.0/5
+betav = 1.0/5
+gammav = -2.0/5
 
     # T(x) = at * n0^alphat * L38^betat * t7^gammat * (1-x)^deltat  (K)
     # Equation 4 of Mac Low and McCray (1987)

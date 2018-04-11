@@ -8,7 +8,6 @@ import astropy.units as units
 import os
 import pickle
 import naima
-from statistics import mean, stdev
 from naima.models import PionDecay, TableModel
 from Functions import *
 from Functions_CR import *
@@ -21,7 +20,7 @@ from Conversion_factors import *
 from Parameters_SB import *
 
     # IRAP
-#os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/stat_SN/Test/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/')
 pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Gamma_emission/Test/'
 pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Remain/Test/'
 #pathfigure_CR = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/CR/1/'
@@ -36,29 +35,14 @@ pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor
 ## ======= ##
 
     # Number of iterations
-nit = 100
-
-    # Parameters for the SB
-        # luminosity
-L36 = Pob * erg236erg     # mechanical energy expressed in 10^36 erg/s
-L38 = L36 * t36erg238erg  # mechanical energy expressed in 10^38 erg/s
-
-        # in the ISM
-pISM = n0 * kb * TISM               # pressure in the ISM (dyne cm^-2)
-C02 = kb*TISM/(mu*mpg)/(km2cm)**2   # isothermal sound speed in the ambiant gas (km/s)
+nit = 1
 
     # Correction factor
-        # Observations
-t_end = 4.5e6       # time at which R = rsb
-t_end_6 = t_end * yr26yr # in Myr
-Robs = 47           # pc
-
-        # Weaver model
-Rsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)[0] # pc
-
-        # Correction factor
+t_end = 4.5e6               # time at which R = Robs
+t_end_6 = t_end * yr26yr    # in Myr
+Robs = 47.0                 # observed radius (pc)
+Rsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t_end_6)[0] # from Weaver's model (pc and km/s)
 correction_factor = Robs/Rsb
-ncorr = len(correction_factor)
 
     # Parameters for the cosmic rays
 
@@ -72,7 +56,7 @@ alpha = 2.0         # exponent of the power-law distribution
 
         # Diffusion coefficient of the cosmic rays (cm^2 s^-1)
 delta = 1.0/2       # exponent of the power-law of the diffusion coefficient
-D0 = 1e28           # diffusion coefficient at 10 GeV/c in cm^2 s^-1
+D0 = 1e28           # diffusion coefficient at 10 GeV/c in cm^2 s^-1  ==> prendre *10 et /10
 
     # Which zone for the Computation
 zones = [2]
@@ -93,138 +77,160 @@ Esep = numpy.array([100, 1*TeV2GeV, 10*TeV2GeV]) # ranges of energy (GeV)
 
     # Initialization
 figure_number = 1
-Lum_it_1 = []       # total gamma luminosity from 100 MeV to 100 GeV
-Lum_it_2 = []       # total gamma luminosity from 100 GeV to 100 TeV
+Lum_it_HESS = []    # total gamma luminosity from 1 TeV to 10 TeV
 Lum_it = []         # total gamma luminosity from 100 MeV to 100 TeV
+Gamma_it = []       # spectral index from 1 TeV to 10 TeV
 n_pwn_it = []       # total number of pulsar wind nebula
 nob_it = []         # total of remained OB stars
+t0_it = []          # SN explosion times (yr)
 
     ##----------##
     # Iterations #
     ##----------##
 
+with open('SN', 'wb') as SN_write:
+
+    for i in range (nit):
+
+            # SN explosion time
+        n = 5             # number of massive stars in the OB association
+        t0 = random_SN(t0min, t0max, n)/yr26yr
+        t0 = sorted(t0)
+
+        t0_it.append(t0)
+
+    t0_it = numpy.asarray(t0_it)
+
+    pickle.dump(t0_it, SN_write)
+
+with open('SN', 'rb') as SN_load:
+
+    t0_it = pickle.load(SN_load)
+    n = len(t0_it[0])
+
 for i in range (nit):
 
-        # SN explosion time
-    n = 5             # number of massive stars in the OB association
-    t0 = random_SN(t0min, t0max, n)/yr26yr
-    t0 = sorted(t0)
+    t0 = t0_it[i]
 
-    Lum_
+    Lum_HESS, Lum, Gamma, Lum_units, figure_number, n_pwn, nob = data(correction_factor, t0, t_fix, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, delta, zones, pathfigure_gamma, i, figure_number)
 
-    for l in range (ncorr):
-
-        Lum_1, Lum_2, Lum_3, Lum, Lum_units, figure_number, n_pwn, nob = data(correction_factor[l], t0, t_fix, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, delta, zones, pathfigure_gamma, i, figure_number)
-
-    Lum_it_1.append(Lum_1)
-    Lum_it_2.append(Lum_2)
+    Lum_it_HESS.append(Lum_HESS)
+    print(Lum_HESS)
     Lum_it.append(Lum)
+    Gamma_it.append(Gamma)
     n_pwn_it.append(n_pwn)
     nob_it.append(nob)
 
-        # spectral index
-    indE = 10       # which energy that the spectral index would be computed
-    spectral_index(indE, zones, pathfigure_gamma, i, figure_number)
-
     print('end of the iteration %d' %i)
 
-Lum_it_1 = numpy.asarray(Lum_it_1)
-Lum_it_2 = numpy.asarray(Lum_it_2)
+Lum_it_HESS = numpy.asarray(Lum_it_HESS)
+ind = numpy.where(Lum_HESS > 0)[0]
+print(Lum_HESS[ind])
 Lum_it = numpy.asarray(Lum_it)
+Gamma_it = numpy.asarray(Gamma_it)
 n_pwn_it = numpy.asarray(n_pwn_it)
 nob_it = numpy.asarray(nob_it)
-
+"""
     ##---------------------------##
     # Mean and standard deviation #
     ##---------------------------##
 
         # Initialization
             # Mean
-Lum_1_mean = numpy.zeros(number_bin_t)      # from 100 MeV to 100 GeV
-Lum_2_mean = numpy.zeros(number_bin_t)      # from 100 GeV to 100 TeV
+Lum_HESS_mean = numpy.zeros(number_bin_t)   # from 1 TeV to 10 TeV
 Lum_mean = numpy.zeros(number_bin_t)        # from 100 MeV to 100 TeV
+Gamma_mean = numpy.zeros(number_bin_t)      # spectral index
 n_pwn_mean = numpy.zeros(number_bin_t)      # number of pulsar wind nebula
 nob_mean = numpy.zeros(number_bin_t)        # number of remained OB stars
 
             # Standard deviation
-Lum_1_stdev = numpy.zeros(number_bin_t)     # from 100 MeV to 100 GeV
-Lum_2_stdev = numpy.zeros(number_bin_t)     # from 100 GeV to 100 TeV
-Lum_stdev = numpy.zeros(number_bin_t)       # from 100 MeV to 100 TeV
-n_pwn_stdev = numpy.zeros(number_bin_t)     # number of pulsar wind nebula
-nob_stdev = numpy.zeros(number_bin_t)        # number of remained OB stars
+Lum_HESS_std = numpy.zeros(number_bin_t)    # from 1 TeV to 10 TeV
+Lum_std = numpy.zeros(number_bin_t)         # from 100 MeV to 100 TeV
+Gamma_std = numpy.zeros(number_bin_t)       # spectral index
+n_pwn_std = numpy.zeros(number_bin_t)       # number of pulsar wind nebula
+nob_std = numpy.zeros(number_bin_t)         # number of remained OB stars
 
 for j in range (number_bin_t):
 
-    Lum_1_mean[j] = mean(Lum_it_1[:,j])
-    Lum_2_mean[j] = mean(Lum_it_2[:,j])
-    Lum_mean[j] = mean(Lum_it[:,j])
-    n_pwn_mean[j] = mean(n_pwn_it[:,j])
-    nob_mean[j] = mean(nob_it[:, j])
+    Lum_HESS_mean[j] = numpy.mean(Lum_it_HESS[:,j])
+    Lum_mean[j] = numpy.mean(Lum_it[:,j])
+    Gamma_mean[j] = numpy.mean(Gamma_it[:,j])
+    n_pwn_mean[j] = numpy.mean(n_pwn_it[:,j])
+    nob_mean[j] = numpy.mean(nob_it[:, j])
 
-    Lum_1_stdev[j] = stdev(Lum_it_1[:,j])
-    Lum_2_stdev[j] = stdev(Lum_it_2[:,j])
-    Lum_stdev[j] = stdev(Lum_it[:,j])
-    n_pwn_stdev[j] = stdev(n_pwn_it[:,j])
-    nob_stdev[j] = stdev(nob_it[:, j])
+    Lum_HESS_std[j] = numpy.std(Lum_it_HESS[:,j])
+    Lum_std[j] = numpy.std(Lum_it[:,j])
+    Gamma_std[j] = numpy.std(Gamma_it[:,j])
+    n_pwn_std[j] = numpy.std(n_pwn_it[:,j])
+    nob_std[j] = numpy.std(nob_it[:, j])
 
-Lum_1_pst = Lum_1_mean + Lum_1_stdev
-Lum_1_mst = Lum_1_mean - Lum_1_stdev
+Lum_HESS_pst = Lum_HESS_mean + Lum_HESS_std
+Lum_HESS_mst = Lum_HESS_mean - Lum_HESS_std
+ind = numpy.where(Lum_HESS_mean > 0)[0]
+print(Lum_HESS_pst[ind])
 
-Lum_2_pst = Lum_2_mean + Lum_2_stdev
-Lum_2_mst = Lum_2_mean - Lum_2_stdev
+Lum_pst = Lum_mean + Lum_std
+Lum_mst = Lum_mean - Lum_std
 
-Lum_pst = Lum_mean + Lum_stdev
-Lum_mst = Lum_mean - Lum_stdev
+Gamma_pst = Gamma_mean + Gamma_std
+Gamma_mst = Gamma_mean - Gamma_std
 
-n_pwn_pst = n_pwn_mean + n_pwn_stdev
-n_pwn_mst = n_pwn_mean - n_pwn_stdev
+n_pwn_pst = n_pwn_mean + n_pwn_std
+n_pwn_mst = n_pwn_mean - n_pwn_std
 
-nob_pst = nob_mean + nob_stdev
-nob_mst = nob_mean - nob_stdev
+nob_pst = nob_mean + nob_std
+nob_mst = nob_mean - nob_std
 
     # Plot
-        # Gamma luminosity
-figure_1 = figure_number
-figure_2 = figure_1 + 1
-figure = figure_2 + 1
-
 label = 'none'
 sym = ['-.', ':', ':']
-Title_1 = 'Mean gamma emission for %d SN explosions (%d iterations) from 100 MeV to 1 TeV'%(n, nit)
-Title_2 = 'Mean gamma emission for %d SN explosions (%d iterations) from 1 TeV to 100 TeV'%(n, nit)
-Title = 'Mean gamma emission for %d SN explosions (%d iterations) from 100 MeV to 100 TeV'%(n, nit)
 xlabel = 'Time [Myr]'
+
+        # Gamma luminosity
+figure_HESS = figure_number
+figure = figure_HESS + 1
+
+Title_HESS = 'Mean gamma emission for %d SN explosions (%d iterations) from 1 TeV to 10 TeV'%(n, nit)
+Title = 'Mean gamma emission for %d SN explosions (%d iterations) from 100 MeV to 100 TeV'%(n, nit)
 ylabel = '$L_\gamma$ [erg s$^{-1}$]'
 
-log_plot(figure_1, 3, t6, [Lum_1_mean, Lum_1_pst, Lum_1_mst], label, Title_1, xlabel, ylabel, sym)
+log_plot(figure_HESS, 3, t6, [Lum_HESS_mean, Lum_HESS_pst, Lum_HESS_mst], label, Title_HESS, xlabel, ylabel, sym)
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_range1.eps')
-
-log_plot(figure_2, 3, t6, [Lum_2_mean, Lum_2_pst, Lum_2_mst], label, Title_2, xlabel, ylabel, sym)
-plt.savefig(pathfigure_gamma+'Mean_gamma_emission_range2.eps')
 
 log_plot(figure, 3, t6, [Lum_mean, Lum_pst, Lum_mst], label, Title, xlabel, ylabel, sym)
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_all.eps')
 
+figure_number = figure + 1
+
+        # spectral index
+figure_Gamma = figure_number
+Title_Gamma = 'Photon index for %d SN explosions (%d iterations) from 1 TeV to 10 TeV'%(n, nit)
+ylabel = '$\Gamma_{ph}$'
+
+log_plot(figure, 3, t6, [Gamma_mean, Gamma_pst, Gamma_mst], label, Title_Gamma, xlabel, ylabel, sym)
+plt.savefig(pathfigure_gamma+'Mean_gamma_emission_all.eps')
+figure_number = figure_Gamma + 1
+
         # Number of pulsar wind nebula
-figure_pwn = figure + 1
+figure_pwn = figure_number
 label = 'none'
-sym_stdev = ['-.', ':', ':']
 Title_pwn = 'Number of pulsar wind nebula in the superbubble'
-xlabel = 'Time [Myr]'
 ylabel = '$n_{pwn}$'
 
 log_plot(figure_pwn, 3, t6, [n_pwn_mean, n_pwn_pst, n_pwn_mst], label, Title_pwn, xlabel, ylabel, sym)
 plt.savefig(pathfigure_remain+'Mean_pwn.eps')
 
+figure_number = figure_pwn + 1
+
         # Number of remained OB stars in the association
-figure_ob = figure_pwn + 1
+figure_ob = figure_number
 label = 'none'
-sym_stdev = ['-.', ':', ':']
 Title_pwn = 'Number of remained Ob stars'
-xlabel = 'Time [Myr]'
 ylabel = '$n_{ob}$'
 log_plot(figure_ob, 3, t6, [nob_mean, nob_pst, nob_mst], label, Title_pwn, xlabel, ylabel, sym)
 plt.savefig(pathfigure_remain+'Mean_ob.eps')
+
+figure_number = figure_ob + 1
 
 plt.show()
 """

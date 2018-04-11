@@ -225,7 +225,7 @@ def random_SN(xmin, xmax, size = 1):
 
     y = numpy.random.random(size = size)
 
-    return xmax * y + xmin
+    return (xmax-xmin) * y + xmin
 
 def interpolation(x, y):
     """

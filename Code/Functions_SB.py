@@ -173,7 +173,7 @@ def profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, b
         n0      :       atomic density expressed in cm^-3
         L38     :       total luminosity injected by the stars and SN expressed in 10^38 erg/s
         t7      :       age of the system expressed in 10^7 yr
-        R_sb    :       array of distance (pc)
+        rsb     :       array of distance (pc)
         Rsb     :       outer radius of the SB (pc)
     """
     x = rsb/Rsb

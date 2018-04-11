@@ -30,13 +30,28 @@ def luminosity(lum_energy, energy):
     Return the luminosity in a range of energy
 
     Inputs:
-        lum_energy  :       intrinsic luminosity array for a range of energy (erg/s/GeV)
+        lum_energy  :       intrinsic luminosity array per energy (erg/s/GeV)
         energy      :       range of energy in which we will compute the luminosity (GeV)
     """
     lum = integrate.trapz(lum_energy, energy)
     lum = numpy.nan_to_num(lum)
 
     return lum
+
+def spectral_index(Emin, Emax, lum_ph_min, lum_ph_max):
+
+    """
+    Return the spectral index at an energy
+
+    Inputs:
+        Emin        :       minimum energy of the range (GeV)
+        Emax        :       maximum energy of the range (GeV)
+        lum_ph_min  :       intrinsic luminosity in photons at Emin (ph/s)
+        lum_ph_max  :       intrinsic luminosity in photons at Emax (ph/s)
+    """
+
+    return -(numpy.log(lum_ph_max) - numpy.log(lum_ph_min))/(numpy.log(Emax) - numpy.log(Emin))
+
 
 def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, delta, zones, pathfigure, iteration, figure_number):
 
@@ -67,6 +82,13 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
         radius      :       file with the radius array for each time step (pc)
         data        :       file with the distribution of relativistic particles for each time step, each SN explosion and each zones (GeV^-1)
     """
+        # Parameters for the SB
+            # luminosity
+    L36 = Pob * erg236erg     # mechanical energy expressed in 10^36 erg/s
+    L38 = L36 * t36erg238erg  # mechanical energy expressed in 10^38 erg/s
+
+            # in the ISM
+    C02 = kb*TISM/(mu*mpg)/(km2cm)**2   # isothermal sound speed in the ambiant gas (km/s)
 
         ##===============================##
         # Energy of the cosmic rays (GeV) #
@@ -98,10 +120,7 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
     spectrum_energy = spectrum * units.GeV
 
             # range of energy for the gamma luminosity
-    ind_1 = numpy.where(spectrum <= Esep[0])[0]                         # from 100 MeV to 100 GeV
-    ind_2 = numpy.where(spectrum > Esep[0]) & (spectrum <= Esep[1]))[0] # from 100 GeV to 1 TeV
-    ind_3 = numpy.where(spectrum > Esep[1]) & (spectrum <= Esep[2]))[0] # from 1 TeV to 10 TeV
-    ind_4 = numpy.where(spectrum > Esep[3])[0]                          # from 10 TeV to 100 TeV
+    ind_HESS = numpy.where((spectrum > Esep[0]) & (spectrum <= Esep[1]))[0]      # from 1 TeV to 10 TeV
 
         ## =============================================================== ##
         # Computation of gamma luminosity in each range of energy(erg s^-1) #
@@ -120,26 +139,25 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
 
         if zone == 1:       # in the SB
 
-            Lumsb_sn_1 = numpy.zeros(nt)         # 100 MeV to 100 GeV
-            Lumsb_sn_2 = numpy.zeros(nt)         # 100 GeV to 100 TeV
-            Lumsb_sn = numpy.zeros(nt)           # 100 MeV to 100 TeV
+            Lumsb_sn_HESS = numpy.zeros(nt)         # 1 TeV to 10 TeV
+            Lumsb_sn = numpy.zeros(nt)              # 100 MeV to 100 TeV
 
         elif zone == 2:     # in the supershell
 
-            Lumshell_sn_1 = numpy.zeros(nt)      # 100 MeV to 100 GeV
-            Lumshell_sn_2 = numpy.zeros(nt)      # 100 GeV to 100 TeV
-            Lumshell_sn = numpy.zeros(nt)        # 100 MeV to 100 TeV
+            Lumshell_sn_HESS = numpy.zeros(nt)      # 1 TeV to 10 TeV
+            Lumshell_sn = numpy.zeros(nt)           # 100 MeV to 100 TeV
 
         else:               # outside the SB
 
-            Lumout_sn_1 = numpy.zeros(nt)       # 100 MeV to 100 GeV
-            Lumout_sn_2 = numpy.zeros(nt)       # 100 GeV to 100 TeV
-            Lumout_sn = numpy.zeros(nt)         # 100 MeV to 100 TeV
+            Lumout_sn_HESS = numpy.zeros(nt)        # 1 TeV to 10 TeV
+            Lumout_sn = numpy.zeros(nt)             # 100 MeV to 100 TeV
 
             # Total
-    Lumtot_sn_1 = numpy.zeros(nt)       # 100 MeV to 100 GeV
-    Lumtot_sn_2 = numpy.zeros(nt)       # 100 GeV to 100 TeV
-    Lumtot_sn = numpy.zeros(nt)         # 100 MeV to 100 TeV
+    Lumtot_sn_HESS = numpy.zeros(nt)        # 1 TeV to 10 TeV
+    Lumtot_sn = numpy.zeros(nt)             # 100 MeV to 100 TeV
+
+                # total spectral index
+    Gamma_sn = numpy.zeros(nt)
 
         # Pulsar wind nebula
     n_pwn_tot = numpy.zeros(nt)
@@ -163,25 +181,23 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
 
             if zone == 1:                       # in the SB
 
-                Lum1_t_sb = numpy.zeros(number_bin_t)
-                Lum2_t_sb = numpy.zeros(number_bin_t)
+                LumHESS_t_sb = numpy.zeros(number_bin_t)
                 Lum_t_sb = numpy.zeros(number_bin_t)
 
             elif zone == 2:                     # in the supershell
 
-                Lum1_t_shell = numpy.zeros(number_bin_t)
-                Lum2_t_shell = numpy.zeros(number_bin_t)
+                LumHESS_t_shell = numpy.zeros(number_bin_t)
                 Lum_t_shell = numpy.zeros(number_bin_t)
 
             else:                               # outside the SB
 
-                Lum1_t_out = numpy.zeros(number_bin_t)
-                Lum2_t_out = numpy.zeros(number_bin_t)
+                LumHESS_t_out = numpy.zeros(number_bin_t)
                 Lum_t_out = numpy.zeros(number_bin_t)
 
-        Lum1_t_tot = numpy.zeros(number_bin_t)
-        Lum2_t_tot = numpy.zeros(number_bin_t)
+        LumHESS_t_tot = numpy.zeros(number_bin_t)
         Lum_t_tot = numpy.zeros(number_bin_t)
+
+        Gamma = numpy.zeros(number_bin_t)
 
                 # number of pulsar wind nebula
         t_pwn_min = t0[i]               # in yr
@@ -194,13 +210,16 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
             t6 = time6[j]           # 10^6 yr
             t7 = t6 * s6yr27yr      # 10^7 yr
             delta_t = time[j] - time[0]
-            sed_r = []
             SB = False  # we do not compute inside the SB
+            sedmin = 0
+            sedmax = 0
 
                 # Parameters of the SB
             Rsb, Vsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)           # radius and velocity of the SB
-            Msb, Mswept = masses(an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu)   # swept-up and inner masses (solar masses)
-            hs, ns = density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb)            # thickness and density of the shell (pc)
+            #Rsb = correction_factor * Rsb
+            #Vsb = correction_factor * Vsb
+            Msb, Mswept = masses(an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu)                       # swept-up and inner masses (solar masses)
+            hs, ns = density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb)                                # thickness and density of the shell (pc)
 
                 # For each zones
             for zone in (zones):
@@ -229,14 +248,15 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
                     PD = PionDecay(model, nh = ngas[0], nuclear_enhancement = True, useLUT = False)
                     sed_PD = PD.sed(spectrum_energy, distance = 0 * units.pc)
 
+                    sedmin += numpy.asarray(sed_PD[ind_HESS[0]])
+                    sedmax += numpy.asarray(ed_PD[ind_HESS[-1]])
+
                         # Gamma luminosity (erg s^-1)
                     lum_energy = numpy.asarray(sed_PD/spectrum)
                     lum_units = (sed_PD/spectrum_energy).units
 
-                    Lum1 = luminosity(lum_energy[ind1], spectrum[ind1])
-                    Lum1_t[j] += Lum1
-                    Lum2 = luminosity(lum_energy[ind2], spectrum[ind2])
-                    Lum2_t[j] += Lum2
+                    LumHESS = luminosity(lum_energy[ind_HESS], spectrum[ind_HESS])
+                    LumHESS_t[j] += LumHESS
                     Lum = luminosity(lum_energy, spectrum)
                     Lum_t[j] += Lum
 
@@ -252,13 +272,14 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
                         PD = PionDecay(model, nh = ngas[k], nuclear_enhancement = True, useLUT = False)
                         sed_PD = PD.sed(spectrum_energy, distance = 0 * units.pc)
 
+                        sedmin += numpy.asarray(sed_PD[ind_HESS[0]])
+                        sedmax += numpy.asarray(sed_PD[ind_HESS[-1]])
+
                             # Gamma luminosity (erg s^-1)
                         lum_energy = sed_PD/spectrum
 
-                        Lum1 = luminosity(lum_energy[ind1], spectrum[ind1])
-                        Lum1_t_sb[j] += Lum1
-                        Lum2 = luminosity(lum_energy[ind2], spectrum[ind2])
-                        Lum2_t_sb[j] += Lum2
+                        LumHESS = luminosity(lum_energy[ind_HESS], spectrum[ind_HESS])
+                        LumHESS_t_sb[j] += LumHESS
                         Lum = luminosity(lum_energy, spectrum)
                         Lum_t_sb[j] += Lum
 
@@ -277,15 +298,18 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
                     PD = PionDecay(model, nh = ngas, nuclear_enhancement = True, useLUT = False)
                     sed_PD = PD.sed(spectrum_energy, distance = 0 * units.pc)
 
+                    sedmin += numpy.asarray(sed_PD[ind_HESS[0]])
+                    sedmax += numpy.asarray(sed_PD[ind_HESS[-1]])
+
                         # Gamma luminosity (erg s^-1)
                     lum_energy = numpy.asarray(sed_PD/spectrum)
+                    print(sed_PD)
 
                     lum_units = (sed_PD/spectrum_energy).unit
 
-                    Lum1 = luminosity(lum_energy[ind1], spectrum[ind1])
-                    Lum1_t_shell[j] += Lum1
-                    Lum2 = luminosity(lum_energy[ind2], spectrum[ind2])
-                    Lum2_t_shell[j] += Lum2
+                    LumHESS = luminosity(lum_energy[ind_HESS], spectrum[ind_HESS])
+                    print(LumHESS)
+                    LumHESS_t_shell[j] += LumHESS
                     Lum = luminosity(lum_energy, spectrum)
                     Lum_t_shell[j] += Lum
 
@@ -306,24 +330,27 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
                     lum_energy = sed_PD/spectrum
                     lum_units = (sed_PD/spectrum_energy).units
 
-                    Lum1 = luminosity(lum_energy[ind1], spectrum[ind1])
-                    Lum1_t_out[j] += Lum1
-                    Lum2 = luminosity(lum_energy[ind2], spectrum[ind2])
-                    Lum2_t_out[j] += Lum2
+                    LumHESS = luminosity(lum_energy[ind_HESS], spectrum[ind_HESS])
+                    LumHESS_t_out[j] += LumHESS
                     Lum = luminosity(lum_energy, spectrum)
                     Lum_t_out[j] += Lum
 
             if SB:  # if we compute what happens inside the SB
 
-                Lum1_t_tot[j] = Lum1_t_sb[j] + Lum1_t_shell[j]
-                Lum2_t_tot[j] = Lum2_t_sb[j] + Lum2_t_shell[j]
+                LumHESS_t_tot[j] = LumHESS_t_sb[j] + LumHESS_t_shell[j]
                 Lum_t_tot[j] = Lum_t_sb[j] + Lum_t_shell[j]
 
             else:   # the only relevant gamma luminosity is the one of the supershell
 
-                Lum1_t_tot[j] = Lum1_t_shell[j]
-                Lum2_t_tot[j] = Lum2_t_shell[j]
+                LumHESS_t_tot[j] = LumHESS_t_shell[j]
                 Lum_t_tot[j] = Lum_t_shell[j]
+
+                    # spectral index
+            Emin = spectrum[ind_HESS[0]]
+            Emax = spectrum[ind_HESS[-1]]
+            lum_ph_min = sedmin/(Emin**2)
+            lum_ph_max = sedmax/(Emax**2)
+            Gamma[j] = spectral_index(Emin, Emax, lum_ph_min, lum_ph_max)
 
             # Interpolation + plot
 
@@ -336,79 +363,71 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
         for l in (indt_pwn):
             n_pwn_tot[l] += 1
 
-                # Gamma luminosity
+                # Gamma luminosity + spectral index
 
-        Title_1 = 'Gamma emission from 100 MeV to 100 GeV (t0 = %.2e yr)'%t0[i]
-        Title_2 = 'Gamma emission from 100 GeV to 100 TeV (t0 = %.2e yr)'%t0[i]
+        Title_HESS = 'Gamma emission from 1 TeV to 10 TeV (t0 = %.2e yr)'%t0[i]
         Title = 'Gamma emission from 100 MeV to 100 TeV (t0 = %.2e yr)'%t0[i]
         xlabel = 'Time [Myr]'
         ylabel = '$L_\gamma$ [erg s$^-1$]'
-        figure_1 = figure_number
-        figure_2 = figure_1 + 1
-        figure = figure_2 + 1
+        figure_HESS = figure_number
+        figure = figure_HESS + 1
 
         for zone in (zones):
 
             if zone == 1:       # in the SB
 
-                Lum1_sb = interpolation(time, Lum1_t_sb)
-                Lum2_sb = interpolation(time, Lum2_t_sb)
+                LumHESS_sb = interpolation(time, LumHESS_t_sb)
                 Lum_sb = interpolation(time, Lum_t_sb)
 
                     # plot
                 #label = 'SB'
                 #sym = '-.'
 
-                #log_plot(figure_1, 1, time6, Lum1_t_sb, label, Title_1, xlabel, ylabel, sym)
-                #log_plot(figure_2, 1, time6, Lum2_t_sb, label, Title_2, xlabel, ylabel, sym)
+                #log_plot(figure_HESS, 1, time6, LumHESS_t_sb, label, Title_HESS, xlabel, ylabel, sym)
                 #log_plot(figure, 1, time6, Lum_t_sb, label, Title, xlabel, ylabel, sym)
 
             elif zone == 2:     # in the supershell
 
-                Lum1_shell = interpolation(time, Lum1_t_shell)
-                Lum2_shell = interpolation(time, Lum2_t_shell)
+                LumHESS_shell = interpolation(time, LumHESS_t_shell)
                 Lum_shell = interpolation(time, Lum_t_shell)
 
                     # plot
                 #label = 'shell'
                 #sym = '--'
 
-                #log_plot(figure_1, 1, time6, Lum1_t_shell, label, Title_1, xlabel, ylabel, sym)
-                #log_plot(figure_2, 1, time6, Lum2_t_shell, label, Title_2, xlabel, ylabel, sym)
+                #log_plot(figure_HESS, 1, time6, LumHESS_t_shell, label, Title_HESS, xlabel, ylabel, sym)
                 #log_plot(figure, 1, time6, Lum_t_shell, label, Title, xlabel, ylabel, sym)
 
             else:               # outside the SB
 
-                Lum1_out = interpolation(time, Lum1_t_out)
-                Lum2_out = interpolation(time, Lum2_t_out)
+                LumHESS_out = interpolation(time, LumHESS_t_out)
                 Lum_out = interpolation(time, Lum_t_out)
 
                     # plot
                 #label = 'out'
                 #sym = ':'
 
-                #log_plot(figure_1, 1, time6, Lum1_t_out, label, Title_1, xlabel, ylabel, sym)
-                #log_plot(figure_2, 1, time6, Lum2_t_out, label, Title_2, xlabel, ylabel, sym)
+                #log_plot(figure_HESS, 1, time6, LumHESS_t_out, label, Title_HESS, xlabel, ylabel, sym)
                 #log_plot(figure, 1, time6, Lum_t_out, label, Title, xlabel, ylabel, sym)
 
             # plot
         #label = 'total'
         #sym = ':'
 
-        #log_plot(figure_1, 1, time6, Lum1_t_tot, label, Title_1, xlabel, ylabel, sym)
+        #log_plot(figure_HESS, 1, time6, LumHESS_t_tot, label, Title_HESS, xlabel, ylabel, sym)
         #plt.savefig(pathfigure+'Gamma_luminosity_range1_it%d_t0%d.eps'%(iteration,i))
-
-        #log_plot(figure_2, 1, time6, Lum2_t_tot, label, Title_2, xlabel, ylabel, sym)
-        #plt.savefig(pathfigure+'Gamma_luminosity_range2_it%d_t0%d.eps'%(iteration,i))
 
         #log_plot(figure, 1, time6, Lum_t_tot, label, Title, xlabel, ylabel, sym)
         #plt.savefig(pathfigure+'Gamma_luminosity_all_it%d_t0%d.eps'%(iteration,i))
         #figure_number = figure + 1
         #plt.show()
 
-        Lum1_tot = interpolation(time, Lum1_t_tot)
-        Lum2_tot = interpolation(time, Lum2_t_tot)
+        LumHESS_tot = interpolation(time, LumHESS_t_tot)
         Lum_tot = interpolation(time, Lum_t_tot)
+        indL = numpy.where(Lum_t_tot != 0)
+        print(Lum_t_tot[indL])
+
+        Gamma_tot = interpolation(time, Gamma)
 
         for l in (indt):
 
@@ -416,174 +435,144 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
 
                 if zone == 1:       # in the SB
 
-                    Lumsb_sn_1[l] += Lum1_sb(t[l])
-                    Lumsb_sn_2[l] += Lum2_sb(t[l])
+                    Lumsb_sn_HESS[l] += LumHESS_sb(t[l])
                     Lumsb_sn[l] += Lum_sb(t[l])
 
                 elif zone == 2:     # in the supershell
 
-                    Lumshell_sn_1[l] += Lum1_shell(t[l])
-                    Lumshell_sn_2[l] += Lum2_shell(t[l])
+                    Lumshell_sn_HESS[l] += LumHESS_shell(t[l])
                     Lumshell_sn[l] += Lum_shell(t[l])
 
                 else:               # outside the SB
 
-                    Lumout_sn_1[l] += Lum1_out(t[l])
-                    Lumout_sn_2[l] += Lum2_out(t[l])
+                    Lumout_sn_HESS[l] += LumHESS_out(t[l])
                     Lumout_sn[l] += Lum_out(t[l])
 
-            Lumtot_sn_1[l] += Lum1_tot(t[l])
-            Lumtot_sn_2[l] += Lum2_tot(t[l])
+            Lumtot_sn_HESS[l] += LumHESS_tot(t[l])
             Lumtot_sn[l] += Lum_tot(t[l])
+            Gamma_sn[l] += Gamma_tot(t[l])
+            Gamma_sn[l]= numpy.nan_to_num(Gamma_sn[l])
 
-    return Lumtot_sn_1, Lumtot_sn_2, Lumtot_sn, lum_units, figure_number, n_pwn_tot, nob
+    return Lumtot_sn_HESS, Lumtot_sn, Gamma_sn, lum_units, figure_number, n_pwn_tot, nob
 
-def spectral_index(indE, zones, pathfigure, iteration, figure_number):
+def spectral_index_t(E_interval, pathfigure, iteration, figure_number):
 
     """
     Return the spectral index at a precise energy_load
 
     Inputs:
-        indE        :       which energy the spectral index is compute (GeV)
-        zones       :       which zone do you want to compute (1: cavity of the SB, 2: supershell and 3: outside)
+        E_interval  :       range of energy to compute the spectral index
         pathfigure  :       path to save figures
         iteration   :       number of the iteration
         figure_number:      number of the figure
     """
 
-    with open('SN', 'rb') as t0_load:
-        with open('time', 'rb') as time_load:
-            with open('spectra', 'rb') as spectra_load:
-                with open('radius', 'rb') as radius_load:
 
-                        # Sn explosions time (yr)
-                    t0 = pickle.load(t0_load)
-                    nt0 = len(t0)
+    for i in range (nt0):
 
-                        # time array (yr)
-                    t = pickle.load(time_load)
-                    t_sn_unit = units.Myr
+        indSN = numpy.where(t > t0[i])[0]
+        nt = len(t[indSN])
+        lum_gamma = sed[i]/E_gamma                             # E dN/dE (erg s^- GeV^-1)
 
-                        # radius (pc)
-                    radius = pickle.load(radius_load)
+            # spectral index for each time and energy
+        Gamma_t = []
 
-                        # Energy of the gamma photon (GeV)
-                    E_gamma = pickle.load(spectra_load)
-                    E_gamma_unit = pickle.load(spectra_load)
-                    nE = len(E_gamma)
+        for j in range (nt):
 
-                        # Spectral distribution of the gamma photons (erg s^-1)
-                    sed = pickle.load(spectra_load)          # E^2 dN/dE (erg s^-1)
-                    sed_unit = pickle.load(spectra_load)
+            Lum_t = numpy.asarray(lum_gamma[j])
+            n = 0
+            alpha_zone = []
 
+            for zone in (zones):
 
-                    alpha_t0 = []
+                if zone == 1:                                   # in the SB
 
-                    for i in range (nt0):
+                    r = radius[j]
+                    nr = len(radius)
 
-                        indSN = numpy.where(t > t0[i])[0]
-                        nt = len(t[indSN])
-                        lum_gamma = sed[i]/E_gamma                             # E dN/dE (erg s^- GeV^-1)
+                    for k in range (nr):
+                        Lum_r = Lum_t[k]
 
-                            # spectral index for each time and energy
-                        alpha_t = []
+                        if indE < nE-1:
 
-                        for j in range (nt):
+                            alpha = -(numpy.log(Lum_r[indE + 1]) - numpy.log(Lum_r[indE]))/(numpy.log(E_gamma[indE + 1]) - numpy.log(E_gamma[indE]))
+                        else:
+                            alpha = -(numpy.log(Lum_r[indE]) - numpy.log(Lum_r[indE - 1]))/(numpy.log(E_gamma[indE]) - numpy.log(E_gamma[indE - 1]))
 
-                            Lum_t = numpy.asarray(lum_gamma[j])
-                            n = 0
-                            alpha_zone = []
+                    alpha_zone.append(alpha)
+                    n = nr
 
-                            for zone in (zones):
+                elif zone == 2:                                 # in the supershell
 
-                                if zone == 1:                                   # in the SB
+                    Lum_r = Lum_t[n]
 
-                                    r = radius[j]
-                                    nr = len(radius)
+                    if indE < nE-1:
 
-                                    for k in range (nr):
-                                        Lum_r = Lum_t[k]
+                        alpha = -(numpy.log(Lum_r[indE + 1]) - numpy.log(Lum_r[indE]))/(numpy.log(E_gamma[indE + 1]) - numpy.log(E_gamma[indE]))
+                    else:
+                        alpha = -(numpy.log(Lum_r[indE]) - numpy.log(Lum_r[indE - 1]))/(numpy.log(E_gamma[indE]) - numpy.log(E_gamma[indE - 1]))
 
-                                        if indE < nE-1:
+                    alpha_zone.append(alpha)
+                    n += 1
 
-                                            alpha = -(numpy.log(Lum_r[indE + 1]) - numpy.log(Lum_r[indE]))/(numpy.log(E_gamma[indE + 1]) - numpy.log(E_gamma[indE]))
-                                        else:
-                                            alpha = -(numpy.log(Lum_r[indE]) - numpy.log(Lum_r[indE - 1]))/(numpy.log(E_gamma[indE]) - numpy.log(E_gamma[indE - 1]))
+                else:                                           # outside the SB
 
-                                    alpha_zone.append(alpha)
-                                    n = nr
+                    Lum_r = Lum_t[n]
 
-                                elif zone == 2:                                 # in the supershell
+                    if indE < nE-1:
 
-                                    Lum_r = Lum_t[n]
+                        alpha = -(numpy.log(Lum_r[indE + 1]) - numpy.log(Lum_r[indE]))/(numpy.log(E_gamma[indE + 1]) - numpy.log(E_gamma[indE]))
+                    else:
+                        alpha = -(numpy.log(Lum_r[indE]) - numpy.log(Lum_r[indE - 1]))/(numpy.log(E_gamma[indE]) - numpy.log(E_gamma[indE - 1]))
 
-                                    if indE < nE-1:
+                    alpha_zone.append(alpha)
 
-                                        alpha = -(numpy.log(Lum_r[indE + 1]) - numpy.log(Lum_r[indE]))/(numpy.log(E_gamma[indE + 1]) - numpy.log(E_gamma[indE]))
-                                    else:
-                                        alpha = -(numpy.log(Lum_r[indE]) - numpy.log(Lum_r[indE - 1]))/(numpy.log(E_gamma[indE]) - numpy.log(E_gamma[indE - 1]))
+            alpha_t.append(alpha_zone)
 
-                                    alpha_zone.append(alpha)
-                                    n += 1
+        alpha_t0.append(alpha_t)
 
-                                else:                                           # outside the SB
+            # Plot
 
-                                    Lum_r = Lum_t[n]
+        for zone in (zones):
 
-                                    if indE < nE-1:
+            n = 0
 
-                                        alpha = -(numpy.log(Lum_r[indE + 1]) - numpy.log(Lum_r[indE]))/(numpy.log(E_gamma[indE + 1]) - numpy.log(E_gamma[indE]))
-                                    else:
-                                        alpha = -(numpy.log(Lum_r[indE]) - numpy.log(Lum_r[indE - 1]))/(numpy.log(E_gamma[indE]) - numpy.log(E_gamma[indE - 1]))
+            if zone == 1:                                           # in the SB
 
-                                    alpha_zone.append(alpha)
+                label = 'SB'
+                sym = '-.'
 
-                            alpha_t.append(alpha_zone)
+                for k in range (nr):
+                    alpha = numpy.asarray(alpha_t)[:,k]
+                    log_plot(figure_number, 1, t[indSN] * yr26yr, alpha, label, u'Spectral index of the gamma emission at 'r'$E_\gamma$'u' = %.2e {0}'.format(E_gamma_unit.to_string('latex_inline')) %E_gamma[indE], 'Time [{0}]'.format(t_sn_unit.to_string('latex_inline')), r'$\alpha$', sym)
+                    plt.savefig(pathfigure+'spectral_index_SB_%dit.eps'%iteration)
 
-                        alpha_t0.append(alpha_t)
+                n = nr
+                figure_number += 1
 
-                            # Plot
+            elif zone == 2:                                         # in the supershell
 
-                        for zone in (zones):
+                label = 'Shell'
+                sym = '--'
 
-                            n = 0
+                alpha = numpy.asarray(alpha_t)[:, n]
 
-                            if zone == 1:                                           # in the SB
+                log_plot(figure_number, 1, t[indSN] * yr26yr, alpha, label, u'Spectral index of the gamma emission at 'r'$E_\gamma$'u' = %.2e {0}'.format(E_gamma_unit.to_string('latex_inline')) %E_gamma[indE], 'Time [{0}]'.format(t_sn_unit.to_string('latex_inline')), r'$\alpha$', sym)
+                plt.savefig(pathfigure+'spectral_index_shell_%dit.eps'%iteration)
 
-                                label = 'SB'
-                                sym = '-.'
+                n += 1
+                figure_number += 1
 
-                                for k in range (nr):
-                                    alpha = numpy.asarray(alpha_t)[:,k]
-                                    log_plot(figure_number, 1, t[indSN] * yr26yr, alpha, label, u'Spectral index of the gamma emission at 'r'$E_\gamma$'u' = %.2e {0}'.format(E_gamma_unit.to_string('latex_inline')) %E_gamma[indE], 'Time [{0}]'.format(t_sn_unit.to_string('latex_inline')), r'$\alpha$', sym)
-                                    plt.savefig(pathfigure+'spectral_index_SB_%dit.eps'%iteration)
+            else:                                                   # outside the SB
 
-                                n = nr
-                                figure_number += 1
+                label = 'Out'
+                sym = ':'
 
-                            elif zone == 2:                                         # in the supershell
+                alpha = numpy.asarray(alpha_t)[:, n]
 
-                                label = 'Shell'
-                                sym = '--'
+                log_plot(figure_number, 1, t[indSN] * yr26yr, alpha, label, u'Spectral index of the gamma emission at 'r'$E_\gamma$'u' = %.2e {0}'.format(E_gamma_unit.to_string('latex_inline')) %E_gamma[indE], 'Time [{0}]'.format(t_sn_unit.to_string('latex_inline')), r'$\alpha$', sym)
+                plt.savefig(pathfigure+'spectral_index_out_%dit_E%d.eps'%(iteration, E_gamma[indE]))
 
-                                alpha = numpy.asarray(alpha_t)[:, n]
-
-                                log_plot(figure_number, 1, t[indSN] * yr26yr, alpha, label, u'Spectral index of the gamma emission at 'r'$E_\gamma$'u' = %.2e {0}'.format(E_gamma_unit.to_string('latex_inline')) %E_gamma[indE], 'Time [{0}]'.format(t_sn_unit.to_string('latex_inline')), r'$\alpha$', sym)
-                                plt.savefig(pathfigure+'spectral_index_shell_%dit.eps'%iteration)
-
-                                n += 1
-                                figure_number += 1
-
-                            else:                                                   # outside the SB
-
-                                label = 'Out'
-                                sym = ':'
-
-                                alpha = numpy.asarray(alpha_t)[:, n]
-
-                                log_plot(figure_number, 1, t[indSN] * yr26yr, alpha, label, u'Spectral index of the gamma emission at 'r'$E_\gamma$'u' = %.2e {0}'.format(E_gamma_unit.to_string('latex_inline')) %E_gamma[indE], 'Time [{0}]'.format(t_sn_unit.to_string('latex_inline')), r'$\alpha$', sym)
-                                plt.savefig(pathfigure+'spectral_index_out_%dit_E%d.eps'%(iteration, E_gamma[indE]))
-
-                    alpha_t0 = numpy.asarray(alpha_t0)
-                    #plt.show()
+    alpha_t0 = numpy.asarray(alpha_t0)
+    #plt.show()
     return
