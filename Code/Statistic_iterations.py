@@ -35,13 +35,13 @@ pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor
 ## ======= ##
 
     # Number of iterations
-nit = 1
+nit = 100
 
     # Correction factor
 t_end = 4.5e6               # time at which R = Robs
 t_end_6 = t_end * yr26yr    # in Myr
 Robs = 47.0                 # observed radius (pc)
-Rsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t_end_6)[0] # from Weaver's model (pc and km/s)
+Rsb = radius_velocity_SB(t_end_6)[0] # from Weaver's model (pc and km/s)
 correction_factor = Robs/Rsb
 
     # Parameters for the cosmic rays
@@ -113,9 +113,9 @@ for i in range (nit):
     t0 = t0_it[i]
 
     Lum_HESS, Lum, Gamma, Lum_units, figure_number, n_pwn, nob = data(correction_factor, t0, t_fix, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, delta, zones, pathfigure_gamma, i, figure_number)
-
+    indHESS = numpy.where(Lum_HESS != 0)
+    indGamma = numpy.where(Gamma != 0)
     Lum_it_HESS.append(Lum_HESS)
-    print(Lum_HESS)
     Lum_it.append(Lum)
     Gamma_it.append(Gamma)
     n_pwn_it.append(n_pwn)
@@ -125,12 +125,11 @@ for i in range (nit):
 
 Lum_it_HESS = numpy.asarray(Lum_it_HESS)
 ind = numpy.where(Lum_HESS > 0)[0]
-print(Lum_HESS[ind])
 Lum_it = numpy.asarray(Lum_it)
 Gamma_it = numpy.asarray(Gamma_it)
 n_pwn_it = numpy.asarray(n_pwn_it)
 nob_it = numpy.asarray(nob_it)
-"""
+
     ##---------------------------##
     # Mean and standard deviation #
     ##---------------------------##
@@ -167,7 +166,6 @@ for j in range (number_bin_t):
 Lum_HESS_pst = Lum_HESS_mean + Lum_HESS_std
 Lum_HESS_mst = Lum_HESS_mean - Lum_HESS_std
 ind = numpy.where(Lum_HESS_mean > 0)[0]
-print(Lum_HESS_pst[ind])
 
 Lum_pst = Lum_mean + Lum_std
 Lum_mst = Lum_mean - Lum_std
@@ -207,7 +205,7 @@ figure_Gamma = figure_number
 Title_Gamma = 'Photon index for %d SN explosions (%d iterations) from 1 TeV to 10 TeV'%(n, nit)
 ylabel = '$\Gamma_{ph}$'
 
-log_plot(figure, 3, t6, [Gamma_mean, Gamma_pst, Gamma_mst], label, Title_Gamma, xlabel, ylabel, sym)
+log_plot(figure_Gamma, 3, t6, [Gamma_mean, Gamma_pst, Gamma_mst], label, Title_Gamma, xlabel, ylabel, sym)
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_all.eps')
 figure_number = figure_Gamma + 1
 
@@ -233,4 +231,3 @@ plt.savefig(pathfigure_remain+'Mean_ob.eps')
 figure_number = figure_ob + 1
 
 plt.show()
-"""

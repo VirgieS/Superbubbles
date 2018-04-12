@@ -215,11 +215,11 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
             sedmax = 0
 
                 # Parameters of the SB
-            Rsb, Vsb = radius_velocity_SB(ar, alphar, betar, gammar, n0, L36, t6)           # radius and velocity of the SB
-            #Rsb = correction_factor * Rsb
+            Rsb = radius_velocity_SB(t6) [0]                                                # radius and velocity of the SB
+            Rsb = correction_factor * Rsb
             #Vsb = correction_factor * Vsb
-            Msb, Mswept = masses(an, alphan, betan, gamman, deltan, n0, L38, t7, Rsb, mu)                       # swept-up and inner masses (solar masses)
-            hs, ns = density_thickness_shell(mu, n0, Vsb, C02, Mswept, Msb, Rsb)                                # thickness and density of the shell (pc)
+            Msb, Mswept = masses(t7, Rsb)                                                   # swept-up and inner masses (solar masses)
+            hs, ns = density_thickness_shell_percentage(percentage, Rsb, Mswept, Msb)       # thickness and density of the shell (pc)
 
                 # For each zones
             for zone in (zones):
@@ -235,7 +235,7 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
                     r = numpy.logspace(numpy.log10(rmin), numpy.log10(rmax), number_bin_r)    # position (pc)
 
                         # Density of gas (cm^-3)
-                    nsb = profile_density_temperature(at, alphat, betat, gammat, deltat, an, alphan, betan, gamman, deltan, n0, L38, t7, r, Rsb)[1]
+                    nsb = profile_density_temperature(t7, r, Rsb)[1]
                     ngas = nsb * 1/units.cm**3
 
                         # Particles distribution (GeV^-1)
@@ -303,12 +303,10 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
 
                         # Gamma luminosity (erg s^-1)
                     lum_energy = numpy.asarray(sed_PD/spectrum)
-                    print(sed_PD)
 
                     lum_units = (sed_PD/spectrum_energy).unit
 
                     LumHESS = luminosity(lum_energy[ind_HESS], spectrum[ind_HESS])
-                    print(LumHESS)
                     LumHESS_t_shell[j] += LumHESS
                     Lum = luminosity(lum_energy, spectrum)
                     Lum_t_shell[j] += Lum
@@ -425,7 +423,6 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
         LumHESS_tot = interpolation(time, LumHESS_t_tot)
         Lum_tot = interpolation(time, Lum_t_tot)
         indL = numpy.where(Lum_t_tot != 0)
-        print(Lum_t_tot[indL])
 
         Gamma_tot = interpolation(time, Gamma)
 

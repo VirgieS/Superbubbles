@@ -19,10 +19,11 @@ L38 = L36 * t36erg238erg  # mechanical energy expressed in 10^38 erg/s
 lifetime = 4e6 #30e6     # average lifetime of the lowest B star (yr)
 
     # Fit parameters of the model
-n0 = 1              # ambient density (cm^-3)
+n0 = 30             # ambient density (cm^-3)
 xH = 0.9            # mass fraction of hydrogen
 xHe = 0.1           # mass fraction of helium
 mu = xH + xHe * 4   # average molecular weight
+percentage = 0.20    # percentage of the thickness of the shell in term of the outer radius of the SB
 
     # R(t) = ar * n0^alphar * L36^betar * t6^gammar                  (pc)
     # Equation 51 of Weaver et al. (1977)
@@ -69,7 +70,7 @@ zeta = 1.0      # metallicity of the local ISM
 epsilon = 1.2   # ratio ne/n
 
     # In the ISM
-TISM = 100                          # temperature of the ambient gas (K)
+TISM = 88                          # temperature of the ambient gas (K)
 
     # Released energy by the acceleration of particles for one SN (erg)
 eta = 0.1           # efficiency of the cosmic rays acceleration
