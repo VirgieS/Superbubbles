@@ -23,7 +23,7 @@ n0 = 30             # ambient density (cm^-3)
 xH = 0.9            # mass fraction of hydrogen
 xHe = 0.1           # mass fraction of helium
 mu = xH + xHe * 4   # average molecular weight
-percentage = 0.20    # percentage of the thickness of the shell in term of the outer radius of the SB
+percentage = 0.10    # percentage of the thickness of the shell in term of the outer radius of the SB
 
     # R(t) = ar * n0^alphar * L36^betar * t6^gammar                  (pc)
     # Equation 51 of Weaver et al. (1977)

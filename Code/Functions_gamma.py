@@ -201,7 +201,7 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
 
                 # number of pulsar wind nebula
         t_pwn_min = t0[i]               # in yr
-        t_pwn_max = t_pwn_min + 1e6     # in yr
+        t_pwn_max = t_pwn_min + 1e5     # in yr
         indt_pwn = numpy.where((t >= t_pwn_min) & (t <= t_pwn_max))[0]
 
         for j in range (number_bin_t):                                          # for each time step
@@ -249,7 +249,7 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
                     sed_PD = PD.sed(spectrum_energy, distance = 0 * units.pc)
 
                     sedmin += numpy.asarray(sed_PD[ind_HESS[0]])
-                    sedmax += numpy.asarray(ed_PD[ind_HESS[-1]])
+                    sedmax += numpy.asarray(sed_PD[ind_HESS[-1]])
 
                         # Gamma luminosity (erg s^-1)
                     lum_energy = numpy.asarray(sed_PD/spectrum)

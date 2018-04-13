@@ -6,6 +6,7 @@ Here are all functions needed for the superbubble model
 # Librairies #
 ##----------##
 import matplotlib.pyplot as plt
+from matplotlib import rcParams
 from matplotlib.ticker import AutoLocator, LogLocator
 import numpy
 import scipy.integrate as integrate
@@ -22,7 +23,7 @@ from Conversion_factors import *
 # Functions #
 ##---------##
 
-def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol):
+def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle):
     """
     Function to plot a log-log graphic
     Inputs:
@@ -35,6 +36,7 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
         xlabel          :       label of the x-axis
         ylabel          :       label of the y-axis
         symbol          :       symbol
+    """
     """
         # figure
     fig, ax = plt.subplots(figsize=(10,7))
@@ -53,40 +55,65 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
     #plt.ylim(ymin, ymax)
     #plt.yticks(numpy.logspace(numpy.log10(ymin), numpy.log10(ymax), 10, endpoint = True))
     ax.yaxis.set_minor_locator(LogLocator())
+    """
+    plt.figure(figure_number, figsize = (10, 7))
 
-
+        # Plot
     if number_of_plot > 1:
 
         for i in range (number_of_plot):
             y_plot = y[i]
 
             if len(symbol) > 1:
-                sym = symbol[i]
+                rcParams['lines.marker'] = symbol[i]
+                rcParams['lines.linestyle'] = linestyle[i]
 
             else:
-                sym = symbol
+                rcParams['lines.marker'] = symbol
+                rcParams['lines.linestyle'] = linestyle
 
             if label_name == 'none':
-                plt.loglog(x, y_plot, sym)
+                plt.loglog(x, y_plot)
 
             else:
-                plt.loglog(x, y_plot, sym, label = label_name[i])
+                plt.loglog(x, y_plot, label = label_name[i])
                 plt.legend(loc = 'best')
 
     elif label_name == 'none':
-        plt.loglog(x, y, symbol)
+
+        rcParams['lines.marker'] = symbol
+        rcParams['lines.linestyle'] = linestyle
+
+        plt.loglog(x, y)
 
     else:
-        plt.loglog(x, y, symbol, label = label_name)
+        rcParams['lines.marker'] = symbol
+        rcParams['lines.linestyle'] = linestyle
+
+        plt.loglog(x, y, label = label_name)
         plt.legend(loc = 'best')
 
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 
+        # axes
+    rcParams['xtick.bottom'] = True
+    rcParams['xtick.top'] = True
+    rcParams['xtick.minor.visible'] = True
+
+    rcParams['ytick.left'] = True
+    rcParams['ytick.right'] = True
+    rcParams['ytick.minor.visible'] = True
+
+    rcParams['grid.alpha'] = 0.75
+    rcParams['grid.color'] = 'k'
+    rcParams['grid.linestyle'] = ':'
+    rcParams['grid.linewidth'] = 0.5
+
     return
 
-def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol):
+def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle):
     """
     Function to plot a linear graphic
     Inputs:
@@ -101,21 +128,7 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
         symbol          :       symbol
     """
         # figure
-    fig, ax = plt.subplots(figsize=(10,7))
-    fig = plt.figure(figure_number)
-
-        # axes
-    #xmin = min(x)
-    #xmax = max(x)
-    #plt.xlim(xmin, xmax)
-    #plt.xticks(numpy.linspace(xmin, xmax, 10, endpoint = True))
-    ax.xaxis.set_minor_locator(AutoLocator())
-
-    #ymin = min(y)
-    #ymax = max(y)
-    #plt.ylim(ymin, ymax)
-    #plt.yticks(numpy.linspace(ymin, ymax, 10, endpoint = True))
-    ax.yaxis.set_minor_locator(AutoLocator())
+    plt.figure(figure_number, figsize=(10,7))
 
     if number_of_plot > 1:
 
@@ -123,27 +136,53 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
             y_plot = y[i]
 
             if len(symbol) > 1:
-                sym = symbol[i]
-
-            if label_name == 'none':
-                plt.plot(x, y_plot, symbol)
+                rcParams['lines.marker'] = symbol[i]
+                rcParams['lines.linestyle'] = linestyle[i]
 
             else:
-                plt.plot(x, y_plot, sym, label = label_name[i])
+                rcParams['lines.marker'] = symbol
+                rcParams['lines.linestyle'] = linestyle
+
+            if label_name == 'none':
+
+                plt.plot(x, y_plot)
+
+            else:
+
+                plt.plot(x, y_plot, label = label_name[i])
                 plt.legend(loc = 'best')
 
     elif label_name == 'none':
-        plt.plot(x, y, symbol)
+        rcParams['lines.marker'] = symbol
+        rcParams['lines.linestyle'] = linestyle
+
+        plt.plot(x, y)
 
     else:
-        plt.plot(x, y, symbol, label = label_name)
+        rcParams['lines.marker'] = symbol
+        rcParams['lines.linestyle'] = linestyle
+
+        plt.plot(x, y, label = label_name)
         plt.legend(loc = 'best')
 
-    #plt.tight_layout()
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    #fig.savefig(pathfigure+name_figure)
+
+        # axes
+    rcParams['xtick.bottom'] = True
+    rcParams['xtick.top'] = True
+    rcParams['xtick.minor.visible'] = True
+
+    rcParams['ytick.left'] = True
+    rcParams['ytick.right'] = True
+    rcParams['ytick.minor.visible'] = True
+
+    rcParams['grid.alpha'] = 0.75
+    rcParams['grid.color'] = 'k'
+    rcParams['grid.linestyle'] = ':'
+    rcParams['grid.linewidth'] = 0.5
+
     return
 
 def integration_log(x, y):

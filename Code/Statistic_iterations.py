@@ -20,7 +20,7 @@ from Conversion_factors import *
 from Parameters_SB import *
 
     # IRAP
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/')
+#os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/')
 pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Gamma_emission/Test/'
 pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Remain/Test/'
 #pathfigure_CR = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/CR/1/'
@@ -35,7 +35,7 @@ pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor
 ## ======= ##
 
     # Number of iterations
-nit = 100
+nit = 2
 
     # Correction factor
 t_end = 4.5e6               # time at which R = Robs
@@ -181,7 +181,8 @@ nob_mst = nob_mean - nob_std
 
     # Plot
 label = 'none'
-sym = ['-.', ':', ':']
+sym = ['', '', '']
+linestyle = ['-.', ':', ':']
 xlabel = 'Time [Myr]'
 
         # Gamma luminosity
@@ -192,10 +193,10 @@ Title_HESS = 'Mean gamma emission for %d SN explosions (%d iterations) from 1 Te
 Title = 'Mean gamma emission for %d SN explosions (%d iterations) from 100 MeV to 100 TeV'%(n, nit)
 ylabel = '$L_\gamma$ [erg s$^{-1}$]'
 
-log_plot(figure_HESS, 3, t6, [Lum_HESS_mean, Lum_HESS_pst, Lum_HESS_mst], label, Title_HESS, xlabel, ylabel, sym)
+log_plot(figure_HESS, 3, t6, [Lum_HESS_mean, Lum_HESS_pst, Lum_HESS_mst], label, Title_HESS, xlabel, ylabel, sym, linestyle)
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_range1.eps')
 
-log_plot(figure, 3, t6, [Lum_mean, Lum_pst, Lum_mst], label, Title, xlabel, ylabel, sym)
+log_plot(figure, 3, t6, [Lum_mean, Lum_pst, Lum_mst], label, Title, xlabel, ylabel, sym, linestyle)
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_all.eps')
 
 figure_number = figure + 1
@@ -205,8 +206,8 @@ figure_Gamma = figure_number
 Title_Gamma = 'Photon index for %d SN explosions (%d iterations) from 1 TeV to 10 TeV'%(n, nit)
 ylabel = '$\Gamma_{ph}$'
 
-log_plot(figure_Gamma, 3, t6, [Gamma_mean, Gamma_pst, Gamma_mst], label, Title_Gamma, xlabel, ylabel, sym)
-plt.savefig(pathfigure_gamma+'Mean_gamma_emission_all.eps')
+plot(figure_Gamma, 3, t6, [Gamma_mean, Gamma_pst, Gamma_mst], label, Title_Gamma, xlabel, ylabel, sym, linestyle)
+plt.savefig(pathfigure_gamma+'Photon_index.eps')
 figure_number = figure_Gamma + 1
 
         # Number of pulsar wind nebula
@@ -215,7 +216,7 @@ label = 'none'
 Title_pwn = 'Number of pulsar wind nebula in the superbubble'
 ylabel = '$n_{pwn}$'
 
-log_plot(figure_pwn, 3, t6, [n_pwn_mean, n_pwn_pst, n_pwn_mst], label, Title_pwn, xlabel, ylabel, sym)
+plot(figure_pwn, 3, t6, [n_pwn_mean, n_pwn_pst, n_pwn_mst], label, Title_pwn, xlabel, ylabel, sym, linestyle)
 plt.savefig(pathfigure_remain+'Mean_pwn.eps')
 
 figure_number = figure_pwn + 1
@@ -225,7 +226,7 @@ figure_ob = figure_number
 label = 'none'
 Title_pwn = 'Number of remained Ob stars'
 ylabel = '$n_{ob}$'
-log_plot(figure_ob, 3, t6, [nob_mean, nob_pst, nob_mst], label, Title_pwn, xlabel, ylabel, sym)
+plot(figure_ob, 3, t6, [nob_mean, nob_pst, nob_mst], label, Title_pwn, xlabel, ylabel, sym, linestyle)
 plt.savefig(pathfigure_remain+'Mean_ob.eps')
 
 figure_number = figure_ob + 1
