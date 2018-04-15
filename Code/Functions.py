@@ -7,23 +7,23 @@ Here are all functions needed for the superbubble model
 ##----------##
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
-from matplotlib.ticker import AutoLocator, LogLocator
 import numpy
-import scipy.integrate as integrate
-from scipy.special import erf, erfc
 from scipy.interpolate import interp1d
-
-##-----------------------------------------##
-# Physical constants and Conversion factors #
-##-----------------------------------------##
-from Physical_constants import *
-from Conversion_factors import *
 
 ##---------##
 # Functions #
 ##---------##
 
-def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle):
+    # axes
+rcParams['xtick.bottom'] = True
+rcParams['xtick.top'] = True
+rcParams['xtick.minor.visible'] = True
+
+rcParams['ytick.left'] = True
+rcParams['ytick.right'] = True
+rcParams['ytick.minor.visible'] = True
+
+def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle, text):
     """
     Function to plot a log-log graphic
     Inputs:
@@ -36,28 +36,22 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
         xlabel          :       label of the x-axis
         ylabel          :       label of the y-axis
         symbol          :       symbol
-    """
+        linestyle       :       style of the line (drashed, etc)
+        text            :       important parameters that you will write on the figure
     """
         # figure
-    fig, ax = plt.subplots(figsize=(10,7))
-    fig = plt.figure(figure_number)
-
-        # axes
-    #xmin = min(x)
-    #xmax = max(x)
-    #plt.xlim(xmin, xmax)
-    #plt.xticks(numpy.logspace(numpy.log10(xmin), numpy.log10(xmax), 10, endpoint = True))
-    #plt.xtick.minor.visible = True
-    ax.xaxis.set_minor_locator(LogLocator())
-
-    #ymin = min(y)
-    #ymax = max(y)
-    #plt.ylim(ymin, ymax)
-    #plt.yticks(numpy.logspace(numpy.log10(ymin), numpy.log10(ymax), 10, endpoint = True))
-    ax.yaxis.set_minor_locator(LogLocator())
+    fig = plt.figure(figure_number, figsize = (8, 5))
+    ax = fig.add_subplot(111)
     """
-    plt.figure(figure_number, figsize = (10, 7))
+        # axes
+    rcParams['xtick.bottom'] = True
+    rcParams['xtick.top'] = True
+    rcParams['xtick.minor.visible'] = True
 
+    rcParams['ytick.left'] = True
+    rcParams['ytick.right'] = True
+    rcParams['ytick.minor.visible'] = True
+    """
         # Plot
     if number_of_plot > 1:
 
@@ -97,23 +91,15 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 
-        # axes
-    rcParams['xtick.bottom'] = True
-    rcParams['xtick.top'] = True
-    rcParams['xtick.minor.visible'] = True
+        # grid
+    plt.grid(color = 'k', alpha = 0.15, linestyle = ':')
 
-    rcParams['ytick.left'] = True
-    rcParams['ytick.right'] = True
-    rcParams['ytick.minor.visible'] = True
-
-    rcParams['grid.alpha'] = 0.75
-    rcParams['grid.color'] = 'k'
-    rcParams['grid.linestyle'] = ':'
-    rcParams['grid.linewidth'] = 0.5
+        # text
+    plt.text(0.5, 0.5, text, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
 
     return
 
-def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle):
+def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle, text):
     """
     Function to plot a linear graphic
     Inputs:
@@ -126,10 +112,14 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
         xlabel          :       label of the x-axis
         ylabel          :       label of the y-axis
         symbol          :       symbol
+        linestyle       :       style of the line (drashed, etc)
+        text            :       important parameters that you will write on the figure
     """
         # figure
-    plt.figure(figure_number, figsize=(10,7))
+    fig = plt.figure(figure_number, figsize=(8,5))
+    ax = fig.add_subplot(111)
 
+        # Plot
     if number_of_plot > 1:
 
         for i in range (number_of_plot):
@@ -144,11 +134,9 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
                 rcParams['lines.linestyle'] = linestyle
 
             if label_name == 'none':
-
                 plt.plot(x, y_plot)
 
             else:
-
                 plt.plot(x, y_plot, label = label_name[i])
                 plt.legend(loc = 'best')
 
@@ -169,70 +157,33 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 
-        # axes
-    rcParams['xtick.bottom'] = True
-    rcParams['xtick.top'] = True
-    rcParams['xtick.minor.visible'] = True
+        # grid
+    plt.grid(color = 'k', alpha = 0.15, linestyle = ':')
 
-    rcParams['ytick.left'] = True
-    rcParams['ytick.right'] = True
-    rcParams['ytick.minor.visible'] = True
-
-    rcParams['grid.alpha'] = 0.75
-    rcParams['grid.color'] = 'k'
-    rcParams['grid.linestyle'] = ':'
-    rcParams['grid.linewidth'] = 0.5
+        # text
+    plt.text(0.5, 0.5, text, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
 
     return
 
-def integration_log(x, y):
-
+def histogramme(figure_number, hist, label_name, title, xlabel, ylabel):
     """
-    Return the integrale of a function in log-log scale
-
-    Parameters :
-        x           : abscisse of the function
-        y           : function that we integrate along x : y = f(x)
+    Return the histogramme of hist
+    Inputs:
+        figure_number   :       number of the figure
+        hist            :       input of the histogramme
+        label_name      :       label of the data
+        title           :       title of the histogramme
+        xlabel          :       label of the x-axis
+        ylabel          :       label of the y axis
     """
+    plt.figure(figure_number, figsize=(8,5))
+    plt.hist(hist, histtype = 'step', bins = 100, align = 'mid', label = label_name)
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.legend(loc = 'best')
 
-    #Looking for a and b for y = a*x^b
-    def calculate_ab(xi, xf, yi, yf):
-        logxi = numpy.log(xi)
-        logxf = numpy.log(xf)
-        logyi = numpy.log(yi)
-        logyf = numpy.log(yf)
-        b = (logyf - logyi)/(logxf - logxi)
-        loga = logyi - b*logxi
-        a = numpy.exp(loga)
-        a = numpy.nan_to_num(a)
-        return a, b
-
-    #Calculate deltaS from deltaS = int from xi to xf a*x^b
-    def delta_S(xi, xf, yi, yf):
-        [a, b] = calculate_ab(xi, xf, yi, yf)
-        return a/(b+1)*(xf**(b+1) - xi**(b+1))
-
-    integral = 0
-
-    # Because the function integral_log works only if there is more than two elements not zero
-    idx=(y > 0.0)
-    #idy=(y < 0.0) # only used if the function has negative value
-    idt = idx #+ idy
-    if sum(idt) > 2:
-
-        x = x[idt]
-        y = y[idt]
-
-        #Calculate total integral from init to final a*x^b
-        deltaS = 0
-
-        for i in range (1, len(x)):
-            deltaS = delta_S(x[i-1], x[i], y[i-1], y[i])
-            integral = integral + deltaS
-
-            integral = numpy.nan_to_num(integral)
-
-    return integral
+    return
 
 def random_PL(xmin, xmax, alpha, size = 1):
 

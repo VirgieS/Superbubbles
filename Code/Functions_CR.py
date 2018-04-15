@@ -15,6 +15,7 @@ from scipy.special import erf, erfc
 ##-----------------------------------------##
 from Physical_constants import *
 from Conversion_factors import *
+from Parameters_system import *
 
 ##---------##
 # Functions #
@@ -22,7 +23,7 @@ from Conversion_factors import *
 
 def power_law_distribution(Emin, Emax, E, alpha, eta, Esng, p0):
     """
-    Function to compute the power-law distribution of the CR particles
+    Return the power-law distribution of the CR particles
     Inputs:
         Emin    :       minimum energy of the distribution (GeV)
         Emax    :       maximum energy of the distribution (GeV)
@@ -32,7 +33,7 @@ def power_law_distribution(Emin, Emax, E, alpha, eta, Esng, p0):
         Esng    :       energy released by the SN explosion (GeV)
         p0      :       normalization constant (GeV/c)
     """
-    mpgev = mp*MeV2GeV  # mass of the proton in GeV
+    mpgev = mp*MeV2GeV # mass of the proton in GeV
 
     integral_E = integrate.quad(lambda E: (E**2 + 2*mpgev*E)**(-(1 + alpha)/2.0) * (E + mpgev) * E, Emin, Emax)[0]
     N0 = eta * Esng * cl**(1-alpha) * p0**(-alpha) * 1.0/integral_E         # normalization constant (GeV^-1 c)
@@ -41,7 +42,7 @@ def power_law_distribution(Emin, Emax, E, alpha, eta, Esng, p0):
 
 def diffusion_coefficient(p0, D0, E, delta):
     """
-    Function to compute the diffusion coefficient with a power-law
+    Return the diffusion coefficient with a power-law
     Inputs:
         p0      :       normalization constant (GeV/c)
         D0      :       diffusion coefficient at p0 (cm^2 s^-1)
@@ -53,7 +54,7 @@ def diffusion_coefficient(p0, D0, E, delta):
 
 def diffusion_spherical(t, r, t0, NE, D):
     """
-    Function to the density of the cosmic rays at each time and radius
+    Return the density of the cosmic rays at each time and radius
         N(E, r, deltat) = N(E, 0, t0)/(4*pi*D(E)*deltat) * exp(-r^2/(4*D(E)*deltat))
     Inputs:
         t       :       time (yr)
@@ -78,7 +79,7 @@ def diffusion_spherical(t, r, t0, NE, D):
 
 def shell_particles(r_in, r_out, NE, D, deltat):
     """
-    Function to compute the number of particles in a shell of inner radius r_in and outer radius r_out
+    Return the number of particles in a shell of inner radius r_in and outer radius r_out
     Inputs:
         r_in        :       inner radius of the shell (pc)
         r_out       :       outer radisu of the shell (pc)
@@ -107,7 +108,7 @@ def shell_particles(r_in, r_out, NE, D, deltat):
 
 def inf_particles(Rsb, NE, D, deltat):
     """
-    Function to compute the number of particles outside the superbubble.
+    Return the number of particles outside the superbubble.
     Inputs:
         Rsb         :       outer radius of the SB (pc)
         NE          :       initial particles distribution (GeV^-1)
@@ -125,7 +126,7 @@ def inf_particles(Rsb, NE, D, deltat):
 
 def gauss(x, A, Dt):
     """
-    Function to fit a gaussian on the density profile as function of the radius.
+    Fit a gaussian on the density profile as function of the radius.
     Input:
         r       :   vector radius (pc)
     Fit parameters:

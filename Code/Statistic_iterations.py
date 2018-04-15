@@ -17,25 +17,29 @@ from Functions_gamma import *
 # Physical constants and conversion factors
 from Physical_constants import *
 from Conversion_factors import *
-from Parameters_SB import *
+from Parameters_system import *
+
+##====##
+# Path #
+##====##
 
     # IRAP
 #os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/')
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Gamma_emission/Test/'
-pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Remain/Test/'
+#pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Gamma_emission/Test/'
+#pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Remain/Test/'
 #pathfigure_CR = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/CR/1/'
 
     # Home
-#os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/stat_SN/Test/')
-#pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/stat_SN/Gamma_emission/Test/'
-#pathfigure_CR = '/home/vivi/Documents/Master_2/Superbubbles/figures/stat_SN/CR/2/'
+#os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/30_Dor_C/Test/')
+pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/30_Dor_C/Verif/Gamma_emission/'
+pathfigure_remain = '/home/vivi/Documents/Master_2/Superbubbles/figures/30_Dor_C/Verif/Remain/'
 
 ## ======= ##
 # Statistic #
 ## ======= ##
 
     # Number of iterations
-nit = 2
+nit = 1
 
     # Correction factor
 t_end = 4.5e6               # time at which R = Robs
@@ -43,20 +47,6 @@ t_end_6 = t_end * yr26yr    # in Myr
 Robs = 47.0                 # observed radius (pc)
 Rsb = radius_velocity_SB(t_end_6)[0] # from Weaver's model (pc and km/s)
 correction_factor = Robs/Rsb
-
-    # Parameters for the cosmic rays
-
-        # Energy (GeV)
-Emin_CR = 1            # minimum kinetic energy: Emin = 1GeV
-Emax_CR = 1*PeV2GeV    # minimum kinetic energy: Emax = 1PeV in GeV
-
-        # Power-law distribution of the cosmic rays (GeV^-1 cm^-3)
-p0 = 10             # normalization constant (GeV/c)
-alpha = 2.0         # exponent of the power-law distribution
-
-        # Diffusion coefficient of the cosmic rays (cm^2 s^-1)
-delta = 1.0/2       # exponent of the power-law of the diffusion coefficient
-D0 = 1e28           # diffusion coefficient at 10 GeV/c in cm^2 s^-1  ==> prendre *10 et /10
 
     # Which zone for the Computation
 zones = [2]
@@ -69,11 +59,6 @@ tmax = (t0max + 1)/yr26yr   # yr
 number_bin_t = 3000
 t_fix = numpy.linspace(tmin, tmax, number_bin_t)    # yr
 t6 = t_fix * yr26yr                                 # Myr
-
-    # Energy of the gamma photons (GeV)
-Emin_gamma = 100 * MeV2GeV      # 100 MeV (GeV)
-Emax_gamma = 100 * TeV2GeV      # 100 TeV (GeV)
-Esep = numpy.array([100, 1*TeV2GeV, 10*TeV2GeV]) # ranges of energy (GeV)
 
     # Initialization
 figure_number = 1
@@ -107,6 +92,7 @@ with open('SN', 'rb') as SN_load:
 
     t0_it = pickle.load(SN_load)
     n = len(t0_it[0])
+    t0 = t0_it[0,0]
 
 for i in range (nit):
 
@@ -129,7 +115,27 @@ Lum_it = numpy.asarray(Lum_it)
 Gamma_it = numpy.asarray(Gamma_it)
 n_pwn_it = numpy.asarray(n_pwn_it)
 nob_it = numpy.asarray(nob_it)
+"""
+    ##-----------------------------------------------------##
+    # Histogramme of the probability to have one luminosity #
+    ##-----------------------------------------------------##
+        # choosen time
+ind_hist = [0, 299, 599, 899, 1199, 1499, 1799, 2099, 2399, 2699]
 
+        # Computation of the probability to get a luminosity L
+title = 'Probability of the luminosity in the range of energy [1 TeV, 10 TeV]'
+xlabel = '$L_\gamma$'
+ylabel = 'counts'
+
+for j in (ind_hist):
+    L_hist = Lum_it_HESS[:,j]
+    label = 't = %.2e yr'%t_fix[j]
+    histogramme(figure_number, L_hist, label, title, xlabel, ylabel)
+    plt.legend(loc = 'best')
+
+plt.savefig(pathfigure_gamma+'Histogramme_L_gamma.pdf')
+figure_number += 1
+"""
     ##---------------------------##
     # Mean and standard deviation #
     ##---------------------------##
@@ -184,30 +190,31 @@ label = 'none'
 sym = ['', '', '']
 linestyle = ['-.', ':', ':']
 xlabel = 'Time [Myr]'
+text = r'$D_0$ = %.2e $cm^2 s^{-1}$, $\delta$ = %.2f'u'\n'r'$p_0$ =%.2e $GeV c^{-1}$, $\alpha$ = %.2f'u'\n'r' $n_0$ = %.2e $cm^{-3}$' u'\n' r'$n_{SN}$ = %d, $n_{it}$ = %d'%(D0, delta, p0, alpha, n0, n, nit)
 
         # Gamma luminosity
 figure_HESS = figure_number
 figure = figure_HESS + 1
 
-Title_HESS = 'Mean gamma emission for %d SN explosions (%d iterations) from 1 TeV to 10 TeV'%(n, nit)
-Title = 'Mean gamma emission for %d SN explosions (%d iterations) from 100 MeV to 100 TeV'%(n, nit)
+Title_HESS = 'Mean gamma emission in the energy range [1 TeV, 10 TeV]'
+Title = 'Mean gamma emission in the energy range [100 MeV, 100 TeV]'
 ylabel = '$L_\gamma$ [erg s$^{-1}$]'
 
-log_plot(figure_HESS, 3, t6, [Lum_HESS_mean, Lum_HESS_pst, Lum_HESS_mst], label, Title_HESS, xlabel, ylabel, sym, linestyle)
-plt.savefig(pathfigure_gamma+'Mean_gamma_emission_range1.eps')
+plot(figure_HESS, 3, t6, [Lum_HESS_mean, Lum_HESS_pst, Lum_HESS_mst], label, Title_HESS, xlabel, ylabel, sym, linestyle, text)
+plt.savefig(pathfigure_gamma+'Mean_gamma_emission_range1.pdf')
 
-log_plot(figure, 3, t6, [Lum_mean, Lum_pst, Lum_mst], label, Title, xlabel, ylabel, sym, linestyle)
-plt.savefig(pathfigure_gamma+'Mean_gamma_emission_all.eps')
+plot(figure, 3, t6, [Lum_mean, Lum_pst, Lum_mst], label, Title, xlabel, ylabel, sym, linestyle, text)
+plt.savefig(pathfigure_gamma+'Mean_gamma_emission_all.pdf')
 
 figure_number = figure + 1
 
         # spectral index
 figure_Gamma = figure_number
-Title_Gamma = 'Photon index for %d SN explosions (%d iterations) from 1 TeV to 10 TeV'%(n, nit)
+Title_Gamma = 'Photon index in the energy range [1 TeV, 10 TeV]'
 ylabel = '$\Gamma_{ph}$'
 
-plot(figure_Gamma, 3, t6, [Gamma_mean, Gamma_pst, Gamma_mst], label, Title_Gamma, xlabel, ylabel, sym, linestyle)
-plt.savefig(pathfigure_gamma+'Photon_index.eps')
+plot(figure_Gamma, 3, t6, [Gamma_mean, Gamma_pst, Gamma_mst], label, Title_Gamma, xlabel, ylabel, sym, linestyle, text)
+plt.savefig(pathfigure_gamma+'Photon_index.pdf')
 figure_number = figure_Gamma + 1
 
         # Number of pulsar wind nebula
@@ -216,8 +223,8 @@ label = 'none'
 Title_pwn = 'Number of pulsar wind nebula in the superbubble'
 ylabel = '$n_{pwn}$'
 
-plot(figure_pwn, 3, t6, [n_pwn_mean, n_pwn_pst, n_pwn_mst], label, Title_pwn, xlabel, ylabel, sym, linestyle)
-plt.savefig(pathfigure_remain+'Mean_pwn.eps')
+plot(figure_pwn, 3, t6, [n_pwn_mean, n_pwn_pst, n_pwn_mst], label, Title_pwn, xlabel, ylabel, sym, linestyle, text)
+plt.savefig(pathfigure_remain+'Mean_pwn.pdf')
 
 figure_number = figure_pwn + 1
 
@@ -226,8 +233,8 @@ figure_ob = figure_number
 label = 'none'
 Title_pwn = 'Number of remained Ob stars'
 ylabel = '$n_{ob}$'
-plot(figure_ob, 3, t6, [nob_mean, nob_pst, nob_mst], label, Title_pwn, xlabel, ylabel, sym, linestyle)
-plt.savefig(pathfigure_remain+'Mean_ob.eps')
+plot(figure_ob, 3, t6, [nob_mean, nob_pst, nob_mst], label, Title_pwn, xlabel, ylabel, sym, linestyle, text)
+plt.savefig(pathfigure_remain+'Mean_ob.pdf')
 
 figure_number = figure_ob + 1
 
