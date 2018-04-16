@@ -32,6 +32,8 @@ def power_law_distribution(Emin, Emax, E, alpha, eta, Esng, p0):
         eta     :       efficiency of the cosmic rays acceleration
         Esng    :       energy released by the SN explosion (GeV)
         p0      :       normalization constant (GeV/c)
+    Output:
+        NE      :       intial particles distribution (GeV^-1 cm^-3)
     """
     mpgev = mp*MeV2GeV # mass of the proton in GeV
 
@@ -48,34 +50,11 @@ def diffusion_coefficient(p0, D0, E, delta):
         D0      :       diffusion coefficient at p0 (cm^2 s^-1)
         E       :       energy array (GeV)
         delta   :       exponent of the power-law expression
+    Output:
+        D       :       diffusion coefficient (cm^2 s^-1)
     """
     mpgev = mp*MeV2GeV  # mass of the proton in GeV
     return D0 * (numpy.sqrt(E**2 + 2*mpgev*E)/p0)**delta
-
-def diffusion_spherical(t, r, t0, NE, D):
-    """
-    Return the density of the cosmic rays at each time and radius
-        N(E, r, deltat) = N(E, 0, t0)/(4*pi*D(E)*deltat) * exp(-r^2/(4*D(E)*deltat))
-    Inputs:
-        t       :       time (yr)
-        r       :       distance (pc)
-        t0      :       time when the SN explode (yr) for the test if the SN has already exploded
-        NE      :       initial density of the population of CR (GeV^-1)
-        D       :       diffusion coefficient (cm^2 s^-1)
-    """
-
-    delta_t = t - t0            # time after the SN explosion (yr)
-
-        # density of the particles in time and position (GeV^-1)
-    N = numpy.zeros(len(r))
-
-    if delta_t >= 0:            # if there is already an explosion
-        if delta_t == 0:        # at the SN explosion
-            print('explosion')
-            N[0] = NE
-        else:
-            N = NE/((4*numpy.pi*D*(delta_t*yr2s))**(3/2.0))*numpy.exp(-(r*pc2cm)**2/(4*D*(delta_t*yr2s)))
-    return N
 
 def shell_particles(r_in, r_out, NE, D, deltat):
     """
@@ -86,6 +65,8 @@ def shell_particles(r_in, r_out, NE, D, deltat):
         NE          :       initial particles distribution (GeV^-1)
         D           :       diffusion coefficient (cm^2 s^-1)
         deltat      :       time after the SN explosion (yr)
+    Output:
+        N           :       number of particles in a shell (GeV^-1)
     """
 
     r_out = r_out * pc2cm   # in cm
@@ -114,6 +95,8 @@ def inf_particles(Rsb, NE, D, deltat):
         NE          :       initial particles distribution (GeV^-1)
         D           :       diffusion coefficient (cm^2 s^-1)
         deltat      :       time after the SN explosion (yr)
+    Output:
+        N           :       number of particles outside the SB (GeV^-1)
     """
 
     N = numpy.zeros_like(NE)
@@ -122,6 +105,33 @@ def inf_particles(Rsb, NE, D, deltat):
         a = (Rsb*pc2cm)/(numpy.sqrt(4 * D * deltat * yr2s))
         N = NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * erfc(a) + 2 * numpy.exp(-a**2) * a)
 
+    return N
+
+def diffusion_spherical(t, r, t0, NE, D):
+    """
+    Return the density of the cosmic rays at each time and radius
+        N(E, r, deltat) = N(E, 0, t0)/(4*pi*D(E)*deltat) * exp(-r^2/(4*D(E)*deltat))
+    Inputs:
+        t       :       time (yr)
+        r       :       distance (pc)
+        t0      :       time when the SN explode (yr) for the test if the SN has already exploded
+        NE      :       initial density of the population of CR (GeV^-1)
+        D       :       diffusion coefficient (cm^2 s^-1)
+    Output:
+        N       :       density of CR (GeV^-1 cm^-3)
+    """
+
+    delta_t = t - t0            # time after the SN explosion (yr)
+
+        # density of the particles in time and position (GeV^-1)
+    N = numpy.zeros(len(r))
+
+    if delta_t >= 0:            # if there is already an explosion
+        if delta_t == 0:        # at the SN explosion
+            print('explosion')
+            N[0] = NE
+        else:
+            N = NE/((4*numpy.pi*D*(delta_t*yr2s))**(3/2.0))*numpy.exp(-(r*pc2cm)**2/(4*D*(delta_t*yr2s)))
     return N
 
 def gauss(x, A, Dt):

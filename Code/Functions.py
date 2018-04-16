@@ -25,33 +25,24 @@ rcParams['ytick.minor.visible'] = True
 
 def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle, text):
     """
-    Function to plot a log-log graphic
+    Plot a log-log graphic
     Inputs:
         figure_number   :       define the number of the figure
-        number_of_plot  :       define how many plot do you want on one figure (with the same axis)
+        number_of_plot  :       define how many plot you want on one figure (with the same axis)
         x               :       x-vector
         y               :       y-array (line = one y-array and row = each different y-plot)
-        label_name      :       legend of one plots
+        label_name      :       legend of one y
         title           :       title of the plot
         xlabel          :       label of the x-axis
         ylabel          :       label of the y-axis
-        symbol          :       symbol
+        symbol          :       symbol of one y
         linestyle       :       style of the line (drashed, etc)
         text            :       important parameters that you will write on the figure
     """
         # figure
     fig = plt.figure(figure_number, figsize = (8, 5))
     ax = fig.add_subplot(111)
-    """
-        # axes
-    rcParams['xtick.bottom'] = True
-    rcParams['xtick.top'] = True
-    rcParams['xtick.minor.visible'] = True
 
-    rcParams['ytick.left'] = True
-    rcParams['ytick.right'] = True
-    rcParams['ytick.minor.visible'] = True
-    """
         # Plot
     if number_of_plot > 1:
 
@@ -104,14 +95,14 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
     Function to plot a linear graphic
     Inputs:
         figure_number   :       define the number of the figure
-        number_of_plot  :       define how many plot do you want on one figure (with the same axis)
+        number_of_plot  :       define how many plot you want on one figure (with the same axis)
         x               :       x-vector
         y               :       y-array (line = one y-array and row = each different y-plot)
-        label_name      :       legend of one plots
+        label_name      :       legend of one y
         title           :       title of the plot
         xlabel          :       label of the x-axis
         ylabel          :       label of the y-axis
-        symbol          :       symbol
+        symbol          :       symbol of one y
         linestyle       :       style of the line (drashed, etc)
         text            :       important parameters that you will write on the figure
     """
@@ -169,8 +160,8 @@ def histogramme(figure_number, hist, label_name, title, xlabel, ylabel):
     """
     Return the histogramme of hist
     Inputs:
-        figure_number   :       number of the figure
-        hist            :       input of the histogramme
+        figure_number   :       define the number of the figure
+        hist            :       what you want to make the histogramme
         label_name      :       label of the data
         title           :       title of the histogramme
         xlabel          :       label of the x-axis

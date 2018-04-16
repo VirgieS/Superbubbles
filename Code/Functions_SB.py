@@ -15,12 +15,15 @@ from Parameters_SB import *
 
 def radius_velocity_SB(t6):
     """
-    Function to compute the radius and the velocity of the forward shock of a superbubble
+    Returns the radius and the velocity of the forward shock of a superbubble
     From the equation 52 and 53 of the article Weaver et al. 1977
         Rsb = ar * n0^alphar * L36^betar * t6^gammar                    (pc)
         Vsb = dRsb/dt = ar * gammar * n0^alphar  L36^betar * t6^gammar  (km/s)
     Inputs:
         t6      :       age of the system expressed in 10^6 yr
+    Outputs:
+        Rsb     :       outer radius of the SB (pc)
+        Vsb     :       velocity of the forward shock (km/s)
     """
 
         # Outer radius of the SB (pc)
@@ -36,13 +39,16 @@ def radius_velocity_SB(t6):
 
 def masses(t7, Rsb):
     """
-    Function to compute the mass in the superbubble and the swept-up mass by the superbubble
+    Returns the mass in the superbubble and the swept-up mass by the superbubble
     From the equation 5 of the article Mac Low and McCray (1987)
         x = r/Rsb where r is the distance to the center of the superbubble (pc) and Rsb is the outer radius (pc)
         n(x) = an * n0^alphan * L38^betan * t7^gamman * (1-x)^deltan        (cm^-3)
     Inputs:
         t7      :       age of the system expressed in 10^8 yr
         Rsb     :       outer radius of the superbubble expressed in pc
+    Outputs:
+        Msb     :       mass inside the superbubble (solar mass)
+        Mswept  :       swept-up mass by the growth of the SB (solar mass)
     """
 
         # mass within the superbubble (solar mass)
@@ -58,18 +64,23 @@ def masses(t7, Rsb):
 
 def density_thickness_shell_percentage(percentage, Rsb, Mswept, Msb):
     """
-    Return the density and the thickness of the shell
+    Returns the density and the thickness of the shell with the correction of the Weaver's model
 
     Inputs:
         percentage      :   thickness of the shell is a percentage of the outer radius
         Rsb             :   outer radius of the SB (pc)
         Mswept          :   swept-up mass by the SB (solar masses)
         Msb             :   mass in the SB (solar masses)
+    Outputs:
+        ns              :   density in the shell (cm^-3)
+        hs              :   thickness of the shell (pc)
     """
         # thickness (pc)
+        # percentage of the outer radius
     hs = percentage * Rsb
 
         # density (cm^-3)
+        # from the corrected volume of the supershell
     Vs = 4 * numpy.pi/3.0 * Rsb**3 * (1 - (1-percentage)**3)
     Ms = (Mswept - Msb)*Msun2g
     ns = Ms/(Vs * mu * mpg)
@@ -78,7 +89,7 @@ def density_thickness_shell_percentage(percentage, Rsb, Mswept, Msb):
 
 def density_thickness_shell(Vsb, C02, Mswept, Msb, Rsb):
     """
-    Function to compute the density and the thickness of the shell
+    Returns the density and the thickness of the shell
     From the equation 67 of the article Weaver et al. (1977)
         ns = n0 * (Vsb^2 + C0^2)/Cs^2
         where Cs^2 = kb*Ts/(mu*mpg)
@@ -88,6 +99,9 @@ def density_thickness_shell(Vsb, C02, Mswept, Msb, Rsb):
         Mswept  :       swept-up mass by the suerbubble (solar masses)
         Msb     :       mass in the superbubble (solar masses)
         Rsb     :       outer radius of the superbubble (pc)
+    Outputs:
+        ns      :       density in the shell (cm^-3)
+        hs      :       thickness in the shell (cm^-3)
     """
         # density in the shell (cm^-3)
     Ts = 1e2                                    # temperature of the shell (K)
@@ -105,7 +119,7 @@ def density_thickness_shell(Vsb, C02, Mswept, Msb, Rsb):
 
 def pressure_SB(ap, alphap, betap, gammap, n0, L36, t6):
     """
-    Function to compute the pressure in the superbubble
+    Returns the pressure in the superbubble
     From the equation 22 of the article Weaver et al. (1977)
         p = ap * n0^alphap * L36^betap * t6^gammap
     Inputs:
@@ -116,12 +130,14 @@ def pressure_SB(ap, alphap, betap, gammap, n0, L36, t6):
         n0      :       atomic density expressed in cm^-3
         L36     :       total luminosity injected by the stars and SN expressed in 10^36 erg/s
         t6      :       age of the system expressed in 10^6 yr
+    Output:
+        p       :       pressure in the SB (dyne cm^-2)
     """
     return ap * n0**(alphap) * L36**(betap) * t6**(gammap)
 
 def luminosity_SB(t7, Rsb):
     """
-    Function to compute the pressure in the superbubble
+    Returns the luminosity in the superbubble from the cooling rate.
     From the equation 6 of the article Mac Low and McCray (1987)
         C = ne * n * LambdaT                :   cooling rate per unit volume (erg cm^-3 s^-1)
         where LambdaT = al * T6^etal * zeta (erg cm^3 s^-1)
@@ -130,6 +146,8 @@ def luminosity_SB(t7, Rsb):
     Inputs:
         t7      :       age of the system expressed in 10^7 yr
         Rsb     :       outer radius of the superbubble (pc)
+    Output:
+        Lsb     :       luminosity of the SB (erg s^-1)
     """
     at6 = at * K26K
     deltax = 2 * deltan + etal * deltat
@@ -138,7 +156,7 @@ def luminosity_SB(t7, Rsb):
 
 def profile_density_temperature(t7, rsb, Rsb):
     """
-    Function to compute the density and the temperature profiles in the superbubble
+    Returns the density and the temperature profiles in the superbubble
     From equations 4 and 5 of the article of Mac Low and McCray (1987)
         x = r/Rsb where r is the distance to the center of the SB (pc) and Rsb is the outer radius (pc)
         T(x) = at * n0^alphat * L38^betat * t7^gammat * (1-x)^deltat    (K)
@@ -147,9 +165,16 @@ def profile_density_temperature(t7, rsb, Rsb):
         t7      :       age of the system expressed in 10^7 yr
         rsb     :       array of distance (pc)
         Rsb     :       outer radius of the SB (pc)
+    Outputs:
+        Tsb     :       temperature profile in the SB (K)
+        nsb     :       density profile in the SB (cm^-3)
     """
     x = rsb/Rsb
+
+        # temperature profile (K)
     Tsb = at * n0**alphat * L38**betat * t7**gammat * (1-x)**deltat
+
+        # density profile (cm^-3)
     nsb = an * n0**alphan * L38**betan * t7**gamman * (1-x)**deltan
 
     return Tsb, nsb

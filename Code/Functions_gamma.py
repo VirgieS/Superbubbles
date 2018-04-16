@@ -32,6 +32,9 @@ def luminosity(lum_energy, energy):
     Inputs:
         lum_energy  :       intrinsic luminosity array per energy (erg/s/eV)
         energy      :       range of energy in which we will compute the luminosity (eV)
+
+    Output:
+        lum         :       luminosity (erg s^-1)
     """
     lum = integrate.trapz(lum_energy, energy)
     lum = numpy.nan_to_num(lum)
@@ -48,15 +51,23 @@ def spectral_index(Emin, Emax, lum_ph_min, lum_ph_max):
         Emax        :       maximum energy of the range (GeV)
         lum_ph_min  :       intrinsic luminosity in photons at Emin (ph/s)
         lum_ph_max  :       intrinsic luminosity in photons at Emax (ph/s)
+
+    Output:
+        Gamma       :       photon spectral index
     """
 
     return -(numpy.log(lum_ph_max) - numpy.log(lum_ph_min))/(numpy.log(Emax) - numpy.log(Emin))
 
-
 def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, delta, zones, pathfigure, iteration, figure_number):
 
     """
-    Return 5 files with differents quantities.
+    Returns 6 importants quantities:
+        luminosity in the all energy range
+        luminosity in specific energy range
+        photon spectral index
+        luminosity unit
+        number of pulsar wind nebula
+        number of remained OB stars
     Inputs:
         correction_factor   : correction factor for the radius of the SB
         t0          :       (sorted) array of the SN explosion times (yr)
@@ -74,6 +85,14 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
         pathfigure  :       path of the file where to save the figure of Gamma emission
         iteration   :       number of the iteration
         figure_number:      number of the figure
+    Outputs:
+        Lumtot_sn_HESS  :   luminosity in the HESS energy range (erg s^-1)
+        Lumtot_sn       :   luminosity in the all energy range (erg s^-1)
+        Gamma_sn        :   photon spectral index
+        lum_units       :   luminosity index (quantity)
+        n_pwn_tot       :   number of pulsar wind nebulae inside the SB
+        nob             :   number of remained OB stars inside the OB association
+        figure_number   :   number of the figure
     """
 
         ##===============================##
@@ -435,4 +454,4 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
             Gamma_sn[l] += Gamma_tot(t[l])
             Gamma_sn[l]= numpy.nan_to_num(Gamma_sn[l])
 
-    return Lumtot_sn_HESS, Lumtot_sn, Gamma_sn, lum_units, figure_number, n_pwn_tot, nob
+    return Lumtot_sn_HESS, Lumtot_sn, Gamma_sn, lum_units, n_pwn_tot, nob, figure_number
