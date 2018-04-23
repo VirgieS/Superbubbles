@@ -24,35 +24,35 @@ from Parameters_system import *
 ##====##
 
     # IRAP
-#os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/')
-#pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Gamma_emission/Test/'
-#pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Remain/Test/'
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/5_SN/')
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Verif/5_SN/10_iterations/Test/Gamma_emission/'
+pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Verif/5_SN/10_iterations/Test/Remain/'
 #pathfigure_CR = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/CR/1/'
 
     # Home
 #os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/30_Dor_C/Test/')
-pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/30_Dor_C/Verif/Gamma_emission/'
-pathfigure_remain = '/home/vivi/Documents/Master_2/Superbubbles/figures/30_Dor_C/Verif/Remain/'
+#pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/30_Dor_C/Verif/Gamma_emission/'
+#pathfigure_remain = '/home/vivi/Documents/Master_2/Superbubbles/figures/30_Dor_C/Verif/Remain/'
 
 ## ======= ##
 # Statistic #
 ## ======= ##
 
     # Number of iterations
-nit = 1                                                                         #you need to change for your simulations
+nit = 10                                                                       #you need to change it for your simulations
 
     # Correction factor
-t_end = 4.5e6               # time at which R = Robs                            #you need to change for your simulations
+t_end = 4.5e6               # time at which R = Robs                            #you need to change it for your simulations
 t_end_6 = t_end * yr26yr    # in Myr
-Robs = 47.0                 # observed radius (pc)                              #you need to change for your simulations
+Robs = 47.0                 # observed radius (pc)                              #you need to change it for your simulations
 Rsb = radius_velocity_SB(t_end_6)[0] # from Weaver's model (pc and km/s)
 correction_factor = Robs/Rsb
 
     # Which zone for the Computation
-zones = [2]                                                                     #you need to change for your simulations
+zones = [2]                                                                     #you need to change it for your simulations
 
     # Fix time array (yr)
-t0min = 3                   # Myr                                               #you need to change for your simulations
+t0min = 3                   # Myr                                               #you need to change it for your simulations
 t0max = t_end_6             # Myr
 tmin = t0min/yr26yr         # yr
 tmax = (t0max + 1)/yr26yr   # yr
@@ -78,8 +78,10 @@ with open('SN', 'wb') as SN_write:
     for i in range (nit):
 
             # SN explosion time
-        n = 5             # number of massive stars in the OB association       #you need to change for your simulations
-        t0 = random_SN(t0min, t0max, n)/yr26yr
+        nsn = 5             # number of massive stars in the OB association     #you need to change it for your simulations
+        #mean = 5            # mean value of SN explosions in the superbubble    #you need to change it for your simulations
+        #nsn = numpy.random.poisson(lam = mean) # random number of SN which mean value equals to mean
+        t0 = random_SN(t0min, t0max, nsn)/yr26yr
         t0 = sorted(t0)
 
         t0_it.append(t0)
@@ -99,8 +101,6 @@ for i in range (nit):
     t0 = t0_it[i]
 
     Lum_HESS, Lum, Gamma, Lum_units, n_pwn, nob, figure_number = data(correction_factor, t0, t_fix, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, delta, zones, pathfigure_gamma, i, figure_number)
-    indHESS = numpy.where(Lum_HESS != 0)
-    indGamma = numpy.where(Gamma != 0)
     Lum_it_HESS.append(Lum_HESS)
     Lum_it.append(Lum)
     Gamma_it.append(Gamma)
@@ -110,32 +110,28 @@ for i in range (nit):
     print('end of the iteration %d' %i)
 
 Lum_it_HESS = numpy.asarray(Lum_it_HESS)
-ind = numpy.where(Lum_HESS > 0)[0]
 Lum_it = numpy.asarray(Lum_it)
 Gamma_it = numpy.asarray(Gamma_it)
 n_pwn_it = numpy.asarray(n_pwn_it)
 nob_it = numpy.asarray(nob_it)
-"""
+
     ##-----------------------------------------------------##
     # Histogramme of the probability to have one luminosity #
     ##-----------------------------------------------------##
         # choosen time
 ind_hist = [0, 299, 599, 899, 1199, 1499, 1799, 2099, 2399, 2699]
-
         # Computation of the probability to get a luminosity L
 title = 'Probability of the luminosity in the range of energy [1 TeV, 10 TeV]'
 xlabel = '$L_\gamma$'
 ylabel = 'counts'
-
 for j in (ind_hist):
     L_hist = Lum_it_HESS[:,j]
     label = 't = %.2e yr'%t_fix[j]
     histogramme(figure_number, L_hist, label, title, xlabel, ylabel)
     plt.legend(loc = 'best')
-
 plt.savefig(pathfigure_gamma+'Histogramme_L_gamma.pdf')
 figure_number += 1
-"""
+
     ##---------------------------##
     # Mean and standard deviation #
     ##---------------------------##
@@ -171,7 +167,7 @@ for j in range (number_bin_t):
 
 Lum_HESS_pst = Lum_HESS_mean + Lum_HESS_std
 Lum_HESS_mst = Lum_HESS_mean - Lum_HESS_std
-ind = numpy.where(Lum_HESS_mean > 0)[0]
+#ind = numpy.where(Lum_HESS_mean > 0)[0]
 
 Lum_pst = Lum_mean + Lum_std
 Lum_mst = Lum_mean - Lum_std
@@ -190,7 +186,7 @@ label = 'none'
 sym = ['', '', '']
 linestyle = ['-.', ':', ':']
 xlabel = 'Time [Myr]'
-text = r'$D_0$ = %.2e $cm^2 s^{-1}$, $\delta$ = %.2f'u'\n'r'$p_0$ =%.2e $GeV c^{-1}$, $\alpha$ = %.2f'u'\n'r' $n_0$ = %.2e $cm^{-3}$' u'\n' r'$n_{SN}$ = %d, $n_{it}$ = %d'%(D0, delta, p0, alpha, n0, n, nit)
+text = r'$D_0$ = %.2e $cm^2 s^{-1}$, $\delta$ = %.2f'u'\n'r'$p_0$ =%.2e $GeV c^{-1}$, $\alpha$ = %.2f'u'\n'r' $n_0$ = %.2e $cm^{-3}$' u'\n' r'$n_{SN}$ = %d, $n_{it}$ = %d'%(D0, delta, p0, alpha, n0, nsn, nit)
 
         # Gamma luminosity
 figure_HESS = figure_number

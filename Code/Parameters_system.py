@@ -102,4 +102,4 @@ D0 = 1e28           # diffusion coefficient at 10 GeV/c in cm^2 s^-1  ==> prendr
     # Energy of the gamma photons (GeV)
 Emin_gamma = 100 * MeV2GeV      # 100 MeV (GeV)
 Emax_gamma = 100 * TeV2GeV      # 100 TeV (GeV)
-Esep = numpy.array([100, 1*TeV2GeV, 10*TeV2GeV]) # ranges of energy (GeV)
+Esep = numpy.array([1*TeV2GeV, 10*TeV2GeV]) # ranges of energy (GeV)

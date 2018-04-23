@@ -11,7 +11,7 @@ from scipy.special import erf, erfc
 ##-----------------------------------------##
 from Physical_constants import *
 from Conversion_factors import *
-from Parameters_SB import *
+from Parameters_system import *
 
 def radius_velocity_SB(t6):
     """
@@ -78,11 +78,12 @@ def density_thickness_shell_percentage(percentage, Rsb, Mswept, Msb):
         # thickness (pc)
         # percentage of the outer radius
     hs = percentage * Rsb
+    Rc = Rsb - hs
 
         # density (cm^-3)
         # from the corrected volume of the supershell
-    Vs = 4 * numpy.pi/3.0 * Rsb**3 * (1 - (1-percentage)**3)
-    Ms = (Mswept - Msb)*Msun2g
+    Vs = 4 * numpy.pi/3.0 * ((Rsb * pc2cm)**3 - (Rc * pc2cm)**3)
+    Ms = (Mswept - Msb) * Msun2g
     ns = Ms/(Vs * mu * mpg)
 
     return ns, hs
@@ -113,7 +114,6 @@ def density_thickness_shell(Vsb, C02, Mswept, Msb, Rsb):
     Vs = Ms/(ns * mu * mpg)*1.0/(pc2cm)**3      # volume of the shell (pc^3)
     Rc = (Rsb**3 - 3.0/(4*numpy.pi)*Vs)**(1.0/3)# radius of the continuity contact (pc)
     hs = Rsb-Rc                                 # thickness of the shell (pc)
-    print(hs)
 
     return ns, hs
 

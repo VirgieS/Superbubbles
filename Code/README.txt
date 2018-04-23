@@ -73,7 +73,7 @@ All the physical constants.
 ##============##
 
 The main program to make statistic about the gamma emission of one specific SB.
-All you need to give in this program are (look for '%#you need to change for your simulations'):
+All you need to give in this program are (look for '%#you need to change it for your simulations'):
 BEFORE THE ITERATIONS
 - nit       :   the number of iterations that you want to do
 - t_end     :   the estimated age of the SB (yr) (for 30 Dor C it is 4.5 Myr)

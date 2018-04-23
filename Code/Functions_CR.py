@@ -35,12 +35,12 @@ def power_law_distribution(Emin, Emax, E, alpha, eta, Esng, p0):
     Output:
         NE      :       intial particles distribution (GeV^-1 cm^-3)
     """
-    mpgev = mp*MeV2GeV # mass of the proton in GeV
+    mpgev = mp * MeV2GeV # mass of the proton in GeV
 
-    integral_E = integrate.quad(lambda E: (E**2 + 2*mpgev*E)**(-(1 + alpha)/2.0) * (E + mpgev) * E, Emin, Emax)[0]
+    integral_E = integrate.quad(lambda E: (E**2 + 2 * mpgev * E)**(-(1 + alpha)/2.0) * (E + mpgev) * E, Emin, Emax)[0]
     N0 = eta * Esng * cl**(1-alpha) * p0**(-alpha) * 1.0/integral_E         # normalization constant (GeV^-1 c)
 
-    return N0/cl**(1-alpha) * (E**2 + 2*mpgev*E)**(-(1+alpha)/2.0) * (E + mpgev)/p0**(-alpha)    # GeV^-1
+    return N0/cl**(1 - alpha) * (E**2 + 2 * mpgev * E)**(-(1 + alpha)/2.0) * (E + mpgev)/p0**(-alpha)    # GeV^-1
 
 def diffusion_coefficient(p0, D0, E, delta):
     """
@@ -53,8 +53,8 @@ def diffusion_coefficient(p0, D0, E, delta):
     Output:
         D       :       diffusion coefficient (cm^2 s^-1)
     """
-    mpgev = mp*MeV2GeV  # mass of the proton in GeV
-    return D0 * (numpy.sqrt(E**2 + 2*mpgev*E)/p0)**delta
+    mpgev = mp * MeV2GeV  # mass of the proton in GeV
+    return D0 * (numpy.sqrt(E**2 + 2 * mpgev * E)/p0)**delta
 
 def shell_particles(r_in, r_out, NE, D, deltat):
     """

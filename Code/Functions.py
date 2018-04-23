@@ -168,7 +168,7 @@ def histogramme(figure_number, hist, label_name, title, xlabel, ylabel):
         ylabel          :       label of the y axis
     """
     plt.figure(figure_number, figsize=(8,5))
-    plt.hist(hist, histtype = 'step', bins = 100, align = 'mid', label = label_name)
+    plt.hist(hist, histtype = 'step', bins = 10, align = 'mid', label = label_name)
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
