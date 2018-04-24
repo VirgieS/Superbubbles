@@ -88,7 +88,7 @@ def density_thickness_shell_percentage(percentage, Rsb, Mswept, Msb):
 
     return ns, hs
 
-def density_thickness_shell(Vsb, C02, Mswept, Msb, Rsb):
+def density_thickness_shell(Vsb, Mswept, Msb, Rsb):
     """
     Returns the density and the thickness of the shell
     From the equation 67 of the article Weaver et al. (1977)
@@ -105,7 +105,6 @@ def density_thickness_shell(Vsb, C02, Mswept, Msb, Rsb):
         hs      :       thickness in the shell (cm^-3)
     """
         # density in the shell (cm^-3)
-    Ts = 1e2                                    # temperature of the shell (K)
     Cs2 = kb*Ts/(mu*mpg)/(km2cm)**2             # isothermal sound speed in the shell (km/s)
     ns = n0 * (Vsb**2 + C02)/Cs2                # density in the shell (cm^-3)
 
@@ -117,7 +116,7 @@ def density_thickness_shell(Vsb, C02, Mswept, Msb, Rsb):
 
     return ns, hs
 
-def pressure_SB(ap, alphap, betap, gammap, n0, L36, t6):
+def pressure_SB(t6):
     """
     Returns the pressure in the superbubble
     From the equation 22 of the article Weaver et al. (1977)
