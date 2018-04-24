@@ -25,7 +25,8 @@ n0 = 30             # ambient density (cm^-3)
 xH = 0.9            # mass fraction of hydrogen
 xHe = 0.1           # mass fraction of helium
 mu = xH + xHe * 4   # average molecular weight
-percentage = 0.10    # percentage of the thickness of the shell in term of the outer radius of the SB
+percentage = 0.10   # percentage of the thickness of the shell in term of the outer radius of the SB
+Ts = 1e2            # shell temperature (K)
 
     # R(t) = ar * n0^alphar * L36^betar * t6^gammar                  (pc)
     # Equation 51 of Weaver et al. (1977)
@@ -72,8 +73,10 @@ zeta = 1.0      # metallicity of the local ISM
 epsilon = 1.2   # ratio ne/n
 
     # In the ISM
-TISM = 88                          # temperature of the ambient gas (K)
+TISM = 88                           # temperature of the ambient gas (K)
 C02 = kb*TISM/(mu*mpg)/(km2cm)**2   # isothermal sound speed in the ambiant gas (km/s)
+C0 = numpy.sqrt(C02)
+pISM = n0*kb*TISM                   # pressure in dyne cm^-2
 
 ##===========##
 # Cosmic rays #

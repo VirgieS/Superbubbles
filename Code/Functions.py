@@ -7,6 +7,8 @@ Here are all functions needed for the superbubble model
 ##----------##
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
+from mpl_toolkits.axes_grid1 import host_subplot
+import mpl_toolkits.axisartist as AA
 import numpy
 from scipy.interpolate import interp1d
 
@@ -153,6 +155,67 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
 
         # text
     plt.text(0.5, 0.5, text, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
+
+    return
+
+def log_plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbol):
+    """
+    Plot a log-log graphic for two different y-axis
+    Inputs:
+        figure_number   :       define the number of the figure
+        x               :       x-vector
+        y               :       (2D) y-array
+        label_name      :       legend of one y
+        title           :       title of the plot
+        xlabel          :       label of the x-axis
+        ylabel          :       labels of the y-axis
+        symbol          :       symbol of one y
+    """
+
+        # figure
+    fig = plt.figure(figure_number, figsize = (8, 5))
+
+        # axes
+    host = host_subplot(111, axes_class=AA.Axes)
+    plt.subplots_adjust(right=0.75)
+
+    par = host.twinx()
+
+    par.axis["right"].toggle(all=True)
+
+            # host axes
+    xmin = min(x)
+    xmax = max(x)
+    host.set_xlim(xmin, xmax)
+
+    ymin = min(y[0])
+    ymax = max(y[0])
+    host.set_ylim(ymin, ymax)
+
+    host.set_xlabel(xlabel)
+    host.set_ylabel(ylabel[0])
+    p1, = host.loglog(x, y[0], symbol[0], label = label_name[0])
+
+            # second axes
+    ymin = min(y[1])
+    ymax = max(y[1])
+    par.set_ylim(ymin, ymax)
+    par.set_ylabel(ylabel[1])
+    p2, = par.loglog(x, y[1], symbol[1], label = label_name[1])
+
+        # legend
+    host.legend()
+    host.axis["left"].label.set_color(p1.get_color())
+    par.axis["right"].label.set_color(p2.get_color())
+
+        # grid
+    plt.grid(color = 'k', alpha = 0.15, linestyle = ':')
+
+        # Title
+    plt.title(title)
+
+        # Draw
+    plt.draw()
 
     return
 

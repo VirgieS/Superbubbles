@@ -41,6 +41,24 @@ def luminosity(lum_energy, energy):
 
     return lum
 
+def luminosity2(lum_energy, energy, R):
+
+    """
+    Return the luminosity in a range of energy
+
+    Inputs:
+        lum_energy  :       intrinsic luminosity array per energy (erg/s/eV)
+        energy      :       range of energy in which we will compute the luminosity (eV)
+
+    Output:
+        lum         :       luminosity (erg s^-1)
+    """
+    R = R*pc2cm
+    lum = 4*numpy.pi*R**2*integrate.trapz(lum_energy, energy)
+    lum = numpy.nan_to_num(lum)
+
+    return lum
+
 def spectral_index(Emin, Emax, lum_ph_min, lum_ph_max):
 
     """
@@ -257,12 +275,12 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
                             # intrisic differential luminosity (eV^-1 s^-1)
                     model = TableModel(E_CR, N_part, amplitude = 1)
                     PD = PionDecay(model, nh = ngas[0], nuclear_enhancement = True, useLUT = False)
-                    flux_PD = PD.sed(spectrum_energy, distance = 0 * units.pc)
+                    flux_PD = PD.flux(spectrum_energy, distance = 0 * units.pc)
 
                             # Gamma luminosity (erg s^-1)
-                    lum_units = flux_PD.unit * 1/units.eV#* units.erg #* units.eV
+                    lum_units = flux_PD.unit * units.erg * units.eV
                     flux_PD = numpy.nan_to_num(numpy.asarray(flux_PD))
-                    lum_energy = flux_PD/spectrum_ev#* spectrum_erg          # erg s^-1 eV^-1
+                    lum_energy = flux_PD * spectrum_erg          # erg s^-1 eV^-1
 
                     Lum = luminosity(lum_energy, spectrum_ev)
                     Lum_t_sb[j] += Lum
@@ -271,14 +289,14 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
                             # intrisic differential luminosity (eV^-1 s^-1)
                     model = TableModel(E_CR, N_part, amplitude = 1)
                     PD = PionDecay(model, nh = ngas[0], nuclear_enhancement = True, useLUT = False)
-                    flux_PD = PD.sed(spectrum_HESS_energy, distance = 0 * units.pc)
+                    flux_PD = PD.flux(spectrum_HESS_energy, distance = 0 * units.pc)
 
                             # Gamma luminosity (erg s^-1)
-                    lum_units = flux_PD.unit * 1/units.eV#* units.erg #* units.eV
+                    lum_units = flux_PD.unit * units.erg * units.eV
                     flux_PD = numpy.nan_to_num(numpy.asarray(flux_PD))
-                    lum_energy = flux_PD/spectrum_HESS_ev#* spectrum_HESS_erg          # erg s^-1 eV^-1
-                    fluxmin[j] += flux_PD[0]/(spectrum_HESS_ev[0])**2
-                    fluxmax[j] += flux_PD[-1]/(spectrum_HESS_ev[-1])**2
+                    lum_energy = flux_PD * spectrum_HESS_erg          # erg s^-1 eV^-1
+                    fluxmin[j] += flux_PD[0]
+                    fluxmax[j] += flux_PD[-1]
 
 
                     LumHESS = luminosity(lum_energy, spectrum_HESS_ev)
@@ -295,12 +313,12 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
                                 # intrisic differential luminosity (eV^-1 s^-1)
                         model = TableModel(E_CR, N_part, amplitude = 1)
                         PD = PionDecay(model, nh = ngas[k], nuclear_enhancement = True, useLUT = False)
-                        flux_PD = PD.sed(spectrum_energy, distance = 0 * units.pc)
+                        flux_PD = PD.flux(spectrum_energy, distance = 0 * units.pc)
 
                                 # Gamma luminosity (erg s^-1)
-                        lum_units = flux_PD.unit * 1/units.eV#* units.erg #* units.eV
+                        lum_units = flux_PD.unit * units.erg * units.eV
                         flux_PD = numpy.nan_to_num(numpy.asarray(flux_PD))
-                        lum_energy = flux_PD/spectrum_ev#* spectrum_erg          # erg s^-1 eV^-1
+                        lum_energy = flux_PD * spectrum_erg          # erg s^-1 eV^-1
                         Lum = luminosity(lum_energy, spectrum_ev)
                         Lum_t_sb[j] += Lum
 
@@ -308,14 +326,14 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
                                 # intrisic differential luminosity (eV^-1 s^-1)
                         model = TableModel(E_CR, N_part, amplitude = 1)
                         PD = PionDecay(model, nh = ngas[k], nuclear_enhancement = True, useLUT = False)
-                        flux_PD = PD.sed(spectrum_HESS_energy, distance = 0 * units.pc)
+                        flux_PD = PD.flux(spectrum_HESS_energy, distance = 0 * units.pc)
 
                                 # Gamma luminosity (erg s^-1)
-                        lum_units = flux_PD.unit * 1/units.eV#* units.erg #* units.eV
+                        lum_units = flux_PD.unit * units.erg * units.eV
                         flux_PD = numpy.nan_to_num(numpy.asarray(flux_PD))
-                        lum_energy = flux_PD/spectrum_HESS_ev#* spectrum_HESS_erg          # erg s^-1 eV^-1
-                        fluxmin[j] += flux_PD[0]/(spectrum_HESS_ev[0])**2
-                        fluxmax[j] += flux_PD[-1](spectrum_HESS_ev[-1])**2
+                        lum_energy = flux_PD * spectrum_HESS_erg          # erg s^-1 eV^-1
+                        fluxmin[j] += flux_PD[0]
+                        fluxmax[j] += flux_PD[-1]
 
                         LumHESS = luminosity(lum_energy, spectrum_HESS_ev)
                         LumHESS_t_sb[j] += LumHESS
@@ -334,12 +352,12 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
                             # intrisic differential luminosity (eV^-1 s^-1)
                     model = TableModel(E_CR, N_part, amplitude = 1)
                     PD = PionDecay(model, nh = ngas, nuclear_enhancement = True, useLUT = False)
-                    flux_PD = PD.sed(spectrum_energy, distance = 0 * units.pc)
+                    flux_PD = PD.flux(spectrum_energy, distance = 0 * units.pc)
 
                             # Gamma luminosity (erg s^-1)
-                    lum_units = flux_PD.unit * 1/units.eV#* units.erg #* units.eV
+                    lum_units = flux_PD.unit * units.erg * units.eV
                     flux_PD = numpy.nan_to_num(numpy.asarray(flux_PD))
-                    lum_energy = flux_PD/spectrum_ev#* spectrum_erg          # erg s^-1 eV^-1
+                    lum_energy = flux_PD * spectrum_erg          # erg s^-1 eV^-1
                     Lum = luminosity(lum_energy, spectrum_ev)
                     Lum_t_shell[j] += Lum
 
@@ -347,14 +365,14 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
                             # intrisic differential luminosity (eV^-1 s^-1)
                     model = TableModel(E_CR, N_part, amplitude = 1)
                     PD = PionDecay(model, nh = ngas, nuclear_enhancement = True, useLUT = False)
-                    flux_PD = PD.sed(spectrum_HESS_energy, distance = 0 * units.pc)
+                    flux_PD = PD.flux(spectrum_HESS_energy, distance = 0 * units.pc)
 
                             # Gamma luminosity (erg s^-1)
-                    lum_units = flux_PD.unit * 1/units.eV#* units.erg #* units.eV
+                    lum_units = flux_PD.unit * units.erg * units.eV
                     flux_PD = numpy.nan_to_num(numpy.asarray(flux_PD))
-                    lum_energy = flux_PD/spectrum_HESS_ev#* spectrum_HESS_erg          # erg s^-1 eV^-1
-                    fluxmin[j] += flux_PD[0]/(spectrum_HESS_ev[0])**2
-                    fluxmax[j] += flux_PD[-1]/(spectrum_HESS_ev[-1])**2
+                    lum_energy = flux_PD * spectrum_HESS_erg          # erg s^-1 eV^-1
+                    fluxmin[j] += flux_PD[0]
+                    fluxmax[j] += flux_PD[-1]
 
 
                     LumHESS = luminosity(lum_energy, spectrum_HESS_ev)
@@ -372,12 +390,12 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
                             # intrisic differential luminosity (eV^-1 s^-1)
                     model = TableModel(E_CR, N_part, amplitude = 1)
                     PD = PionDecay(model, nh = ngas, nuclear_enhancement = True, useLUT = False)
-                    flux_PD = PD.sed(spectrum_energy, distance = 0 * units.pc)
+                    flux_PD = PD.flux(spectrum_energy, distance = 0 * units.pc)
 
                             # Gamma luminosity (erg s^-1)
-                    lum_units = flux_PD.unit * 1/units.eV#* units.erg #* units.eV
+                    lum_units = flux_PD.unit * units.erg * units.eV
                     flux_PD = numpy.nan_to_num(numpy.asarray(flux_PD))
-                    lum_energy = flux_PD/spectrum_ev#* spectrum_erg          # erg s^-1 eV^-1
+                    lum_energy = flux_PD * spectrum_erg          # erg s^-1 eV^-1
 
                     Lum = luminosity(lum_energy, spectrum_ev)
                     Lum_t_out[j] += Lum
@@ -386,12 +404,12 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
                             # intrisic differential luminosity (eV^-1 s^-1)
                     model = TableModel(E_CR, N_part, amplitude = 1)
                     PD = PionDecay(model, nh = ngas, nuclear_enhancement = True, useLUT = False)
-                    flux_PD = PD.sed(spectrum_HESS_energy, distance = 0 * units.pc)
+                    flux_PD = PD.flux(spectrum_HESS_energy, distance = 0 * units.pc)
 
                             # Gamma luminosity (erg s^-1)
-                    lum_units = flux_PD.unit * 1/units.eV#* units.erg #* units.eV
+                    lum_units = flux_PD.unit * units.erg * units.eV
                     flux_PD = numpy.nan_to_num(numpy.asarray(flux_PD))
-                    lum_energy = flux_PD/spectrum_HESS_ev# * spectrum_HESS_erg          # erg s^-1 eV^-1
+                    lum_energy = flux_PD * spectrum_HESS_erg          # erg s^-1 eV^-1
 
                     LumHESS = luminosity(lum_energy, spectrum_HESS_ev)
                     LumHESS_t_out[j] += LumHESS
@@ -513,5 +531,6 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
     Emin = Esep[0] * GeV2eV     # eV
     Emax = Esep[1] * GeV2eV     # eV
     Gamma_sn = spectral_index(Emin, Emax, fluxmin_sn, fluxmax_sn)
+    print(lum_units)
 
-    return Lumtot_sn_HESS, Lumtot_sn, Gamma_sn, lum_units, n_pwn_tot, nob, figure_number
+    return Lumtot_sn_HESS, Lumtot_sn, Gamma_sn, fluxmin_sn, fluxmax_sn, lum_units, n_pwn_tot, nob, figure_number
