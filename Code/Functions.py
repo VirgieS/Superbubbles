@@ -42,7 +42,7 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
         text            :       important parameters that you will write on the figure
     """
         # figure
-    fig = plt.figure(figure_number, figsize = (8, 5))
+    fig = plt.figure(figure_number, figsize = (10, 7))
     ax = fig.add_subplot(111)
 
         # Plot

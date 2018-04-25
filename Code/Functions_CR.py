@@ -21,28 +21,22 @@ from Parameters_system import *
 # Functions #
 ##---------##
 
-def power_law_distribution(Emin, Emax, E, alpha, eta, Esng, p0):
+def power_law_distribution(E):
     """
     Return the power-law distribution of the CR particles
     Inputs:
-        Emin    :       minimum energy of the distribution (GeV)
-        Emax    :       maximum energy of the distribution (GeV)
         E       :       energy array (GeV)
-        alpha   :       exponent of the power-law distribution
-        eta     :       efficiency of the cosmic rays acceleration
-        Esng    :       energy released by the SN explosion (GeV)
-        p0      :       normalization constant (GeV/c)
     Output:
-        NE      :       intial particles distribution (GeV^-1 cm^-3)
+        NE      :       intial particles distribution (GeV^-1)
     """
     mpgev = mp * MeV2GeV # mass of the proton in GeV
 
-    integral_E = integrate.quad(lambda E: (E**2 + 2 * mpgev * E)**(-(1 + alpha)/2.0) * (E + mpgev) * E, Emin, Emax)[0]
+    integral_E = integrate.quad(lambda E: (E**2 + 2 * mpgev * E)**(-(1 + alpha)/2.0) * (E + mpgev) * E, Emin_CR, Emax_CR)[0]
     N0 = eta * Esng * cl**(1-alpha) * p0**(-alpha) * 1.0/integral_E         # normalization constant (GeV^-1 c)
 
     return N0/cl**(1 - alpha) * (E**2 + 2 * mpgev * E)**(-(1 + alpha)/2.0) * (E + mpgev)/p0**(-alpha)    # GeV^-1
 
-def diffusion_coefficient(p0, D0, E, delta):
+def diffusion_coefficient(E):
     """
     Return the diffusion coefficient with a power-law
     Inputs:
@@ -107,40 +101,32 @@ def inf_particles(Rsb, NE, D, deltat):
 
     return N
 
-def diffusion_spherical(t, r, t0, NE, D):
+def diffusion_spherical(delta_t, r, NE, D):
     """
     Return the density of the cosmic rays at each time and radius
         N(E, r, deltat) = N(E, 0, t0)/(4*pi*D(E)*deltat) * exp(-r^2/(4*D(E)*deltat))
     Inputs:
-        t       :       time (yr)
+        delta_t :       time interval since the SN explosion (yr)
         r       :       distance (pc)
-        t0      :       time when the SN explode (yr) for the test if the SN has already exploded
         NE      :       initial density of the population of CR (GeV^-1)
         D       :       diffusion coefficient (cm^2 s^-1)
     Output:
         N       :       density of CR (GeV^-1 cm^-3)
     """
+    r = r * pc2cm               # cm
+    delta_t = delta_t * yr2s    # s
 
-    delta_t = t - t0            # time after the SN explosion (yr)
+    return NE/((4*numpy.pi * D * delta_t)**(3/2.0))*numpy.exp(-(r**2)/(4 * D * delta_t))
 
-        # density of the particles in time and position (GeV^-1)
-    N = numpy.zeros(len(r))
-
-    if delta_t >= 0:            # if there is already an explosion
-        if delta_t == 0:        # at the SN explosion
-            print('explosion')
-            N[0] = NE
-        else:
-            N = NE/((4*numpy.pi*D*(delta_t*yr2s))**(3/2.0))*numpy.exp(-(r*pc2cm)**2/(4*D*(delta_t*yr2s)))
-    return N
-
-def gauss(x, A, Dt):
+def gauss(r, A, Dt):
     """
     Fit a gaussian on the density profile as function of the radius.
     Input:
         r       :   vector radius (pc)
     Fit parameters:
-        A       :   normalization of the gaussian (pc)
-        Dt      :   factor related to the standard deviation (pc^2 s^-1 yr)
+        A       :   normalization of the gaussian
+        Dt      :   factor related to the standard deviation (pc^2)
+    Output:
+        y = A/(4 * pi * Dt)**(3/2) * exp(- x**2/(4 * Dt)
     """
-    return A/((4.*numpy.pi*Dt)**(3/2.0))*numpy.exp(-(x)**2/(4.*Dt))
+    return A/((4. * numpy.pi * Dt)**(3/2.0)) * numpy.exp(-(r)**2/(4. * Dt))

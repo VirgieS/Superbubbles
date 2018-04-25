@@ -83,8 +83,9 @@ pISM = n0*kb*TISM                   # pressure in dyne cm^-2
 ##===========##
 
     # Released energy by the acceleration of particles for one SN (erg)
-eta = 0.1           # efficiency of the cosmic rays acceleration
-Esn = 1e51          # total kinetic energy released from the SN explosion (erg)
+eta = 0.1               # efficiency of the cosmic rays acceleration
+Esn = 1e51              # total kinetic energy released from the SN explosion (erg)
+Esng = Esn * erg2GeV    # GeV
 
     # Energy (GeV)
 Emin_CR = 1            # minimum kinetic energy: Emin = 1GeV
