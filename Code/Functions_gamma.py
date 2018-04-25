@@ -41,24 +41,6 @@ def luminosity(lum_energy, energy):
 
     return lum
 
-def luminosity2(lum_energy, energy, R):
-
-    """
-    Return the luminosity in a range of energy
-
-    Inputs:
-        lum_energy  :       intrinsic luminosity array per energy (erg/s/eV)
-        energy      :       range of energy in which we will compute the luminosity (eV)
-
-    Output:
-        lum         :       luminosity (erg s^-1)
-    """
-    R = R*pc2cm
-    lum = 4*numpy.pi*R**2*integrate.trapz(lum_energy, energy)
-    lum = numpy.nan_to_num(lum)
-
-    return lum
-
 def spectral_index(Emin, Emax, lum_ph_min, lum_ph_max):
 
     """
@@ -125,15 +107,14 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
         ## ====================================================== ##
             # N(p) = N0 * (p/p0)^(-alpha)
             # N(E) = N0/c * ((E^2 + 2*mp*c^2*E)^(-(1+alpha)/2) * (E + mp*c^2)/((E0^2 + 2*mp*E0)^(-alpha/2)) d^3(r)
-    Esng = Esn * erg2GeV    # GeV
-    N_E = power_law_distribution(Emin_CR, Emax_CR, ECR, alpha, eta, Esng, p0)
+    N_E = power_law_distribution(ECR)
 
         ## =============================== ##
         # diffusion coefficient (cm^2 s^-1) #
         ## =============================== ##
             # D(p) = D0 * (p/p0)^(-delta)
             # D(E) = D0 * (E^2 + 2*mpg*E)^(delta/2) * 1/p0^delta
-    D = diffusion_coefficient(p0, D0, ECR, delta)
+    D = diffusion_coefficient(ECR)
 
         ##===========================##
         # Energy of the gamma photons #
