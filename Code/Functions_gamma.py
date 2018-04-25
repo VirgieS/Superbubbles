@@ -512,6 +512,8 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
     Emin = Esep[0] * GeV2eV     # eV
     Emax = Esep[1] * GeV2eV     # eV
     Gamma_sn = spectral_index(Emin, Emax, fluxmin_sn, fluxmax_sn)
-    print(lum_units)
+    indsn = numpy.where(fluxmin_sn != 0)[0]
+    print(fluxmin_sn[indsn])
+    print(fluxmax_sn[indsn])
 
     return Lumtot_sn_HESS, Lumtot_sn, Gamma_sn, fluxmin_sn, fluxmax_sn, lum_units, n_pwn_tot, nob, figure_number

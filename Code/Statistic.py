@@ -24,9 +24,9 @@ from Parameters_system import *
 ##====##
 
     # IRAP
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/5_SN/')
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Verif/5_SN/1000_iterations/'
-pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Verif/5_SN/1000_iterations/'
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/5_SN/Test/')
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Verif/5_SN/1_iteration/'
+pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Verif/5_SN/1_iteration/'
 #pathfigure_CR = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/CR/1/'
 
     # Home
@@ -39,7 +39,7 @@ pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor
 ## ======= ##
 
     # Number of iterations
-nit = 1000                                                                       #you need to change it for your simulations
+nit = 1                                                                       #you need to change it for your simulations
 
     # Correction factor
 t_end = 4.5e6               # time at which R = Robs                            #you need to change it for your simulations
@@ -125,10 +125,10 @@ with open('30_Dor_C', 'wb') as data_write:
     pickle.dump(Lum_it, data_write)
     pickle.dump(Gamma_it, data_write)
     pickle.dump(Fluxmin_it, data_write)
-    pcikle.dump(FLuxmax_it, data_write)
+    pickle.dump(Fluxmax_it, data_write)
     pickle.dump(n_pwn_it, data_write)
     pickle.dump(nob_it, data_write)
-
+"""
     ##-----------------------------------------------------##
     # Histogramme of the probability to have one luminosity #
     ##-----------------------------------------------------##
@@ -145,7 +145,7 @@ for j in (ind_hist):
     plt.legend(loc = 'best')
 plt.savefig(pathfigure_gamma+'Histogramme_L_gamma.pdf')
 figure_number += 1
-
+"""
     ##---------------------------##
     # Mean and standard deviation #
     ##---------------------------##
@@ -155,6 +155,8 @@ figure_number += 1
 Lum_HESS_mean = numpy.zeros(number_bin_t)   # from 1 TeV to 10 TeV
 Lum_mean = numpy.zeros(number_bin_t)        # from 100 MeV to 100 TeV
 Gamma_mean = numpy.zeros(number_bin_t)      # spectral index
+Fluxmin_mean = numpy.zeros(number_bin_t)    # photon flux at 1 TeV
+Fluxmax_mean = numpy.zeros(number_bin_t)    # photon flux at 10 TeV
 n_pwn_mean = numpy.zeros(number_bin_t)      # number of pulsar wind nebula
 nob_mean = numpy.zeros(number_bin_t)        # number of remained OB stars
 
@@ -162,6 +164,8 @@ nob_mean = numpy.zeros(number_bin_t)        # number of remained OB stars
 Lum_HESS_std = numpy.zeros(number_bin_t)    # from 1 TeV to 10 TeV
 Lum_std = numpy.zeros(number_bin_t)         # from 100 MeV to 100 TeV
 Gamma_std = numpy.zeros(number_bin_t)       # spectral index
+Fluxmin_std = numpy.zeros(number_bin_t)     # photon flux at 1 TeV
+Fluxmax_std = numpy.zeros(number_bin_t)     # photon flux at 10 TeV
 n_pwn_std = numpy.zeros(number_bin_t)       # number of pulsar wind nebula
 nob_std = numpy.zeros(number_bin_t)         # number of remained OB stars
 
@@ -170,12 +174,16 @@ for j in range (number_bin_t):
     Lum_HESS_mean[j] = numpy.mean(Lum_it_HESS[:,j])
     Lum_mean[j] = numpy.mean(Lum_it[:,j])
     Gamma_mean[j] = numpy.mean(Gamma_it[:,j])
+    Fluxmin_mean[j] = numpy.mean(Fluxmin_it[:,j])
+    Fluxmax_mean[j] = numpy.mean(Fluxmax_it[:,j])
     n_pwn_mean[j] = numpy.mean(n_pwn_it[:,j])
     nob_mean[j] = numpy.mean(nob_it[:, j])
 
     Lum_HESS_std[j] = numpy.std(Lum_it_HESS[:,j])
     Lum_std[j] = numpy.std(Lum_it[:,j])
     Gamma_std[j] = numpy.std(Gamma_it[:,j])
+    Fluxmin_std[j] = numpy.std(Fluxmin_it[:,j])
+    Fluxmax_std[j] = numpy.std(Fluxmax_it[:,j])
     n_pwn_std[j] = numpy.std(n_pwn_it[:,j])
     nob_std[j] = numpy.std(nob_it[:, j])
 
@@ -189,6 +197,12 @@ Lum_mst = Lum_mean - Lum_std
 Gamma_pst = Gamma_mean + Gamma_std
 Gamma_mst = Gamma_mean - Gamma_std
 
+Fluxmin_pst = Fluxmin_mean + Fluxmin_std
+Fluxmin_mst = Fluxmin_mean - Fluxmin_std
+
+Fluxmax_pst = Fluxmax_mean + Fluxmax_std
+Fluxmax_mst = Fluxmax_mean - Fluxmax_std
+
 n_pwn_pst = n_pwn_mean + n_pwn_std
 n_pwn_mst = n_pwn_mean - n_pwn_std
 
@@ -200,7 +214,7 @@ label = 'none'
 sym = ['', '', '']
 linestyle = ['-.', ':', ':']
 xlabel = 'Time [Myr]'
-text = r'$D_0$ = %.2e $cm^2 s^{-1}$, $\delta$ = %.2f'u'\n'r'$p_0$ =%.2e $GeV c^{-1}$, $\alpha$ = %.2f'u'\n'r' $n_0$ = %.2e $cm^{-3}$' u'\n' r'$n_{SN, mean}$ = %d, $n_{it}$ = %d'%(D0, delta, p0, alpha, n0, mean, nit)
+text = r'$D_0$ = %.2e $cm^2 s^{-1}$, $\delta$ = %.2f'u'\n'r'$p_0$ =%.2e $GeV c^{-1}$, $\alpha$ = %.2f'u'\n'r' $n_0$ = %.2e $cm^{-3}$' u'\n' r'$n_{SN}$ = %d, $n_{it}$ = %d'%(D0, delta, p0, alpha, n0, nsn, nit)
 
         # Gamma luminosity
 figure_HESS = figure_number
@@ -226,6 +240,18 @@ ylabel = '$\Gamma_{ph}$'
 plot(figure_Gamma, 3, t6, [Gamma_mean, Gamma_pst, Gamma_mst], label, Title_Gamma, xlabel, ylabel, sym, linestyle, text)
 plt.savefig(pathfigure_gamma+'Photon_index.pdf')
 figure_number = figure_Gamma + 1
+
+        # Flux at 1 TeV and 10 TeV
+figure_flux = figure_number
+Title_flux = 'Photon flux at 1 TeV and 10 TeV'
+ylabel = '$\Phi_{ph}$ [ph s$^{-1}$ eV$^{-1}$]'
+label_fluxmin = ['mean: 1 TeV','+std: 1 TeV','-std: 1 TeV']
+label_fluxmax = ['mean: 10 TeV','+std: 10 TeV','-std: 10 TeV']
+
+plot(figure_flux, 3, t6, [Fluxmin_mean, Fluxmin_pst, Fluxmin_mst], label_fluxmin, Title_flux, xlabel, ylabel, sym, linestyle, text)
+plot(figure_flux, 3, t6, [Fluxmax_mean, Fluxmax_pst, Fluxmax_mst], label_fluxmax, Title_flux, xlabel, ylabel, sym, linestyle, text)
+plt.savefig(pathfigure_gamma+'Photon_flux.pdf')
+figure_number = figure_flux + 1
 
         # Number of pulsar wind nebula
 figure_pwn = figure_number
