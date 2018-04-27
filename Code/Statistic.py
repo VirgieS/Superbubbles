@@ -24,9 +24,9 @@ from Parameters_system import *
 ##====##
 
     # IRAP
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/5_SN/Test/')
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Verif/5_SN/1_iteration/'
-pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Verif/5_SN/1_iteration/'
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/1_SN/')
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Verif/1_SN/10_iterations/Gamma_emission/'
+pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Verif/1_SN/10_iterations/Remain/'
 #pathfigure_CR = '/Users/stage/Documents/Virginie/Superbubbles/figures/stat_SN/CR/1/'
 
     # Home
@@ -39,7 +39,7 @@ pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor
 ## ======= ##
 
     # Number of iterations
-nit = 1                                                                       #you need to change it for your simulations
+nit = 10                                                                       #you need to change it for your simulations
 
     # Correction factor
 t_end = 4.5e6               # time at which R = Robs                            #you need to change it for your simulations
@@ -64,9 +64,7 @@ t6 = t_fix * yr26yr                                 # Myr
 figure_number = 1
 Lum_it_HESS = []    # total gamma luminosity from 1 TeV to 10 TeV
 Lum_it = []         # total gamma luminosity from 100 MeV to 100 TeV
-Gamma_it = []       # spectral index from 1 TeV to 10 TeV
-Fluxmin_it = []     # photon flux at 1 TeV
-Fluxmax_it = []     # photon flux at 10 TeV
+Flux_it = []        # photon flux from 1 to 10 TeV
 n_pwn_it = []       # total number of pulsar wind nebula
 nob_it = []         # total of remained OB stars
 t0_it = []          # SN explosion times (yr)
@@ -74,13 +72,12 @@ t0_it = []          # SN explosion times (yr)
     ##----------##
     # Iterations #
     ##----------##
-
 with open('SN', 'wb') as SN_write:
 
     for i in range (nit):
 
             # SN explosion time
-        nsn = 5             # number of massive stars in the OB association     #you need to change it for your simulations
+        nsn = 1             # number of massive stars in the OB association     #you need to change it for your simulations
         #mean = 5            # mean value of SN explosions in the superbubble    #you need to change it for your simulations
         #nsn = numpy.random.poisson(lam = mean) # random number of SN which mean value equals to mean
         t0 = random_SN(t0min, t0max, nsn)/yr26yr
@@ -95,6 +92,7 @@ with open('SN', 'wb') as SN_write:
 with open('SN', 'rb') as SN_load:
 
     t0_it = pickle.load(SN_load)
+    nsn = len(t0_it[0])
 
 with open('30_Dor_C', 'wb') as data_write:
 
@@ -102,12 +100,10 @@ with open('30_Dor_C', 'wb') as data_write:
 
         t0 = t0_it[i]
 
-        Lum_HESS, Lum, Gamma, fluxmin, fluxmax, Lum_units, n_pwn, nob, figure_number = data(correction_factor, t0, t_fix, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, p0, alpha, D0, delta, zones, pathfigure_gamma, i, figure_number)
+        Lum_HESS, Lum, Flux, n_pwn, nob, figure_number, number_bin_E, spectrum_HESS = data(correction_factor, t0, t_fix, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, zones, pathfigure_gamma, i, figure_number)
         Lum_it_HESS.append(Lum_HESS)
         Lum_it.append(Lum)
-        Gamma_it.append(Gamma)
-        Fluxmin_it.append(fluxmin)
-        Fluxmax_it.append(fluxmax)
+        Flux_it.append(Flux)
         n_pwn_it.append(n_pwn)
         nob_it.append(nob)
 
@@ -115,93 +111,80 @@ with open('30_Dor_C', 'wb') as data_write:
 
     Lum_it_HESS = numpy.asarray(Lum_it_HESS)
     Lum_it = numpy.asarray(Lum_it)
-    Gamma_it = numpy.asarray(Gamma_it)
-    Fluxmin_it = numpy.asarray(Fluxmin_it)
-    Fluxmax_it = numpy.asarray(Fluxmax_it)
+    Flux_it = numpy.asarray(Flux_it)
     n_pwn_it = numpy.asarray(n_pwn_it)
     nob_it = numpy.asarray(nob_it)
 
     pickle.dump(Lum_it_HESS, data_write)
     pickle.dump(Lum_it, data_write)
-    pickle.dump(Gamma_it, data_write)
-    pickle.dump(Fluxmin_it, data_write)
-    pickle.dump(Fluxmax_it, data_write)
+    pickle.dump(Flux_it, data_write)
     pickle.dump(n_pwn_it, data_write)
     pickle.dump(nob_it, data_write)
-"""
+
     ##-----------------------------------------------------##
     # Histogramme of the probability to have one luminosity #
     ##-----------------------------------------------------##
-        # choosen time
-ind_hist = [0, 299, 599, 899, 1199, 1499, 1799, 2099, 2399, 2699]
-        # Computation of the probability to get a luminosity L
-title = 'Probability of the luminosity in the range of energy [1 TeV, 10 TeV]'
-xlabel = '$L_\gamma$'
-ylabel = 'counts'
-for j in (ind_hist):
-    L_hist = Lum_it_HESS[:,j]
-    label = 't = %.2e yr'%t_fix[j]
-    histogramme(figure_number, L_hist, label, title, xlabel, ylabel)
-    plt.legend(loc = 'best')
-plt.savefig(pathfigure_gamma+'Histogramme_L_gamma.pdf')
-figure_number += 1
-"""
+
+if nit > 1:
+            # choosen time
+    ind_hist = [0, 299, 599, 899, 1199, 1499, 1799, 2099, 2399, 2699]
+            # Computation of the probability to get a luminosity L
+    title = 'Probability of the luminosity in the range of energy [1 TeV, 10 TeV]'
+    xlabel = '$L_\gamma$'
+    ylabel = 'counts'
+    for j in (ind_hist):
+        L_hist = Lum_it_HESS[:,j]
+        label = 't = %.2e yr'%t_fix[j]
+        histogramme(figure_number, L_hist, label, title, xlabel, ylabel)
+        plt.legend(loc = 'best')
+    plt.savefig(pathfigure_gamma+'Histogramme_L_gamma.pdf')
+    figure_number += 1
+
     ##---------------------------##
     # Mean and standard deviation #
     ##---------------------------##
 
         # Initialization
             # Mean
-Lum_HESS_mean = numpy.zeros(number_bin_t)   # from 1 TeV to 10 TeV
-Lum_mean = numpy.zeros(number_bin_t)        # from 100 MeV to 100 TeV
-Gamma_mean = numpy.zeros(number_bin_t)      # spectral index
-Fluxmin_mean = numpy.zeros(number_bin_t)    # photon flux at 1 TeV
-Fluxmax_mean = numpy.zeros(number_bin_t)    # photon flux at 10 TeV
-n_pwn_mean = numpy.zeros(number_bin_t)      # number of pulsar wind nebula
-nob_mean = numpy.zeros(number_bin_t)        # number of remained OB stars
+Lum_HESS_mean = numpy.zeros(number_bin_t)               # from 1 TeV to 10 TeV
+Lum_mean = numpy.zeros(number_bin_t)                    # from 100 MeV to 100 TeV
+Flux_mean = numpy.zeros((number_bin_t, number_bin_E))   # photon flux from 1 TeV to 10 TeV
+n_pwn_mean = numpy.zeros(number_bin_t)                  # number of pulsar wind nebula
+nob_mean = numpy.zeros(number_bin_t)                    # number of remained OB stars
 
             # Standard deviation
-Lum_HESS_std = numpy.zeros(number_bin_t)    # from 1 TeV to 10 TeV
-Lum_std = numpy.zeros(number_bin_t)         # from 100 MeV to 100 TeV
-Gamma_std = numpy.zeros(number_bin_t)       # spectral index
-Fluxmin_std = numpy.zeros(number_bin_t)     # photon flux at 1 TeV
-Fluxmax_std = numpy.zeros(number_bin_t)     # photon flux at 10 TeV
-n_pwn_std = numpy.zeros(number_bin_t)       # number of pulsar wind nebula
-nob_std = numpy.zeros(number_bin_t)         # number of remained OB stars
+Lum_HESS_std = numpy.zeros(number_bin_t)                # from 1 TeV to 10 TeV
+Lum_std = numpy.zeros(number_bin_t)                     # from 100 MeV to 100 TeV
+Flux_std = numpy.zeros((number_bin_t, number_bin_E))    # photon flux from 1 TeV to 10 TeV
+n_pwn_std = numpy.zeros(number_bin_t)                   # number of pulsar wind nebula
+nob_std = numpy.zeros(number_bin_t)                     # number of remained OB stars
 
 for j in range (number_bin_t):
 
-    Lum_HESS_mean[j] = numpy.mean(Lum_it_HESS[:,j])
-    Lum_mean[j] = numpy.mean(Lum_it[:,j])
-    Gamma_mean[j] = numpy.mean(Gamma_it[:,j])
-    Fluxmin_mean[j] = numpy.mean(Fluxmin_it[:,j])
-    Fluxmax_mean[j] = numpy.mean(Fluxmax_it[:,j])
-    n_pwn_mean[j] = numpy.mean(n_pwn_it[:,j])
+    Lum_HESS_mean[j] = numpy.mean(Lum_it_HESS[:, j])
+    Lum_mean[j] = numpy.mean(Lum_it[:, j])
+    n_pwn_mean[j] = numpy.mean(n_pwn_it[:, j])
     nob_mean[j] = numpy.mean(nob_it[:, j])
 
-    Lum_HESS_std[j] = numpy.std(Lum_it_HESS[:,j])
-    Lum_std[j] = numpy.std(Lum_it[:,j])
-    Gamma_std[j] = numpy.std(Gamma_it[:,j])
-    Fluxmin_std[j] = numpy.std(Fluxmin_it[:,j])
-    Fluxmax_std[j] = numpy.std(Fluxmax_it[:,j])
-    n_pwn_std[j] = numpy.std(n_pwn_it[:,j])
+    Lum_HESS_std[j] = numpy.std(Lum_it_HESS[:, j])
+    Lum_std[j] = numpy.std(Lum_it[:, j])
+    n_pwn_std[j] = numpy.std(n_pwn_it[:, j])
     nob_std[j] = numpy.std(nob_it[:, j])
+
+    for k in range (number_bin_E):
+
+        Flux_mean[j, k] = numpy.mean(Flux_it[:, j, k])
+        Flux_std[j, k] = numpy.std(Flux_it[:, j, k])
 
 Lum_HESS_pst = Lum_HESS_mean + Lum_HESS_std
 Lum_HESS_mst = Lum_HESS_mean - Lum_HESS_std
-#ind = numpy.where(Lum_HESS_mean > 0)[0]
 
 Lum_pst = Lum_mean + Lum_std
 Lum_mst = Lum_mean - Lum_std
 
-Gamma_pst = Gamma_mean + Gamma_std
-Gamma_mst = Gamma_mean - Gamma_std
-
-Fluxmin_pst = Fluxmin_mean + Fluxmin_std
-Fluxmin_mst = Fluxmin_mean - Fluxmin_std
-
-Fluxmax_pst = Fluxmax_mean + Fluxmax_std
-Fluxmax_mst = Fluxmax_mean - Fluxmax_std
+Flux_pst = Flux_mean + Flux_std
+Flux_mst = Flux_mean - Flux_std
+ind = numpy.where(Flux_mean != 0)[0]
 
 n_pwn_pst = n_pwn_mean + n_pwn_std
 n_pwn_mst = n_pwn_mean - n_pwn_std
@@ -215,6 +198,7 @@ sym = ['', '', '']
 linestyle = ['-.', ':', ':']
 xlabel = 'Time [Myr]'
 text = r'$D_0$ = %.2e $cm^2 s^{-1}$, $\delta$ = %.2f'u'\n'r'$p_0$ =%.2e $GeV c^{-1}$, $\alpha$ = %.2f'u'\n'r' $n_0$ = %.2e $cm^{-3}$' u'\n' r'$n_{SN}$ = %d, $n_{it}$ = %d'%(D0, delta, p0, alpha, n0, nsn, nit)
+color = ['cornflowerblue', 'green', 'green']
 
         # Gamma luminosity
 figure_HESS = figure_number
@@ -224,34 +208,41 @@ Title_HESS = 'Mean gamma emission in the energy range [1 TeV, 10 TeV]'
 Title = 'Mean gamma emission in the energy range [100 MeV, 100 TeV]'
 ylabel = '$L_\gamma$ [erg s$^{-1}$]'
 
-plot(figure_HESS, 3, t6, [Lum_HESS_mean, Lum_HESS_pst, Lum_HESS_mst], label, Title_HESS, xlabel, ylabel, sym, linestyle, text)
+plot(figure_HESS, 3, t6, [Lum_HESS_mean, Lum_HESS_pst, Lum_HESS_mst], label, Title_HESS, xlabel, ylabel, sym, linestyle, color, text)
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_range1.pdf')
 
-plot(figure, 3, t6, [Lum_mean, Lum_pst, Lum_mst], label, Title, xlabel, ylabel, sym, linestyle, text)
+plot(figure, 3, t6, [Lum_mean, Lum_pst, Lum_mst], label, Title, xlabel, ylabel, sym, linestyle, color, text)
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_all.pdf')
 
 figure_number = figure + 1
 
         # spectral index
+Emin = Esep[0]
+Emax = Esep[1]
+
+            # Mean
+Fluxmin = Flux_mean[:, 0]
+print(Fluxmin)
+Fluxmax = Flux_mean[:, -1]
+print(Fluxmax)
+Gamma_mean = spectral_index(Emin, Emax, Fluxmin, Fluxmax)
+
+            # std
+Fluxmin = Flux_pst[:, 0]
+Fluxmax = Flux_pst[:, -1]
+Gamma_pst = spectral_index(Emin, Emax, Fluxmin, Fluxmax)
+Fluxmin = Flux_mst[:, 0]
+Fluxmax = Flux_mst[:, -1]
+Gamma_mst = spectral_index(Emin, Emax, Fluxmin, Fluxmax)
+
 figure_Gamma = figure_number
 Title_Gamma = 'Photon index in the energy range [1 TeV, 10 TeV]'
 ylabel = '$\Gamma_{ph}$'
+print(Gamma_mean.shape)
 
-plot(figure_Gamma, 3, t6, [Gamma_mean, Gamma_pst, Gamma_mst], label, Title_Gamma, xlabel, ylabel, sym, linestyle, text)
+plot(figure_Gamma, 3, t6, [Gamma_mean, Gamma_pst, Gamma_mst], label, Title_Gamma, xlabel, ylabel, sym, linestyle, color, text)
 plt.savefig(pathfigure_gamma+'Photon_index.pdf')
 figure_number = figure_Gamma + 1
-
-        # Flux at 1 TeV and 10 TeV
-figure_flux = figure_number
-Title_flux = 'Photon flux at 1 TeV and 10 TeV'
-ylabel = '$\Phi_{ph}$ [ph s$^{-1}$ eV$^{-1}$]'
-label_fluxmin = ['mean: 1 TeV','+std: 1 TeV','-std: 1 TeV']
-label_fluxmax = ['mean: 10 TeV','+std: 10 TeV','-std: 10 TeV']
-
-plot(figure_flux, 3, t6, [Fluxmin_mean, Fluxmin_pst, Fluxmin_mst], label_fluxmin, Title_flux, xlabel, ylabel, sym, linestyle, text)
-plot(figure_flux, 3, t6, [Fluxmax_mean, Fluxmax_pst, Fluxmax_mst], label_fluxmax, Title_flux, xlabel, ylabel, sym, linestyle, text)
-plt.savefig(pathfigure_gamma+'Photon_flux.pdf')
-figure_number = figure_flux + 1
 
         # Number of pulsar wind nebula
 figure_pwn = figure_number
@@ -259,7 +250,7 @@ label = 'none'
 Title_pwn = 'Number of pulsar wind nebula in the superbubble'
 ylabel = '$n_{pwn}$'
 
-plot(figure_pwn, 3, t6, [n_pwn_mean, n_pwn_pst, n_pwn_mst], label, Title_pwn, xlabel, ylabel, sym, linestyle, text)
+plot(figure_pwn, 3, t6, [n_pwn_mean, n_pwn_pst, n_pwn_mst], label, Title_pwn, xlabel, ylabel, sym, linestyle, color, text)
 plt.savefig(pathfigure_remain+'Mean_pwn.pdf')
 
 figure_number = figure_pwn + 1
@@ -269,9 +260,87 @@ figure_ob = figure_number
 label = 'none'
 Title_pwn = 'Number of remained Ob stars'
 ylabel = '$n_{ob}$'
-plot(figure_ob, 3, t6, [nob_mean, nob_pst, nob_mst], label, Title_pwn, xlabel, ylabel, sym, linestyle, text)
+plot(figure_ob, 3, t6, [nob_mean, nob_pst, nob_mst], label, Title_pwn, xlabel, ylabel, sym, linestyle, color, text)
 plt.savefig(pathfigure_remain+'Mean_ob.pdf')
 
 figure_number = figure_ob + 1
+"""
+with open('30_Dor_C', 'rb') as data_load:
+
+    Lum_it_HESS = pickle.load(data_load)
+    Lum_it = pickle.load(data_load)
+    Gamma_it = pickle.load(data_load)
+    Fluxmin_it = pickle.load(data_load)
+    Fluxmax_it = pickle.load(data_load)
+    Flux_it = pickle.load(data_load)
+    n_pwn_it = pickle.load(data_load)
+    nob_it = pickle.load(data_load)
+
+    number_bin_E = 20
+    spectrum_HESS = numpy.logspace(numpy.log10(1), numpy.log10(10), number_bin_E)   # TeV
+    spectrum_HESS_ev = spectrum_HESS * TeV2eV
+    #figure_number = 1
+
+    label_name = ['simulations', 'fit']
+    xlabel_flux = 'E [TeV]'
+    ylabel_flux = 'dN/dE [eV^-1 s^-1]'
+    symbol = ['+', '']
+    linestyle = ['','-']
+    text = ''
+
+    for i in range (nsn):
+
+        indt = numpy.where(t_fix>= t0_it[0,i])[0]
+        title = 'Intrinsic differential luminosity at the Sn explosion at %.2f yr' %t0_it[0,i]
+
+        b = Flux_it[0, indt[0], 0] * (spectrum_HESS_ev[0])**(Gamma_it[0, indt[0]])
+        fit = b * spectrum_HESS_ev**(-Gamma_it[0, indt[0]])
+        y = [Flux_it[0, indt[0]], fit]
+
+        log_plot(figure_number, 2, spectrum_HESS, y, label_name, title, xlabel_flux, ylabel_flux, symbol, linestyle, text)
+        figure_number += 1
+
+        print(Gamma_it[0, indt[0]])
+
+number_bin_E = 20
+Flux_mean = numpy.zeros((number_bin_t, number_bin_E)) # photon flux from 1 TeV to 10 TeV
+Gamma_mean = numpy.zeros(number_bin_t)
+for j in range (number_bin_t):
+
+    Gamma_mean[j] = numpy.mean(Gamma_it[:,j])
+
+    for k in range (number_bin_E):
+
+        Flux_mean[j, k] = numpy.mean(Flux_it[:, j, k])
+
+        # Intrinsic luminosity for all sn explosions (eV^-1 s^-1)
+
+spectrum_HESS = numpy.logspace(numpy.log10(1), numpy.log10(10), number_bin_E)   # TeV
+spectrum_HESS_ev = spectrum_HESS * TeV2eV
+"""
+figure_flux = figure_number
+Title_flux = 'Intrinsic luminosity for all the energy range of HESS'
+xlabel = 'E [TeV]'
+ylabel = '$\Phi_{ph}$ [ph s$^{-1}$ eV$^{-1}$]'
+label = ['simulations', 'fit']
+sym = ['+', '']
+linestyle = ['', '-.']
+color = ['cornflowerblue', 'orange']
+text = ''
+
+indt = numpy.where(Flux_mean != 0)[0]
+
+spectrum_HESS_ev = spectrum_HESS * GeV2eV   # in eV
+spectrum_HESS_TeV = spectrum_HESS_ev/TeV2eV # in TeV
+
+b_mean = Flux_mean[indt[0], 0] * (spectrum_HESS_ev[0])**(Gamma_mean[indt[0]])
+fit_mean = b_mean * spectrum_HESS_ev**(-Gamma_mean[indt[0]])
+
+y = [Flux_mean[indt[0]], fit_mean]
+
+log_plot(figure_flux, 2, spectrum_HESS, y, label, Title_flux, xlabel, ylabel, sym, linestyle, color, text)
+
+plt.savefig(pathfigure_gamma+'Photon_flux_all.pdf')
+figure_number = figure_flux + 1
 
 plt.show()

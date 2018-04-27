@@ -10,7 +10,7 @@ from matplotlib import rcParams
 from mpl_toolkits.axes_grid1 import host_subplot
 import mpl_toolkits.axisartist as AA
 import numpy
-from scipy.interpolate import interp1d
+from scipy.interpolate import interp1d,interp2d
 
 ##---------##
 # Functions #
@@ -25,7 +25,7 @@ rcParams['ytick.left'] = True
 rcParams['ytick.right'] = True
 rcParams['ytick.minor.visible'] = True
 
-def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle, text):
+def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle, color, text):
     """
     Plot a log-log graphic
     Inputs:
@@ -54,30 +54,34 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
             if len(symbol) > 1:
                 rcParams['lines.marker'] = symbol[i]
                 rcParams['lines.linestyle'] = linestyle[i]
+                col = color[i]
 
             else:
                 rcParams['lines.marker'] = symbol
                 rcParams['lines.linestyle'] = linestyle
+                col = color
 
             if label_name == 'none':
-                plt.loglog(x, y_plot)
+                plt.loglog(x, y_plot, color = col)
 
             else:
-                plt.loglog(x, y_plot, label = label_name[i])
+                plt.loglog(x, y_plot, label = label_name[i], color = col)
                 plt.legend(loc = 'best')
 
     elif label_name == 'none':
 
         rcParams['lines.marker'] = symbol
         rcParams['lines.linestyle'] = linestyle
+        col = color
 
-        plt.loglog(x, y)
+        plt.loglog(x, y, color = col)
 
     else:
         rcParams['lines.marker'] = symbol
         rcParams['lines.linestyle'] = linestyle
+        col = color
 
-        plt.loglog(x, y, label = label_name)
+        plt.loglog(x, y, label = label_name, col = color)
         plt.legend(loc = 'best')
 
     plt.title(title)
@@ -92,7 +96,7 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
 
     return
 
-def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle, text):
+def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle, color, text):
     """
     Function to plot a linear graphic
     Inputs:
@@ -121,29 +125,33 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
             if len(symbol) > 1:
                 rcParams['lines.marker'] = symbol[i]
                 rcParams['lines.linestyle'] = linestyle[i]
+                col = color[i]
 
             else:
                 rcParams['lines.marker'] = symbol
                 rcParams['lines.linestyle'] = linestyle
+                col = color
 
             if label_name == 'none':
-                plt.plot(x, y_plot)
+                plt.plot(x, y_plot, color = col)
 
             else:
-                plt.plot(x, y_plot, label = label_name[i])
+                plt.plot(x, y_plot, label = label_name[i], color = col)
                 plt.legend(loc = 'best')
 
     elif label_name == 'none':
         rcParams['lines.marker'] = symbol
         rcParams['lines.linestyle'] = linestyle
+        col = color[i]
 
-        plt.plot(x, y)
+        plt.plot(x, y, color = col)
 
     else:
         rcParams['lines.marker'] = symbol
         rcParams['lines.linestyle'] = linestyle
+        col = color[i]
 
-        plt.plot(x, y, label = label_name)
+        plt.plot(x, y, label = label_name, color = col)
         plt.legend(loc = 'best')
 
     plt.title(title)
@@ -271,12 +279,23 @@ def random_SN(xmin, xmax, size = 1):
 
     return (xmax-xmin) * y + xmin
 
-def interpolation(x, y):
+def interpolation1d(x, y):
+    """
+    Return the interpolation of a function
+    Inputs:
+        x       :       x-axis of the function
+        y       :       y-axis of the function: y = f(x)
+    """
+
+    return interp1d(x, y, kind='linear', bounds_error = False, fill_value = 0.0)
+
+def interpolation2d(x, y, z):
     """
     Return the interpolation of a function
     Inputs:
         x       :       x-axis of the function
         y       :       y-axis of the function
+        z       :       z-axis of the function: z = f(x, y)
     """
 
-    return interp1d(x, y, kind='linear', bounds_error = False, fill_value = 0.0)
+    return interp2d(x, y, z, kind='linear', bounds_error = False, fill_value = 0.0)
