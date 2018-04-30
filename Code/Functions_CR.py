@@ -50,6 +50,20 @@ def diffusion_coefficient(E):
     mpgev = mp * MeV2GeV  # mass of the proton in GeV
     return D0 * (numpy.sqrt(E**2 + 2 * mpgev * E)/p0)**delta
 
+def diffusion_time(L, D):
+    """
+    Return the diffusion time for the CR (yr)
+    Inputs:
+        L       :       size of the system (pc)
+        D       :       diffusion coefficient of the CR
+    Output:
+        t_diff  :       diffusion time (yr)
+    """
+
+    L = L * pc2cm
+
+    return L**2/(6 * D) * 1.0/yr2s
+
 def shell_particles(r_in, r_out, NE, D, deltat):
     """
     Return the number of particles in a shell of inner radius r_in and outer radius r_out

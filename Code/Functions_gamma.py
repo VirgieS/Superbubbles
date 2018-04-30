@@ -49,12 +49,15 @@ def spectral_index(Emin, Emax, lum_ph_min, lum_ph_max):
     Inputs:
         Emin        :       minimum energy of the range (GeV)
         Emax        :       maximum energy of the range (GeV)
-        lum_ph_min  :       intrinsic differential luminosity in photons at Emin (ph/s)
-        lum_ph_max  :       intrinsic differential luminosity in photons at Emax (ph/s)
+        lum_ph_min  :       intrinsic differential luminosity in photons at Emin (ph/eV/s)
+        lum_ph_max  :       intrinsic differential luminosity in photons at Emax (ph/eV/s)
 
     Output:
         Gamma       :       photon spectral index
     """
+
+    Emin = Emin * GeV2eV
+    Emax = Emax * GeV2eV
 
     return -(numpy.log(lum_ph_max) - numpy.log(lum_ph_min))/(numpy.log(Emax) - numpy.log(Emin))
 
@@ -173,7 +176,11 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
 
             # Time array (yr)
         tmin = t0[i]        # only when the SN occurs (yr)
-        tmax = tmin + 1e6
+        t6 = tmin * yr26yr  # in Myr
+        Rsb = radius_velocity_SB(t6)[0]
+        tdiff = diffusion_time(Rsb, D[0])
+        print(tdiff)
+        tmax = tmin + 5*tdiff
         number_bin_t = 200
         time = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)
         time6 = time * yr26yr   # in Myr

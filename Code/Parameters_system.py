@@ -13,7 +13,7 @@ from Conversion_factors import *
 ##=============================##
 
     # OB asociation
-Nob = 88            # number of OB-stars in the association
+Nob = 88           # number of OB-stars in the association
 Lob = 1e36          # mean luminosity of an OB-star (erg/s)
 Pob = Nob * Lob     # mean power of the association (erg/s)
 L36 = Pob * erg236erg     # mechanical energy expressed in 10^36 erg/s
@@ -21,7 +21,7 @@ L38 = L36 * t36erg238erg  # mechanical energy expressed in 10^38 erg/s
 lifetime = 4e6 #30e6     # average lifetime of the lowest B star (yr)
 
     # Fit parameters of the model
-n0 = 30             # ambient density (cm^-3)
+n0 = 10             # ambient density (cm^-3)
 xH = 0.9            # mass fraction of hydrogen
 xHe = 0.1           # mass fraction of helium
 mu = xH + xHe * 4   # average molecular weight
