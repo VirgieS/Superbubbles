@@ -327,7 +327,7 @@ def random_PL(xmin, xmax, alpha, size = 1):
 
     return (xmin_alpha + (xmax_alpha - xmin_alpha)*y)**(1./(alpha + 1))
 
-def random_SN(xmin, xmax, size = 1):
+def random_uniform(xmin, xmax, size = 1):
 
     """
     Generate random number with a specific size from a uniform distribution on [xmin, xmax]

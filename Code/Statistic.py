@@ -23,111 +23,111 @@ from Parameters_system import *
 # Path #
 ##====##
 
+## NEED TO WRITE CLEARLY WHAT I DO
+
     # IRAP
-os.chdir('/Users/stage/Dropbox/Superbubbles/Files/30_Dor_C/1000_iterations/Poisson/')#10_SN/')#
-pathfigure_gamma = '/Users/stage/Dropbox/Superbubbles/figures/30_Dor_C/Bons/1000_iterations/Poisson/Gamma_emission/'#10_SN/Gamma_emission/'#
-pathfigure_remain = '/Users/stage/Dropbox/Superbubbles/figures//30_Dor_C/Bons/1000_iterations/Poisson/Remain/'#10_SN/Remain/'#
+#os.chdir('/Users/stage/Dropbox/Superbubbles/Files/30_Dor_C/1000_iterations/Poisson/')#10_SN/')#
+#pathfigure_gamma = '/Users/stage/Dropbox/Superbubbles/figures/30_Dor_C/Bons/1000_iterations/Poisson/Gamma_emission/'#10_SN/Gamma_emission/'#
+#pathfigure_remain = '/Users/stage/Dropbox/Superbubbles/figures//30_Dor_C/Bons/1000_iterations/Poisson/Remain/'#10_SN/Remain/'#
 
     # Home
-#os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/30_Dor_C/Test/')
-#pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/30_Dor_C/Verif/Gamma_emission/'
-#pathfigure_remain = '/home/vivi/Documents/Master_2/Superbubbles/figures/30_Dor_C/Verif/Remain/'
+os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/Test/')
+pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/Test/Gamma_emission'
+pathfigure_remain = '/home/vivi/Documents/Master_2/Superbubbles/figures/Test/Remain/'
 
 ## ======= ##
 # Statistic #
 ## ======= ##
 
     # Number of iterations
-nit = 1000                                                                       #you need to change it for your simulations
-
-    # Correction factor
-t_end = 4.5e6               # time at which R = Robs                            #you need to change it for your simulations
-t_end_6 = t_end * yr26yr    # in Myr
-Robs = 47.0                 # observed radius (pc)                              #you need to change it for your simulations
-Rsb = radius_velocity_SB(t_end_6)[0] # from Weaver's model (pc and km/s)
-correction_factor = Robs/Rsb
+nit = 10                                                                       #you need to change it for your simulations
 
     # Which zone for the Computation
 zones = [2]                                                                     #you need to change it for your simulations
 
-    # Fix time array (yr)
-t0min = 3              # Myr                                                    #you need to change it for your simulations
-t_end_6 = 37
-t0max = t_end_6        # Myr
-tmin = t0min/yr26yr         # yr
-tmax = (t0max + 1)/yr26yr   # yr
-number_bin_t = 3000
-t_fix = numpy.linspace(tmin, tmax, number_bin_t)    # yr
-t6 = t_fix * yr26yr                                 # Myr
-
     # Initialization
 figure_number = 1
-mean = 5            # mean value of SN explosions in the superbubble during the 4.5 first Myrs    #you need to change it for your simulations
+mean_sn = 5                 # mean value of SN explosions already happen        #you need to change it for your simulations
+mean_age = 4.5              # mean age of the superbubble (Myr)                 #you need to change it for your simulatios
 
-Lum_it_HESS = []    # total gamma luminosity from 1 TeV to 10 TeV
-Lum_it = []         # total gamma luminosity from 100 MeV to 100 TeV
-Flux_it = []        # photon flux from 1 to 10 TeV
-n_pwn_it = []       # total number of pulsar wind nebula
-nob_it = []         # total of remained OB stars
-t0_it = []          # SN explosion times (yr)
-n_sn = []           # number of sn occur during the 4.5 first Myr
+Lum_it_HESS = []            # total gamma luminosity from 1 TeV to 10 TeV
+Lum_it = []                 # total gamma luminosity from 100 MeV to 100 TeV
+Flux_it = []                # photon flux from 1 to 10 TeV
+n_pwn_it = []               # total number of pulsar wind nebula
+nob_it = []                 # total of remained OB stars
+t0_it = []                  # SN explosion times (yr)
+age_it = []                 # age of the SB (yr)
+correction_factor_it = []   # correction factor from the Weaver model
+n_sn = []                   # number of sn occur during the 4.5 first Myr
 
     ##----------##
     # Iterations #
     ##----------##
-print('For %d SN'%Nob)
-print('For %d iterations' %nit)
+#print('For %d SN'%Nob)
+#print('For %d iterations' %nit)
 
-with open('SN', 'wb') as SN_write:
+with open('SB', 'wb') as SB_write:
 
     for i in range (nit):
 
-        t0 = []     # Initialization
+            # Initialization
+        t0 = []     # Sn explosion times (yr)
+        age = []    # age of the SB (Myr)
 
-            # SN explosion time
-        #nsn = Nob             # number of massive stars in the OB association     #you need to change it for your simulations
+            # age of the superbubble (Myr) + correction factor
+        t_end_6_min = mean_age - 1      # Myr
+        t_end_6_max = mean_age + 1      # Myr
+        t_end_6 = random_uniform(t_end_6_min, t_end_6_max)  # Myr
+        t_end = t_end_6/yr26yr                       # yr
+        Rsb = 47.0                          # observed radius (pc)              #you need to change it for your simulations
+        Rw = radius_velocity_SB(t_end_6)[0] # from Weaver's model (pc and km/s)
+        correction_factor = Rsb/Rw
 
-                # for the first 4.5 Myr
-        mean = 5            # mean value of SN explosions in the superbubble    #you need to change it for your simulations
-        nsn = numpy.random.poisson(lam = mean) # random number of SN which mean value equals to mean
+        age_it.append(t_end)
+        correction_factor_it.append(correction_factor)
+
+                # Sn explosion times (yr)
+        nsn = numpy.random.poisson(lam = mean_sn) # random number of SN which mean value equals to mean_sn
+        print(nsn)
 
         t0min = 3       # Myr
-        t0max = 4.5 # Myr
+        t0max = t_end_6 # Myr
 
-        t01 = random_SN(t0min, t0max, nsn)/yr26yr
-        t01 = sorted(t01)
-
-        for j in range (nsn):
-            t0.append(t01[j])
-
-                # after this period
-        nsn = Nob - nsn
-
-        t0min = t0max   # Myr
-        t0max = 37      # Myr
-
-        t02 = random_SN(t0min, t0max, nsn)/yr26yr
-        t02 = sorted(t02)
-
-        for j in range (nsn):
-            t0.append(t02[j])
-
-        t0 = numpy.asarray(t0)
+        t0 = random_uniform(t0min, t0max, nsn)/yr26yr
+        t0 = sorted(t0)
 
         t0_it.append(t0)
 
+    age_it = numpy.asarray(age_it)
+    correction_factor_it = numpy.asarray(correction_factor_it)
     t0_it = numpy.asarray(t0_it)
 
-    pickle.dump(t0_it, SN_write)
+    pickle.dump(age_it, SB_write)
+    pickle.dump(correction_factor_it, SB_write)
+    pickle.dump(t0_it, SB_write)
 """
-with open('SN', 'rb') as SN_load:
+with open('SB', 'rb') as SB_load:
 
-    t0_it = pickle.load(SN_load)
+    age_it = pickle.load(SB_load)
+    correction_factor_it = pickle.load(SB_load)
+    t0_it = pickle.load(SB_load)
 """
 with open('General', 'wb') as data_write:
 
+        # Fix time array (yr)
+    t_end_6 = max(age_it) * yr26yr    # Myr
+    t0min = 3              # Myr                                                #you need to change it for your simulations
+    t0max = t_end_6        # Myr
+    tmin = t0min/yr26yr         # yr
+    tmax = (t0max + 1)/yr26yr   # yr
+    number_bin_t = 3000
+    t_fix = numpy.linspace(tmin, tmax, number_bin_t)    # yr
+    t6 = t_fix * yr26yr                                 # Myr
+
     for i in range (nit):
 
+        age = age_it[i]
+        correction_factor = correction_factor_it[i]
         t0 = t0_it[i]
 
         Lum_HESS, Lum, Flux, n_pwn, nob, figure_number, number_bin_E, spectrum_HESS = data(correction_factor, t0, t_fix, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, zones, pathfigure_gamma, i, figure_number)
@@ -327,7 +327,8 @@ plot(figure_ob, 3, t6, [nob_mean, nob_pst, nob_mst], label, Title_pwn, xlabel, y
 plt.savefig(pathfigure_remain+'Mean_ob.pdf')
 
 figure_number = figure_ob + 1
-
+"""
+        # Flux
 figure_flux = figure_number
 Title_flux = 'Intrinsic luminosity for all the energy range of HESS\n'
 xlabel = 'E [TeV]'
@@ -353,6 +354,7 @@ log_plot(figure_flux, 2, spectrum_HESS_TeV, y, label, Title_flux, xlabel, ylabel
 plt.savefig(pathfigure_gamma+'Photon_flux_all.pdf')
 figure_number = figure_flux + 1
 
-print('for %d iteration(s)'%nit)
-print('for a random number of sn with mean value = %d' %mean)
+#print('for %d iteration(s)'%nit)
+#print('for a random number of sn with mean value = %d' %mean)
+"""
 plt.show()
