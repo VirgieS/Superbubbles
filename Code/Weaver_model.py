@@ -60,7 +60,7 @@ Tsb, nsb = profile_density_temperature(t7, rsb, Robs)
     # Plot
 figure_number = 1
 xlabel = 'Radius [pc]'
-color = 'cornflowerblue'
+color = ['cornflowerblue', 'orange']
 text = ''
 
 r = []  # distance array (pc)
@@ -79,6 +79,17 @@ for j in range (number_bin_rs):
     n.append(ns[j])
     T.append(Ts[j])
 
+        # Density/temperature profiles
+title = ''
+ylabel = ['$n(r)$ [cm$^{-3}$]', '$T(r)$ [K]']
+symbol = ['-.', ':']
+y = [n, T]
+label = ['Density', 'Temperature']
+log_plot_multi(figure_number, r, y, label, title, xlabel, ylabel, symbol)
+plt.savefig(pathfigure_SB+'Density_profiles.pdf')
+
+figure_number += 1
+"""
         # density
 title = ''
 ylabel = 'Density [cm$^{-3}$]'
@@ -103,7 +114,6 @@ log_plot(figure_number, 1, r, T, label, title, xlabel, ylabel, symbol, linestyle
 plt.savefig(pathfigure_SB+'Temperature_profiles.pdf')
 
 figure_number += 1
-
 """
 
     # time array (yr)
@@ -133,12 +143,14 @@ psb = pressure_SB(t6)
 Lsb = luminosity_SB(t7, Rsb)
 
     # Plots
-figure_number = 1
+#figure_number = 1
 xlabel = 'Time [Myr]'
-text = '$n_{ob}$ = %d\n$n_c$ = %.2e cm$^{-3}$, $T_c$ = %.2e K, $p_c$ = %.2e dynes cm$^{-2}$\n$T_s$ = %.2e K, $n_0$ = %.2e cm$^{-3}$'%(Nob, an, at, ap, Ts, n0)
+text = ''
+#text = '$n_{ob}$ = %d\n$n_c$ = %.2e cm$^{-3}$, $T_c$ = %.2e K, $p_c$ = %.2e dynes cm$^{-2}$\n$T_s$ = %.2e K, $n_0$ = %.2e cm$^{-3}$'%(Nob, an, at, ap, Ts, n0)
 
         # Radius vs velocity
-title = 'Time evolution of the radius and the velocity'
+#title = 'Time evolution of the radius and the velocity'
+title = ''
 ylabel = ['Radius [pc]', 'Velocity [km s$^{-1}$]']
 symbol = ['x', '+']
 label = ['Radius', 'Velocity']
@@ -149,86 +161,90 @@ plt.savefig(pathfigure_SB+'Radius_velocity.pdf')
 figure_number += 1
 
         # Velocities comparison
-title = 'Comparison of the velocities'
+#title = 'Comparison of the velocities'
 ylabel = 'Velocity [km s$^{-1}$]'
 symbol = ['x', '+']
 label = ['V$_{sb}$', 'C$_0$']
 y = [Vsb, C0*numpy.ones_like(t6)]
 linestyle = ['', '']
-log_plot(figure_number, 2, t6, y, label, title, xlabel, ylabel, symbol, linestyle, text)
+color = ['cornflowerblue', 'orange']
+log_plot(figure_number, 2, t6, y, label, title, xlabel, ylabel, symbol, linestyle, color, text)
 plt.savefig(pathfigure_SB+'Velocities.pdf')
 
 figure_number += 1
 
 
         # Masses inside the SB and swept-up
-title = 'Time evolution of the masses'
+#title = 'Time evolution of the masses'
 label = ['$M_{sb}$', '$M_{swept-up}$']
 ylabel = 'Mass [$M_{\odot}$]'
 y = [Msb, Mswept]
 symbol = ['+', 'x']
 linestyle = ['', '']
-log_plot(figure_number, 2, t6, y, label, title, xlabel, ylabel, symbol, linestyle, text)
+log_plot(figure_number, 2, t6, y, label, title, xlabel, ylabel, symbol, linestyle, color, text)
 plt.savefig(pathfigure_SB+'Masses.pdf')
 
 figure_number += 1
 
         # Thickness vs radius
-title = 'Time evolution of the thickness of the shell compare to the radius'
+#title = 'Time evolution of the thickness of the shell compare to the radius'
 label = ['$h_s$', '$R_{sb}$']
 ylabel = 'Lenght [pc]'
 y = [hs, Rsb]
 symbol = ['+', 'x']
 linestyle = ['', '']
-log_plot(figure_number, 2, t6, y, label, title, xlabel, ylabel, symbol, linestyle, text)
+log_plot(figure_number, 2, t6, y, label, title, xlabel, ylabel, symbol, linestyle, color, text)
 plt.savefig(pathfigure_SB+'Thickness_radius.pdf')
 
 figure_number += 1
 
         # Percentage of thickness
-title = 'Time evolution of the ratio of the thickness'
+#title = 'Time evolution of the ratio of the thickness'
 label = 'none'
 ylabel = '$h_s/R_{sb}$'
 y = hs/Rsb
 symbol = '+'
 linestyle = ''
-log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, symbol, linestyle, text)
+color = 'cornflowerblue'
+log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, symbol, linestyle, color, text)
 plt.savefig(pathfigure_SB+'Thickness_percentage.pdf')
 
 figure_number += 1
 
         # Pressure inside the SB
-title = 'Time evolution of the pressure inside the SB \ncompare to the pressure in the ambient medium'
+#title = 'Time evolution of the pressure inside the SB \ncompare to the pressure in the ambient medium'
 label = 'none'
 ylabel = 'p [dyne cm$^{-2}$]'
 y = [psb, pISM*numpy.ones_like(t6)]
 symbol = ['+', 'x']
 linestyle = ['', '']
-log_plot(figure_number, 2, t6, y, label, title, xlabel, ylabel, symbol, linestyle, text)
+color = ['cornflowerblue', 'orange']
+log_plot(figure_number, 2, t6, y, label, title, xlabel, ylabel, symbol, linestyle, color, text)
 plt.savefig(pathfigure_SB+'Pressures.pdf')
 
 figure_number += 1
 
         # Percentage of pressure
-title = 'Time evolution of the ratio of the pressure'
+#title = 'Time evolution of the ratio of the pressure'
 label = 'none'
 ylabel = '$p_{sb}/P_{ISM}$'
 y = psb/pISM
 symbol = '+'
 linestyle = ''
-log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, symbol, linestyle, text)
+color = 'cornflowerblue'
+log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, symbol, linestyle, color, text)
 plt.savefig(pathfigure_SB+'Pressure_percentage.pdf')
 
 figure_number += 1
 
         # Luminosity of the SB
-title = 'Time evolution of the luminosity of the SB by cooling rate'
+#title = 'Time evolution of the luminosity of the SB by cooling rate'
 label = 'none'
 ylabel = '$L_{sb}$ [erg s$^{-1}$]'
 y = Lsb
 symbol = '+'
 linestyle = ''
-log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, symbol, linestyle, text)
+log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, symbol, linestyle, color, text)
 plt.savefig(pathfigure_SB+'Luminosity.pdf')
-"""
+
 plt.show()

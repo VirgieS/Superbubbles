@@ -25,7 +25,9 @@ rcParams['ytick.left'] = True
 rcParams['ytick.right'] = True
 rcParams['ytick.minor.visible'] = True
 
-rcParams['lines.linewidth'] = 3
+plt.rc('font', family='serif', size = 12)
+
+#rcParams['lines.linewidth'] = 3
 
 def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle, color, text):
     """
@@ -194,22 +196,22 @@ def log_plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbo
     par.axis["right"].toggle(all=True)
 
             # host axes
-    xmin = min(x)
-    xmax = max(x)
-    host.set_xlim(xmin, xmax)
+    #xmin = min(x)
+    #xmax = max(x)
+    #host.set_xlim(xmin, xmax)
 
-    ymin = min(y[0])
-    ymax = max(y[0])
-    host.set_ylim(ymin, ymax)
+    #ymin = min(y[0])
+    #ymax = max(y[0])
+    #host.set_ylim(ymin, ymax)
 
     host.set_xlabel(xlabel)
     host.set_ylabel(ylabel[0])
     p1, = host.loglog(x, y[0], symbol[0], label = label_name[0])
 
             # second axes
-    ymin = min(y[1])
-    ymax = max(y[1])
-    par.set_ylim(ymin, ymax)
+    #ymin = min(y[1])
+    #ymax = max(y[1])
+    #par.set_ylim(ymin, ymax)
     par.set_ylabel(ylabel[1])
     p2, = par.loglog(x, y[1], symbol[1], label = label_name[1])
 
@@ -255,22 +257,22 @@ def plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbol):
     par.axis["right"].toggle(all=True)
 
             # host axes
-    xmin = min(x)
-    xmax = max(x)
-    host.set_xlim(xmin, xmax)
+    #xmin = min(x)
+    #xmax = max(x)
+    #host.set_xlim(xmin, xmax)
 
-    ymin = min(y[0])
-    ymax = max(y[0])
-    host.set_ylim(ymin, ymax)
+    #ymin = min(y[0])
+    #ymax = max(y[0])
+    #host.set_ylim(ymin, ymax)
 
     host.set_xlabel(xlabel)
     host.set_ylabel(ylabel[0])
     p1, = host.plot(x, y[0], symbol[0], label = label_name[0])
 
             # second axes
-    ymin = min(y[1])
-    ymax = max(y[1])
-    par.set_ylim(ymin, ymax)
+    #ymin = min(y[1])
+    #ymax = max(y[1])
+    #par.set_ylim(ymin, ymax)
     par.set_ylabel(ylabel[1])
     p2, = par.plot(x, y[1], symbol[1], label = label_name[1])
 
