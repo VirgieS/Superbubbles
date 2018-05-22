@@ -1,8 +1,0 @@
-/anaconda2/lib/python2.7/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
-  from ._conv import register_converters as _register_converters
-/Users/stage/Documents/Virginie/Superbubbles/Code/Functions_CR.py:91: RuntimeWarning: divide by zero encountered in divide
-  a = r_in/(numpy.sqrt(4 * D * deltat))
-/Users/stage/Documents/Virginie/Superbubbles/Code/Functions_CR.py:92: RuntimeWarning: divide by zero encountered in divide
-  b = r_out/(numpy.sqrt(4 * D * deltat))
-/Users/stage/Documents/Virginie/Superbubbles/Code/Functions_CR.py:94: RuntimeWarning: invalid value encountered in multiply
-  N = NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * (erf(b) - erf(a)) + 2 * numpy.exp(-a**2) * a - 2 * numpy.exp(-b**2) * b)
