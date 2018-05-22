@@ -24,6 +24,23 @@ from Parameters_system import *
 # Functions #
 ##---------##
 
+def luminosity_pwn(t):
+
+    """
+    Return the luminosity of the pulsar wind nebula in the range 1-10 TeV of energy
+    Inputs:
+        t           :       time since the birth of the pulsar (yr)
+    Output:
+        Lum_pwn     :       intrinsic luminosity of a pulsar wind nebula (erg s^-1)
+    """
+    t = t * yr2kyr  # kyr
+    tau_c = (tau_0 + t) * (n-1)/2.0 # characteristic age of the pwn (kyr)
+
+        # energy overflow of the pulsar (erg s^-1)
+    Edot = Edot_0 * (2.0/(n - 1) * tau_c/tau_0)**(-(n + 1)/(n - 1))
+
+    return L_0 * Edot**m
+
 def luminosity(lum_energy, energy):
 
     """
@@ -66,10 +83,10 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
     """
     Returns 6 importants quantities:
         luminosity in the all energy range
-        luminosity in specific energy range
-        photon spectral index
-        luminosity unit
+        intrinsic differential luminosity in the all energy range
+        gamma energy array
         number of pulsar wind nebula
+        intrinsic luminosity produces by the PWNe
         number of remained OB stars
     Inputs:
         correction_factor   :   correction factor for the radius of the SB
@@ -89,6 +106,7 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
         Flux_sn             :   intrinsic differential luminosity (eV^-1 s^-1)
         spectrum            :   energy array of the gamma photons for the whole energy range (GeV)
         n_pwn_tot           :   number of pulsar wind nebulae inside the SB
+        Lum_pwn_tot         :   intrinsic luminosity of the PWNe (erg s^-1)
         nob                 :   number of remained OB stars inside the OB association
         figure_number       :   number of the figure
     """
@@ -161,6 +179,7 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
 
         # Pulsar wind nebula
     n_pwn_tot = numpy.zeros(nt)
+    Lum_pwn_tot = numpy.zeros(nt)
 
     for i in range (nt0):                                                       # for each SN explosions
 
@@ -337,6 +356,7 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
 
         for l in (indt_pwn):
             n_pwn_tot[l] += 1
+            Lum_pwn_tot[l] += luminosity_pwn(t[l])
 
                 # Gamma luminosity + spectral index
         """
@@ -417,4 +437,4 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
             Lumtot_sn[l] += Lum_tot(t[l])
             Flux_sn[l] += Flux_tot(spectrum, t[l])
 
-    return Lumtot_sn, Flux_sn, spectrum, n_pwn_tot, nob, figure_number
+    return Lumtot_sn, Flux_sn, spectrum, n_pwn_tot, Lum_pwn_tot, nob, figure_number

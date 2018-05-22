@@ -107,3 +107,16 @@ D0 = 1e28           # diffusion coefficient at 10 GeV/c in cm^2 s^-1  ==> prendr
 Emin_gamma = 100 * MeV2GeV      # 100 MeV (GeV)
 Emax_gamma = 100 * TeV2GeV      # 100 TeV (GeV)
 Esep = numpy.array([1*TeV2GeV, 10*TeV2GeV]) # ranges of energy (GeV)
+
+##===================##
+# Pulsar wind nebulae #
+##===================##
+
+    # energy overflow of the pulsar (erg s^-1)
+tau_0 = 0.5         # initial spin-down timescale (kyr)
+n = 3.0             # "brakig index"
+Edot_0 = 2.0e39     # initial spin-down luminosity (erg s^-1)
+
+    # gamma luminosity from 1 to 10 TeV (erg s^-1)
+L_0 = 2e12          # constant
+m = 0.59            # index

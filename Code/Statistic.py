@@ -26,9 +26,9 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # IRAP
-os.chdir('/Users/stage/Dropbox/Superbubbles/Files/30_Dor_C/1000_iterations/')#10_SN/')#
-pathfigure_gamma = '/Users/stage/Dropbox/Superbubbles/figures/30_Dor_C/Bons/1000_iterations/Poisson/Gamma_emission/'#10_SN/Gamma_emission/'#
-pathfigure_remain = '/Users/stage/Dropbox/Superbubbles/figures//30_Dor_C/Bons/1000_iterations/Poisson/Remain/'#10_SN/Remain/'#
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/PWN/10')
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/PWN2/Gamma_emission/'
+pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/PWN2/Remain/'
 
     # Home
 #os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/Test/')
@@ -40,7 +40,7 @@ pathfigure_remain = '/Users/stage/Dropbox/Superbubbles/figures//30_Dor_C/Bons/10
 ## ======= ##
 
     # Number of iterations
-nit = 1000                                                                      #you need to change it for your simulations
+nit = 100                                                                      #you need to change it for your simulations
 
     # Which zone for the Computation
 zones = [2]                                                                     #you need to change it for your simulations
@@ -68,6 +68,7 @@ mean_sn = 5                 # mean value of SN explosions already happen        
 Lum_it = []                 # total gamma luminosity for the whole energy range
 Flux_it = []                # photon flux for the whole energy range
 n_pwn_it = []               # total number of pulsar wind nebula
+Lum_pwn_it = []             # luminosity of PWNe
 nob_it = []                 # total of remained OB stars
 t0_it = []                  # SN explosion times (yr)
 
@@ -103,11 +104,12 @@ with open('General', 'wb') as data_write:
 
         t0 = t0_it[i]
 
-        Lum, Flux, spectrum, n_pwn, nob, figure_number = data(correction_factor, t0, t_fix, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, zones, pathfigure_gamma, i, figure_number)
+        Lum, Flux, spectrum, n_pwn, Lum_pwn, nob, figure_number = data(correction_factor, t0, t_fix, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, zones, pathfigure_gamma, i, figure_number)
 
         Lum_it.append(Lum)
         Flux_it.append(Flux)
         n_pwn_it.append(n_pwn)
+        Lum_pwn_it.append(Lum_pwn)
         nob_it.append(nob)
 
         print('end of the iteration %d' %i)
@@ -121,7 +123,6 @@ with open('General', 'wb') as data_write:
     E1max = Esep[-1]
     spectrum_HESS = spectrum[indE]
     spectrum_erg = spectrum_HESS * 1.0/erg2GeV     # only in the energy range (erg)
-    print(spectrum_HESS)
     spectrum_ev = spectrum_erg * 1.0/eV2erg         # eV
     lum_HESS = Flux_it[:, :, indE] * spectrum_erg   # erg s^-1 eV^-1
     Lum_HESS_it = luminosity(lum_HESS, spectrum_ev) # erg s^-1
@@ -136,6 +137,7 @@ with open('General', 'wb') as data_write:
     Gamma_it = numpy.asarray(Gamma_it)
 
     n_pwn_it = numpy.asarray(n_pwn_it)
+    Lum_pwn_it = numpy.asarray(Lum_pwn_it)
     nob_it = numpy.asarray(nob_it)
 
     pickle.dump(Lum_HESS_it, data_write)
@@ -143,6 +145,7 @@ with open('General', 'wb') as data_write:
     pickle.dump(Flux_it, data_write)
     pickle.dump(Gamma_it, data_write)
     pickle.dump(n_pwn_it, data_write)
+    pickle.dump(Lum_pwn_it, data_write)
     pickle.dump(nob_it, data_write)
     pickle.dump(spectrum, data_write)
 """
@@ -162,7 +165,7 @@ with open('General', 'rb') as data_load:
     spectrum = pickle.load(data_load)
     indE = numpy.where((spectrum >= Esep[0]) & (spectrum <= Esep[-1]))
     spectrum_HESS = spectrum[indE]
-"""
+
     ##-----------------------------------------------------##
     # Histogramme of the probability to have one luminosity #
     ##-----------------------------------------------------##
@@ -270,8 +273,10 @@ figure = figure_HESS + 1
 #Title = 'Mean gamma emission in the energy range [100 MeV, 100 TeV]\n'
 Title_HESS = ''
 Title = ''
-ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (%.2f GeV - %.2f GeV)'%(E1min, E1max)
-ylabel = '$L_\gamma$ [erg s$^{-1}$] (%.2f GeV - %.2f GeV)'%(spectrum[0], spectrum[-1])
+E1min = E1min/TeV2GeV
+E1max = E1max/TeV2GeV
+ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (%d TeV - %d TeV)'%(E1min, E1max)
+ylabel = '$L_\gamma$ [erg s$^{-1}$] (%d MeV - %d TeV)'%(spectrum[0]/MeV2GeV, spectrum[-1]/TeV2GeV)
 
 plot(figure_HESS, 3, t6, [Lum_HESS_mean, Lum_HESS_pst, Lum_HESS_mst], label, Title_HESS, xlabel, ylabel_HESS, sym, linestyle, color, text)
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_range1.pdf')
@@ -378,7 +383,7 @@ text = ''
 plot(figure_correlation, number_bin_Gamma, t6, Lum_HESS_Gamma, label, Title_correlation, xlabel, ylabel, sym, linestyle, color, text)
 plt.savefig(pathfigure_gamma+'Correlation.pdf')
 
-"""
+
         # Flux
 figure_flux = figure_number
 Title_flux = 'Intrinsic luminosity for all the energy range of HESS\n'
@@ -408,4 +413,4 @@ figure_number = figure_flux + 1
 #print('for %d iteration(s)'%nit)
 #print('for a random number of sn with mean value = %d' %mean)
 """
-plt.show()
+#plt.show()

@@ -36,6 +36,7 @@ mbarn2cm=1.0e-27            # from mbarn to cm
 
 day2sec = 86400.            # from day to sec
 yr2s = 3.15576e7            # from year to sec
+yr2kyr = 1e-3               # from year to 10^3 years
 yr26yr = 1e-6               # from year to 10^6 years
 s6yr27yr = 0.1              # from 10^6 years to 10^7 years
 
