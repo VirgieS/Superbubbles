@@ -29,37 +29,42 @@ t7 = t6 * s6yr27yr  # in 10 Myr
 
     # Correction factor
 Robs = 47.0                 # observed radius (pc)                              #you need to change it for your simulations
-Rsb = radius_velocity_SB(t6)[0] # from Weaver's model (pc and km/s)
+Rsb, Vsb = radius_velocity_SB(t6) # from Weaver's model (pc and km/s)
 correction_factor = Robs/Rsb
 
     # Mass inside the SB and the sweptup mass (solar masses)
-Msb, Mswept = masses(t7, Rsb)
+Msb, Mswept = masses(t7, Robs)
+#Msb, Mswept = masses(t7, Rsb)
 
     # mass inside the supershell (solar masses)
 #Ms = Mswept - Msb
 
     # thickness (pc), the density (cm^-3) of the shell
-ns, hs = density_thickness_shell_percentage(percentage, Rsb, Mswept, Msb)
+ns, hs = density_thickness_shell_percentage(percentage, Robs, Mswept, Msb)
+#ns, hs = density_thickness_shell(Vsb, Mswept, Msb, Rsb)
 
     # distance array of the shell (pc)
 rmin = Robs - hs   # in pc
 rmax = Robs        # in pc
+#rmin = Rsb - hs
+#rmax = Rsb
 number_bin_rs = 5
-rs = numpy.logspace(numpy.log10(rmin), numpy.log10(rmax), number_bin_rs)
+rshell = numpy.logspace(numpy.log10(rmin), numpy.log10(rmax), number_bin_rs)
 
-ns = ns * numpy.ones(number_bin_rs)
-Ts = Ts * numpy.ones(number_bin_rs)
+nshell = ns * numpy.ones(number_bin_rs)
+Tshell = Ts * numpy.ones(number_bin_rs)
 
     # Density (cm^-3) and temperature (K) profiles of the Superbubble (cm^-3)
-rsbmin = 1e-2       # in pc
+rsbmin = 1       # in pc
 rsbmax = rmin       # in pc
 number_bin_rsb = 20
 rsb = numpy.logspace(numpy.log10(rsbmin), numpy.log10(rsbmax), number_bin_rsb)
 Tsb, nsb = profile_density_temperature(t7, rsb, Robs)
+#Tsb, nsb = profile_density_temperature(t7, rsb, Rsb)
 
     # Plot
 figure_number = 1
-xlabel = 'Radius [pc]'
+xlabel = '$r/R_{sb}$'
 color = ['cornflowerblue', 'orange']
 text = ''
 
@@ -75,31 +80,34 @@ for i in range (number_bin_rsb):
 
 for j in range (number_bin_rs):
 
-    r.append(rs[j])
-    n.append(ns[j])
-    T.append(Ts[j])
+    r.append(rshell[j])
+    n.append(nshell[j])
+    T.append(Tshell[j])
 
+n = numpy.asarray(n)/ns
         # Density/temperature profiles
 title = ''
-ylabel = ['$n(r)$ [cm$^{-3}$]', '$T(r)$ [K]']
+ylabel = ['$n(r)/n_{shell}$', '$T(r)$ [K]']
 symbol = ['-.', ':']
 y = [n, T]
 label = ['Density', 'Temperature']
+r = numpy.asarray(r)
+r = r/Robs
 log_plot_multi(figure_number, r, y, label, title, xlabel, ylabel, symbol)
-plt.savefig(pathfigure_SB+'Density_profiles.pdf')
+plt.savefig(pathfigure_SB+'Density_temperature_profiles_2.pdf')
 
 figure_number += 1
-"""
+
         # density
 title = ''
-ylabel = 'Density [cm$^{-3}$]'
+ylabel = '$n(r)/n_{shell}$'
 symbol = ''
 linestyle = '-.'
 label = 'none'
-print(percentage)
+colord = 'cornflowerblue'
 
-log_plot(figure_number, 1, r, n, label, title, xlabel, ylabel, symbol, linestyle, color, text)
-plt.savefig(pathfigure_SB+'Density_profiles.pdf')
+log_plot(figure_number, 1, r, n, label, title, xlabel, ylabel, symbol, linestyle, colord, text)
+plt.savefig(pathfigure_SB+'Density_profiles_2.pdf')
 
 figure_number += 1
 
@@ -110,12 +118,11 @@ symbol = ''
 linestyle = ':'
 label = 'none'
 
-log_plot(figure_number, 1, r, T, label, title, xlabel, ylabel, symbol, linestyle, color, text)
-plt.savefig(pathfigure_SB+'Temperature_profiles.pdf')
+log_plot(figure_number, 1, r, T, label, title, xlabel, ylabel, symbol, linestyle, colord, text)
+plt.savefig(pathfigure_SB+'Temperature_profiles_2.pdf')
 
 figure_number += 1
 """
-
     # time array (yr)
 tmin = 0.01                    # Myr
 tmax = 37                   # Myr
@@ -213,7 +220,7 @@ figure_number += 1
 
         # Pressure inside the SB
 #title = 'Time evolution of the pressure inside the SB \ncompare to the pressure in the ambient medium'
-label = 'none'
+label = ['$p_{sb}$','$p_{ism}$']
 ylabel = 'p [dyne cm$^{-2}$]'
 y = [psb, pISM*numpy.ones_like(t6)]
 symbol = ['+', 'x']
@@ -246,5 +253,5 @@ symbol = '+'
 linestyle = ''
 log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, symbol, linestyle, color, text)
 plt.savefig(pathfigure_SB+'Luminosity.pdf')
-
+"""
 plt.show()
