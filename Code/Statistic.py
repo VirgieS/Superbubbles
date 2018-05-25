@@ -26,9 +26,9 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # IRAP
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/PWN/10')
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/PWN2/Gamma_emission/'
-pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/PWN2/Remain/'
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/10/5')
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/10/Gamma_emission/'
+pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/10/Remain/'
 
     # Home
 #os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/Test/')
@@ -46,29 +46,40 @@ nit = 100                                                                      #
 zones = [2]                                                                     #you need to change it for your simulations
 
     # Correction factor
-t_end_6 = 4.5           # Myr
-t_end = t_end_6/yr26yr  # yr
-Rsb = 47.0                          # observed radius (pc)              #you need to change it for your simulations
-Rw = radius_velocity_SB(t_end_6)[0] # from Weaver's model (pc and km/s)
-correction_factor = Rsb/Rw
+
+need_correction = False
+
+if need_correction:
+
+    t_end_6 = 4.5           # Myr
+    t_end = t_end_6/yr26yr  # yr
+    Rsb = 47.0                          # observed radius (pc)                  #you need to change it for your simulations
+    Rw = radius_velocity_SB(t_end_6)[0] # from Weaver's model (pc and km/s)
+    correction_factor = Rsb/Rw
+
+else:
+    correction_factor = 1
+    t_end_6 = 7
 
     # Fix time array (yr)
-t0min = 3              # Myr
-t0max = t_end_6 + 1    # Myr
-tmin = t0min/yr26yr         # yr
-tmax = (t0max + 1)/yr26yr   # yr
+t0min = 3           # Myr
+t0max = 7t_end_6    # Myr
+tmin = t0min/yr26yr # yr
+tmax = (t0max+1)/yr26yr         # yr
 number_bin_t = 3000
 t_fix = numpy.linspace(tmin, tmax, number_bin_t)    # yr
 t6 = t_fix * yr26yr                                 # Myr
 
     # Initialization
 figure_number = 1
-mean_sn = 5                 # mean value of SN explosions already happen        #you need to change it for your simulations
+time_sn = (t0max - t0min) * 1.0/Nob * 1.0/yr26yr # yr
+mean_sn = int(tmax/time_sn)                 # mean value of SN explosions already happen        #you need to change it for your simulations
 
 Lum_it = []                 # total gamma luminosity for the whole energy range
 Flux_it = []                # photon flux for the whole energy range
 n_pwn_it = []               # total number of pulsar wind nebula
-Lum_pwn_it = []             # luminosity of PWNe
+Lum_pwn_it = []             # TeV emission of PWNe
+Lum_psr_it = []             # GeV emission of PSRs
 nob_it = []                 # total of remained OB stars
 t0_it = []                  # SN explosion times (yr)
 
@@ -84,7 +95,8 @@ with open('SB', 'wb') as SB_write:
 
     for i in range (nit):
 
-        nsn = numpy.random.poisson(lam = mean_sn)       # random number of SN which mean value equals to mean_sn
+        #nsn = numpy.random.poisson(lam = mean_sn)       # random number of SN which mean value equals to mean_sn
+        nsn = mean_sn
         t0 = random_uniform(t0min, t0max, nsn)/yr26yr   # random SN explosion times with an uniform distribution from t0min to t0max
         t0 = sorted(t0)
 
@@ -93,23 +105,24 @@ with open('SB', 'wb') as SB_write:
     t0_it = numpy.asarray(t0_it)
 
     pickle.dump(t0_it, SB_write)
-"""
+
 with open('SB', 'rb') as SB_load:
 
     t0_it = pickle.load(SB_load)
-"""
+
 with open('General', 'wb') as data_write:
 
     for i in range (nit):
 
         t0 = t0_it[i]
 
-        Lum, Flux, spectrum, n_pwn, Lum_pwn, nob, figure_number = data(correction_factor, t0, t_fix, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, zones, pathfigure_gamma, i, figure_number)
+        Lum, Flux, spectrum, n_pwn, Lum_pwn, Lum_psr, nob = data(correction_factor, t0, t_fix, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, zones)
 
         Lum_it.append(Lum)
         Flux_it.append(Flux)
         n_pwn_it.append(n_pwn)
         Lum_pwn_it.append(Lum_pwn)
+        Lum_psr_it.append(Lum_psr)
         nob_it.append(nob)
 
         print('end of the iteration %d' %i)
@@ -117,54 +130,77 @@ with open('General', 'wb') as data_write:
     Lum_it = numpy.asarray(Lum_it)
     Flux_it = numpy.asarray(Flux_it)
 
-        # Gamma luminosity in a precise energy range
-    indE = numpy.where((spectrum >= Esep[0]) & (spectrum <= Esep[-1]))[0]
-    E1min = Esep[0]
-    E1max = Esep[-1]
+        # in the H.E.S.S. energy range
+    Emin = 1 * TeV2GeV                  # 1 TeV (GeV)
+    Emax = 10 * TeV2GeV                 # 10 TeV (GeV)
+    indE = numpy.where((spectrum >= Emin) & (spectrum <= Emax))[0]
+
+            # Gamma luminosity
     spectrum_HESS = spectrum[indE]
     spectrum_erg = spectrum_HESS * 1.0/erg2GeV     # only in the energy range (erg)
     spectrum_ev = spectrum_erg * 1.0/eV2erg         # eV
     lum_HESS = Flux_it[:, :, indE] * spectrum_erg   # erg s^-1 eV^-1
     Lum_HESS_it = luminosity(lum_HESS, spectrum_ev) # erg s^-1
 
-        # Spectral photon index
-    Emin = Esep[0]
-    Emax = Esep[-1]
+            # Spectral photon index
     Fluxmin = Flux_it[:, :, indE[0]]
     Fluxmax = Flux_it[:, :, indE[-1]]
-    Gamma_it = spectral_index(Emin, Emax, Fluxmin, Fluxmax)
-    Gamma_it = numpy.nan_to_num(Gamma_it)
-    Gamma_it = numpy.asarray(Gamma_it)
+    Gamma_HESS_it = spectral_index(Emin, Emax, Fluxmin, Fluxmax)
+    Gamma_HESS_it = numpy.nan_to_num(Gamma_HESS_it)
+    #Gamma_HESS_it = numpy.asarray(Gamma_HESS_it)
+
+        # in the Fermi energy range
+    Emin = 100 * MeV2GeV                # 100 MeV (GeV)
+    Emax = 100                          # 100 GeV
+    indE = numpy.where((spectrum >= Emin) & (spectrum <= Emax))[0]
+
+            # Gamma luminosity
+    spectrum_Fermi = spectrum[indE]
+    spectrum_erg = spectrum_Fermi * 1.0/erg2GeV     # only in the energy range (erg)
+    spectrum_ev = spectrum_erg * 1.0/eV2erg         # eV
+    lum_Fermi = Flux_it[:, :, indE] * spectrum_erg   # erg s^-1 eV^-1
+    Lum_Fermi_it = luminosity(lum_Fermi, spectrum_ev) # erg s^-1
+
+            # Spectral photon index
+    Fluxmin = Flux_it[:, :, indE[0]]
+    Fluxmax = Flux_it[:, :, indE[-1]]
+    Gamma_Fermi_it = spectral_index(Emin, Emax, Fluxmin, Fluxmax)
+    Gamma_Fermi_it = numpy.nan_to_num(Gamma_Fermi_it)
+    #Gamma_Fermi_it = numpy.asarray(Gamma_Fermi_it)
 
     n_pwn_it = numpy.asarray(n_pwn_it)
     Lum_pwn_it = numpy.asarray(Lum_pwn_it)
+    Lum_psr_it = numpy.asarray(Lum_psr_it)
     nob_it = numpy.asarray(nob_it)
 
     pickle.dump(Lum_HESS_it, data_write)
+    pickle.dump(Lum_Fermi_it, data_write)
     pickle.dump(Lum_it, data_write)
     pickle.dump(Flux_it, data_write)
-    pickle.dump(Gamma_it, data_write)
+    pickle.dump(Gamma_HESS_it, data_write)
+    pickle.dump(Gamma_Fermi_it, data_write)
     pickle.dump(n_pwn_it, data_write)
     pickle.dump(Lum_pwn_it, data_write)
+    pickle.dump(Lum_psr_it, data_write)
     pickle.dump(nob_it, data_write)
     pickle.dump(spectrum, data_write)
-"""
+
     ##---------##
     # Load data #
     ##---------##
 
 with open('General', 'rb') as data_load:
-    E1min = Esep[0]
-    E1max = Esep[-1]
     Lum_HESS_it = pickle.load(data_load)
+    Lum_Fermi_it = pickle.load(data_load)
     Lum_it = pickle.load(data_load)
     Flux_it = pickle.load(data_load)
-    Gamma_it = pickle.load(data_load)
+    Gamma_HESS_it = pickle.load(data_load)
+    Gamma_Fermi_it = pickle.load(data_load)
     n_pwn_it = pickle.load(data_load)
+    Lum_pwn_it = pickle.load(data_load)
+    Lum_psr_it = pickle.load(data_load)
     nob_it = pickle.load(data_load)
     spectrum = pickle.load(data_load)
-    indE = numpy.where((spectrum >= Esep[0]) & (spectrum <= Esep[-1]))
-    spectrum_HESS = spectrum[indE]
 
     ##-----------------------------------------------------##
     # Histogramme of the probability to have one luminosity #
@@ -190,59 +226,75 @@ if nit > 1:
     ##---------------------------##
 
         # Initialization
-number_bin_E = len(spectrum_HESS)
+#number_bin_E = len(spectrum_HESS)
             # Mean
 Lum_HESS_mean = numpy.zeros(number_bin_t)               # from 1 TeV to 10 TeV
+Lum_Fermi_mean = numpy.zeros(number_bin_t)              # from 100 MeV to 100 GeV
 Lum_mean = numpy.zeros(number_bin_t)                    # from 100 MeV to 100 TeV
-Flux_mean = numpy.zeros((number_bin_t, number_bin_E))   # photon flux from 1 TeV to 10 TeV
-Gamma_mean = numpy.zeros(number_bin_t)                  # photon spectral index
+Gamma_HESS_mean = numpy.zeros(number_bin_t)             # photon spectral index from 1 TeV to 10 TeV
+Gamma_Fermi_mean = numpy.zeros(number_bin_t)            # photon spectral index from 100 MeV to 100 GeV
 n_pwn_mean = numpy.zeros(number_bin_t)                  # number of pulsar wind nebula
 nob_mean = numpy.zeros(number_bin_t)                    # number of remained OB stars
+Lum_pwn_mean = numpy.zeros(number_bin_t)                # TeV emission of PWNe
+Lum_psr_mean = numpy.zeros(number_bin_t)                # GeV emission of PSRs
 
             # Standard deviation
 Lum_HESS_std = numpy.zeros(number_bin_t)                # from 1 TeV to 10 TeV
+Lum_Fermi_std = numpy.zeros(number_bin_t)               # from 100 MeV to 100 GeV
 Lum_std = numpy.zeros(number_bin_t)                     # from 100 MeV to 100 TeV
-Flux_std = numpy.zeros((number_bin_t, number_bin_E))    # photon flux from 1 TeV to 10 TeV
-Gamma_std = numpy.zeros(number_bin_t)                   # photon spectral index
+Gamma_HESS_std = numpy.zeros(number_bin_t)              # photon spectral index from 1 TeV to 10 TeV
+Gamma_Fermi_std = numpy.zeros(number_bin_t)             # photon spectral index from 100 MeV to 100 GeV
 n_pwn_std = numpy.zeros(number_bin_t)                   # number of pulsar wind nebula
 nob_std = numpy.zeros(number_bin_t)                     # number of remained OB stars
+Lum_pwn_std = numpy.zeros(number_bin_t)                 # TeV emission of PWNe
+Lum_psr_std = numpy.zeros(number_bin_t)                 # GeV emission of PSRs
 
 for j in range (number_bin_t):
 
     Lum_HESS_mean[j] = numpy.mean(Lum_HESS_it[:, j])
+    Lum_Fermi_mean[j] = numpy.mean(Lum_Fermi_it[:, j])
     Lum_mean[j] = numpy.mean(Lum_it[:, j])
-    Gamma_mean[j] = numpy.mean(Gamma_it[:, j])
+    Gamma_HESS_mean[j] = numpy.mean(Gamma_HESS_it[:, j])
+    Gamma_Fermi_mean[j] = numpy.mean(Gamma_Fermi_it[:, j])
     n_pwn_mean[j] = numpy.mean(n_pwn_it[:, j])
     nob_mean[j] = numpy.mean(nob_it[:, j])
+    Lum_pwn_mean[j] = numpy.mean(Lum_pwn_it[:, j])
+    Lum_psr_mean[j] = numpy.mean(Lum_psr_it[:, j])
 
     Lum_HESS_std[j] = numpy.std(Lum_HESS_it[:, j])
+    Lum_Fermi_std[j] = numpy.std(Lum_Fermi_it[:, j])
     Lum_std[j] = numpy.std(Lum_it[:, j])
-    Gamma_std[j] = numpy.std(Gamma_it[:, j])
+    Gamma_HESS_std[j] = numpy.std(Gamma_HESS_it[:, j])
+    Gamma_Fermi_std[j] = numpy.std(Gamma_Fermi_it[:, j])
     n_pwn_std[j] = numpy.std(n_pwn_it[:, j])
     nob_std[j] = numpy.std(nob_it[:, j])
-
-    for k in range (number_bin_E):
-
-        Flux_mean[j, k] = numpy.mean(Flux_it[:, j, k])
-        Flux_std[j, k] = numpy.std(Flux_it[:, j, k])
+    Lum_pwn_std[j] = numpy.std(Lum_pwn_it[:, j])
+    Lum_psr_std[j] = numpy.std(Lum_pwn_it[:, j])
 
 Lum_HESS_pst = Lum_HESS_mean + Lum_HESS_std
 Lum_HESS_mst = Lum_HESS_mean - Lum_HESS_std
 ind0 = numpy.where(Lum_HESS_mst <= 0)[0]
 Lum_HESS_mst[ind0] = numpy.zeros(len(ind0))
 
+Lum_Fermi_pst = Lum_Fermi_mean + Lum_Fermi_std
+Lum_Fermi_mst = Lum_Fermi_mean - Lum_Fermi_std
+ind0 = numpy.where(Lum_Fermi_mst <= 0)[0]
+Lum_Fermi_mst[ind0] = numpy.zeros(len(ind0))
+
 Lum_pst = Lum_mean + Lum_std
 Lum_mst = Lum_mean - Lum_std
 ind0 = numpy.where(Lum_mst <= 0)[0]
 Lum_mst[ind0] = numpy.zeros(len(ind0))
 
-#Flux_pst = Flux_mean + Flux_std
-#Flux_mst = Flux_mean - Flux_std
+Gamma_HESS_pst = Gamma_HESS_mean + Gamma_HESS_std
+Gamma_HESS_mst = Gamma_HESS_mean - Gamma_HESS_std
+ind0 = numpy.where(Gamma_HESS_mst <= 0)[0]
+Gamma_HESS_mst[ind0] = numpy.zeros(len(ind0))
 
-Gamma_pst = Gamma_mean + Gamma_std
-Gamma_mst = Gamma_mean - Gamma_std
-ind0 = numpy.where(Gamma_mst <= 0)[0]
-Gamma_mst[ind0] = numpy.zeros(len(ind0))
+Gamma_Fermi_pst = Gamma_Fermi_mean + Gamma_Fermi_std
+Gamma_Fermi_mst = Gamma_Fermi_mean - Gamma_Fermi_std
+ind0 = numpy.where(Gamma_Fermi_mst <= 0)[0]
+Gamma_Fermi_mst[ind0] = numpy.zeros(len(ind0))
 
 n_pwn_pst = n_pwn_mean + n_pwn_std
 n_pwn_mst = n_pwn_mean - n_pwn_std
@@ -256,6 +308,16 @@ nob_mst[ind0] = numpy.zeros(len(ind0))
 indNob = numpy.where(nob_pst >= Nob)[0]
 nob_pst[indNob] = Nob * numpy.ones(len(indNob))
 
+Lum_pwn_pst = Lum_pwn_mean + Lum_pwn_std
+Lum_pwn_mst = Lum_pwn_mean - Lum_pwn_std
+ind0 = numpy.where(Lum_pwn_mst <= 0)[0]
+Lum_pwn_mst[ind0] = numpy.zeros(len(ind0))
+
+Lum_psr_pst = Lum_psr_mean + Lum_psr_std
+Lum_psr_mst = Lum_psr_mean - Lum_psr_std
+ind0 = numpy.where(Lum_pwn_mst <= 0)[0]
+Lum_psr_mst[ind0] = numpy.zeros(len(ind0))
+
     # Plot
 label = 'none'
 sym = ['', '', '']
@@ -266,35 +328,60 @@ text = ''
 color = ['cornflowerblue', 'green', 'green']
 
         # Gamma luminosity of the superbubble
+
+            # HESS energy range
 figure_HESS = figure_number
-figure = figure_HESS + 1
 
 #Title_HESS = 'Mean gamma emission of the SB in the energy range [1 TeV, 10 TeV]\n'
-#Title = 'Mean gamma emission in the energy range [100 MeV, 100 TeV]\n'
 Title_HESS = ''
-Title = ''
-E1min = E1min/TeV2GeV
-E1max = E1max/TeV2GeV
-ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (%d TeV - %d TeV)'%(E1min, E1max)
-ylabel = '$L_\gamma$ [erg s$^{-1}$] (%d MeV - %d TeV)'%(spectrum[0]/MeV2GeV, spectrum[-1]/TeV2GeV)
+ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
 
 plot(figure_HESS, 3, t6, [Lum_HESS_mean, Lum_HESS_pst, Lum_HESS_mst], label, Title_HESS, xlabel, ylabel_HESS, sym, linestyle, color, text)
-plt.savefig(pathfigure_gamma+'Mean_gamma_emission_range1.pdf')
+plt.savefig(pathfigure_gamma+'Mean_gamma_emission_HESS.pdf')
+
+            # Fermi energy range
+figure_Fermi = figure_HESS + 1
+
+#Title_Fermi = 'Mean gamma emission of the SB in the energy range [100 MeV, 100 GeV]\n'
+Title_Fermi = ''
+ylabel_Fermi = '$L_\gamma$ [erg s$^{-1}$] (100 MeV - 100 GeV)'
+
+plot(figure_Fermi, 3, t6, [Lum_Fermi_mean, Lum_Fermi_pst, Lum_Fermi_mst], label, Title_Fermi, xlabel, ylabel_Fermi, sym, linestyle, color, text)
+plt.savefig(pathfigure_gamma+'Mean_gamma_emission_Fermi.pdf')
+
+            # whole energy range
+figure = figure_Fermi + 1
+
+#Title = 'Mean gamma emission in the energy range [100 MeV, 100 TeV]\n'
+Title = ''
+ylabel = '$L_\gamma$ [erg s$^{-1}$] (100 MeV - 100 TeV)'
 
 plot(figure, 3, t6, [Lum_mean, Lum_pst, Lum_mst], label, Title, xlabel, ylabel, sym, linestyle, color, text)
-plt.savefig(pathfigure_gamma+'Mean_gamma_emission_all.pdf')
+plt.savefig(pathfigure_gamma+'Mean_gamma_emission.pdf')
 
 figure_number = figure + 1
 
-        # spectral index
-figure_Gamma = figure_number
-#Title_Gamma = 'Photon index in the energy range [1 TeV, 10 TeV]'
-Title_Gamma = ''
-ylabel = '$\Gamma_{ph}$'
+        # Spectral index
 
-plot(figure_Gamma, 3, t6, [Gamma_mean, Gamma_pst, Gamma_mst], label, Title_Gamma, xlabel, ylabel, sym, linestyle, color, text)
-plt.savefig(pathfigure_gamma+'Photon_index.pdf')
-figure_number = figure_Gamma + 1
+            # HESS energy range
+figure_Gamma_HESS = figure_number
+#Title_Gamma_HESS = 'Photon index in the energy range [1 TeV, 10 TeV]'
+Title_Gamma_HESS = ''
+ylabel_HESS = '$\Gamma_{ph}$ (1 TeV - 10 TeV)'
+
+plot(figure_Gamma_HESS, 3, t6, [Gamma_HESS_mean, Gamma_HESS_pst, Gamma_HESS_mst], label, Title_Gamma_HESS, xlabel, ylabel_HESS, sym, linestyle, color, text)
+plt.savefig(pathfigure_gamma+'Photon_index_HESS.pdf')
+
+            # Fermi energy range
+figure_Gamma_Fermi = figure_Gamma_HESS + 1
+#Title_Gamma_Fermi = 'Photon index in the energy range [100 MeV, 100 GeV]'
+Title_Gamma_Fermi = ''
+ylabel_Fermi = '$\Gamma_{ph}$ (100 MeV - 100 GeV)'
+
+plot(figure_Gamma_Fermi, 3, t6, [Gamma_Fermi_mean, Gamma_Fermi_pst, Gamma_Fermi_mst], label, Title_Gamma_Fermi, xlabel, ylabel_Fermi, sym, linestyle, color, text)
+plt.savefig(pathfigure_gamma+'Photon_index_Fermi.pdf')
+
+figure_number = figure_Gamma_Fermi + 1
 
         # Number of pulsar wind nebula
 figure_pwn = figure_number
@@ -308,21 +395,27 @@ plt.savefig(pathfigure_remain+'Mean_pwn.pdf')
 
 figure_number = figure_pwn + 1
 
-        # gamma luminosity of the pulsar wind nebula
-L_pwn = 1e35    # erg s^-1
-L_pwn_mean = n_pwn_mean * L_pwn
-L_pwn_pst = n_pwn_pst * L_pwn
-L_pwn_mst = n_pwn_mst * L_pwn
-
+        # TeV emission of PWN
 figure_pwn = figure_number
 #Title_pwn = 'Mean gamma luminosity of the pulsar wind nebulae inside the SB\n'
 Title_pwn = ''
-ylabel = '$L_{\gamma, pwn}$ [erg s$^{-1}$]'
+ylabel = '$L_{\gamma, pwn}$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
 
-plot(figure_pwn, 3, t6, [L_pwn_mean, L_pwn_pst, L_pwn_mst], label, Title_pwn, xlabel, ylabel, sym, linestyle, color, text)
+plot(figure_pwn, 3, t6, [Lum_pwn_mean, Lum_pwn_pst, Lum_pwn_mst], label, Title_pwn, xlabel, ylabel, sym, linestyle, color, text)
 plt.savefig(pathfigure_remain+'Mean_luminosity_pwn.pdf')
 
 figure_number = figure_pwn + 1
+
+        # GeV emission of PWN
+figure_psr = figure_number
+#Title_pwn = 'Mean gamma luminosity of the pulsar wind nebulae inside the SB\n'
+Title_psr = ''
+ylabel = '$L_{\gamma, psr}$ [erg s$^{-1}$] (100 MeV - 100 GeV)'
+
+plot(figure_psr, 3, t6, [Lum_psr_mean, Lum_psr_pst, Lum_psr_mst], label, Title_psr, xlabel, ylabel, sym, linestyle, color, text)
+plt.savefig(pathfigure_remain+'Mean_luminosity_psr.pdf')
+
+figure_number = figure_psr + 1
 
         # Number of remained OB stars in the association
 figure_ob = figure_number
@@ -383,34 +476,4 @@ text = ''
 plot(figure_correlation, number_bin_Gamma, t6, Lum_HESS_Gamma, label, Title_correlation, xlabel, ylabel, sym, linestyle, color, text)
 plt.savefig(pathfigure_gamma+'Correlation.pdf')
 
-
-        # Flux
-figure_flux = figure_number
-Title_flux = 'Intrinsic luminosity for all the energy range of HESS\n'
-xlabel = 'E [TeV]'
-ylabel = '$\Phi_{ph}$ [ph s$^{-1}$ eV$^{-1}$]'
-label = ['simulations', 'fit']
-sym = ['+', '']
-linestyle = ['', '-.']
-color = ['cornflowerblue', 'orange']
-text = ''
-
-indt = numpy.where(Flux_it[0, :, -1] != 0)[0]
-
-spectrum_HESS_ev = spectrum_HESS * GeV2eV   # in eV
-spectrum_HESS_TeV = spectrum_HESS_ev/TeV2eV # in TeV
-
-b_it = Flux_it[0, indt[0], -1] * (spectrum_HESS_ev[-1])**(Gamma_it[0, indt[0]])
-fit_it = b_it * spectrum_HESS_ev**(-Gamma_it[0, indt[0]])
-
-y = [Flux_it[0, indt[0]], fit_it]
-
-log_plot(figure_flux, 2, spectrum_HESS_TeV, y, label, Title_flux, xlabel, ylabel, sym, linestyle, color, text)
-
-plt.savefig(pathfigure_gamma+'Photon_flux_all.pdf')
-figure_number = figure_flux + 1
-
-#print('for %d iteration(s)'%nit)
-#print('for a random number of sn with mean value = %d' %mean)
-"""
-#plt.show()
+plt.show()
