@@ -13,7 +13,7 @@ from Conversion_factors import *
 ##=============================##
 
     # OB asociation
-Nob = 88           # number of OB-stars in the association
+Nob = 10           # number of OB-stars in the association
 Lob = 1e36          # mean luminosity of an OB-star (erg/s)
 Pob = Nob * Lob     # mean power of the association (erg/s)
 L36 = Pob * erg236erg     # mechanical energy expressed in 10^36 erg/s
@@ -106,17 +106,3 @@ D0 = 1e28           # diffusion coefficient at 10 GeV/c in cm^2 s^-1  ==> prendr
     # Energy of the gamma photons (GeV)
 Emin_gamma = 100 * MeV2GeV      # 100 MeV (GeV)
 Emax_gamma = 100 * TeV2GeV      # 100 TeV (GeV)
-Esep = numpy.array([1*TeV2GeV, 10*TeV2GeV]) # ranges of energy (GeV)
-
-##===================##
-# Pulsar wind nebulae #
-##===================##
-
-    # energy overflow of the pulsar (erg s^-1)
-tau_0 = 0.5         # initial spin-down timescale (kyr)
-n = 3.0             # "brakig index"
-Edot_0 = 2.0e39     # initial spin-down luminosity (erg s^-1)
-
-    # gamma luminosity from 1 to 10 TeV (erg s^-1)
-L_0 = 2e12          # constant
-m = 0.59            # index

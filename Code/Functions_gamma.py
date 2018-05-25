@@ -24,22 +24,69 @@ from Parameters_system import *
 # Functions #
 ##---------##
 
-def luminosity_pwn(t):
+def pwn_emission(tsn,tsb):
 
-    """
-    Return the luminosity of the pulsar wind nebula in the range 1-10 TeV of energy
-    Inputs:
-        t           :       time since the birth of the pulsar (yr)
-    Output:
-        Lum_pwn     :       intrinsic luminosity of a pulsar wind nebula (erg s^-1)
-    """
-    t = t * yr2kyr  # kyr
-    tau_c = (tau_0 + t) * (n-1)/2.0 # characteristic age of the pwn (kyr)
+   """
+   Return the TeV emission (in the HESS energy range (1 TeV to 10 TeV) from a pulsar wind nebula
+	From HESS PWNe paper of 2018
 
-        # energy overflow of the pulsar (erg s^-1)
-    Edot = Edot_0 * (2.0/(n - 1) * tau_c/tau_0)**(-(n + 1)/(n - 1))
+   Inputs:
+	tsn		:	time of the SN explosion (yr)
+	tsb		:	age of the superbubble (yr)
 
-    return L_0 * Edot**m
+   Output:
+	pwn_lum	:	TeV emission of a PWN
+   """
+   # Pulsar parameters from table A1
+   n=3  		# braking index
+   tau0=5e2  	# Initial spin-down time scale in yrs
+   Edot0=2e39  # Initial spin-down power in erg/s
+
+   # Age of pulsar
+   t=tsb-tsn  	# in yrs
+
+   # Compute spin-down power at this time ()
+   Edot=Edot0*(1.0+t/tau0)**((n+1)/(1-n))  # in erg/s
+
+   # Compute 1-10TeV luminosity from fitted relation of table 6 with age limit at 2e5 yr
+   logE=numpy.log10(Edot/1e36)
+   logL=33.22+0.59*logE
+   pwn_lum= 10**logL if t < 2e5 else 0.0  # in erg/s
+
+   return pwn_lum
+
+
+# Compute GeV emission from a pulsar
+def psr_emission(tsn,tsb):
+
+   """
+   Return the GeV emission (in the Fermi energy range (0.1 GeV to 100 GeV) from a pulsar
+	From Fermi-LAT 2PC paper with pulsar initial spin-down parameters from HESS PWNe paper
+
+   Inputs:
+	tsn		:	time of the SN explosion (yr)
+	tsb		:	age of the superbubble (yr)
+
+   Output:
+	psr_lum	:	GeV emission of a PWN
+   """
+
+   # Pulsar parameters from table A1
+   n=3  		# braking index
+   tau0=5e2  	# Initial spin-down time scale in yrs
+   Edot0=2e39  # Initial spin-down power in erg/s
+
+   # Age of pulsar
+   t=tsb-tsn  	# in yrs
+
+   # Compute spin-down power at this time ()
+   Edot=Edot0*(1.0+t/tau0)**((n+1)/(1-n))  # in erg/s
+
+   # Compute 0.1-100GeV luminosity from heuristic relation in 2PC with power limit at 1e34 erg/s
+   # (supported by simulation by Kalapotharakos-2018)
+   psr_lum = numpy.sqrt(1e33*Edot) if Edot > 1e34 else 0.0 # in erg/s
+
+   return psr_lum
 
 def luminosity(lum_energy, energy):
 
@@ -47,11 +94,11 @@ def luminosity(lum_energy, energy):
     Return the luminosity in a range of energy
 
     Inputs:
-        lum_energy  :       intrinsic luminosity array per energy (erg/s/eV)
-        energy      :       range of energy in which we will compute the luminosity (eV)
+        lum_energy 	:       intrinsic luminosity array per energy (erg/s/eV)
+        energy      	:       range of energy in which we will compute the luminosity (eV)
 
     Output:
-        lum         :       luminosity (erg s^-1)
+        lum         		:       luminosity (erg s^-1)
     """
     lum = integrate.trapz(lum_energy, energy)
     lum = numpy.nan_to_num(lum)
@@ -78,37 +125,35 @@ def spectral_index(Emin, Emax, lum_ph_min, lum_ph_max):
 
     return -(numpy.log(lum_ph_max) - numpy.log(lum_ph_min))/(numpy.log(Emax) - numpy.log(Emin))
 
-def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Esep, zones, pathfigure, iteration, figure_number):
+def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, zones):
 
     """
     Returns 6 importants quantities:
         luminosity in the all energy range
-        intrinsic differential luminosity in the all energy range
-        gamma energy array
+        photon spectral index
         number of pulsar wind nebula
-        intrinsic luminosity produces by the PWNe
+	TeV emission of PWNe
+	GeV emission of PSRs
         number of remained OB stars
+
     Inputs:
-        correction_factor   :   correction factor for the radius of the SB
-        t0                  :   (sorted) array of the SN explosion times (yr)
-        t                   :   time array (yr)
-        Emin_CR             :   minimum kinetic energy of the relativistic particles (GeV)
-        Emax_CR             :   maximum kinetic energy of the relativistic particles (GeV)
-        Emin_gamma          :   minimum energy of the gamma photon (GeV)
-        Emax_gamma          :   maximum energy of the gamma photon (GeV)
-        Esep                :   at which energy is the separation between the two ranges of energy (GeV)
-        zones               :   which zone do you want to compute (1: cavity of the SB, 2: supershell and 3: outside)
-        pathfigure          :   path of the file where to save the figure of Gamma emission
-        iteration           :   number of the iteration
-        figure_number       :   number of the figure
+        correction_factor   	:   	correction factor for the radius of the SB
+        t0                  		:   	(sorted) array of the SN explosion times (yr)
+        t                   		:  	time array (yr)
+        Emin_CR             	:   	minimum kinetic energy of the relativistic particles (GeV)
+        Emax_CR             	:   	maximum kinetic energy of the relativistic particles (GeV)
+        Emin_gamma		:   	minimum energy of the gamma photon (GeV)
+        Emax_gamma	:   	maximum energy of the gamma photon (GeV)
+        zones               	:   	which zone do you want to compute (1: cavity of the SB, 2: supershell and 3: outside)
+
     Outputs:
-        Lumtot_sn           :   luminosity in the all energy range (erg s^-1)
-        Flux_sn             :   intrinsic differential luminosity (eV^-1 s^-1)
-        spectrum            :   energy array of the gamma photons for the whole energy range (GeV)
-        n_pwn_tot           :   number of pulsar wind nebulae inside the SB
-        Lum_pwn_tot         :   intrinsic luminosity of the PWNe (erg s^-1)
-        nob                 :   number of remained OB stars inside the OB association
-        figure_number       :   number of the figure
+        Lumtot_sn           	:   	luminosity in the all energy range (erg s^-1)
+        Flux_sn             	:   	intrinsic differential luminosity (eV^-1 s^-1)
+        spectrum            	:   	energy array of the gamma photons for the whole energy range (GeV)
+        n_pwn_tot           	:   	number of pulsar wind nebulae inside the SB
+	Lum_pwn_sn		:	TeV emission of PWNe
+        Lum_psr_sn		:	GeV emission of PSRs
+        nob                 		:   	number of remained OB stars inside the OB association
     """
 
         ##===============================##
@@ -179,7 +224,8 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
 
         # Pulsar wind nebula
     n_pwn_tot = numpy.zeros(nt)
-    Lum_pwn_tot = numpy.zeros(nt)
+    Lum_pwn_sn = numpy.zeros(nt)
+    Lum_psr_sn = numpy.zeros(nt)
 
     for i in range (nt0):                                                       # for each SN explosions
 
@@ -224,18 +270,21 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
 
         Flux = numpy.zeros((number_bin_t, number_bin_E))
 
+        Lum_pwn_t = numpy.zeros(number_bin_t)
+	Lum_psr_t = numpy.zeros(number_bin_t)
+
         for j in range (number_bin_t):                                          # for each time step
 
                 # Initialization
-            t6 = time6[j]           # 10^6 yr
-            t7 = t6 * s6yr27yr      # 10^7 yr
+            t6 = time6[j]           	# 10^6 yr
+            t7 = t6 * s6yr27yr      	# 10^7 yr
             delta_t = time[j] - time[0]
             SB = False  # we do not compute inside the SB
 
                 # Parameters of the SB
             Rsb = radius_velocity_SB(t6) [0]                                                # radius of the SB (pc)
             Rsb = correction_factor * Rsb                                                   # correction of the radius
-            Msb, Mswept = masses(t7, Rsb)                                                   # swept-up and inner masses (solar masses)
+            Msb, Mswept = masses(t7, Rsb)                                                # swept-up and inner masses (solar masses)
             hs, ns = density_thickness_shell_percentage(percentage, Rsb, Mswept, Msb)       # thickness (pc) and density (cm^-3) of the shell
 
                 # For each zones
@@ -346,7 +395,10 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
 
                 Lum_t_tot[j] = Lum_t_shell[j]
 
-            # Interpolation + plot
+            Lum_pwn_t[j] = pwn_emission(t0[i], time[j])
+	    Lum_psr_t[j] = psr_emission(t0[i],time[j])
+
+            # Interpolation
 
                 # number of OB stars
         for l in (indtob):
@@ -356,7 +408,6 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
 
         for l in (indt_pwn):
             n_pwn_tot[l] += 1
-            Lum_pwn_tot[l] += luminosity_pwn(t[l])
 
                 # Gamma luminosity + spectral index
         """
@@ -373,50 +424,23 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
 
                 Lum_sb = interpolation1d(time, Lum_t_sb)
 
-                    # plot
-                #label = 'SB'
-                #sym = '-.'
-
-                #log_plot(figure_HESS, 1, time6, LumHESS_t_sb, label, Title_HESS, xlabel, ylabel, sym)
-                #log_plot(figure, 1, time6, Lum_t_sb, label, Title, xlabel, ylabel, sym)
 
             elif zone == 2:     # in the supershell
 
                 Lum_shell = interpolation1d(time, Lum_t_shell)
 
-                    # plot
-                #label = 'shell'
-                #sym = '--'
-
-                #log_plot(figure_HESS, 1, time6, LumHESS_t_shell, label, Title_HESS, xlabel, ylabel, sym)
-                #log_plot(figure, 1, time6, Lum_t_shell, label, Title, xlabel, ylabel, sym)
 
             else:               # outside the SB
 
                 Lum_out = interpolation1d(time, Lum_t_out)
 
-                    # plot
-                #label = 'out'
-                #sym = ':'
-
-                #log_plot(figure_HESS, 1, time6, LumHESS_t_out, label, Title_HESS, xlabel, ylabel, sym)
-                #log_plot(figure, 1, time6, Lum_t_out, label, Title, xlabel, ylabel, sym)
-
-            # plot
-        #label = 'total'
-        #sym = ':'
-
-        #log_plot(figure_HESS, 1, time6, LumHESS_t_tot, label, Title_HESS, xlabel, ylabel, sym)
-        #plt.savefig(pathfigure+'Gamma_luminosity_range1_it%d_t0%d.eps'%(iteration,i))
-
-        #log_plot(figure, 1, time6, Lum_t_tot, label, Title, xlabel, ylabel, sym)
-        #plt.savefig(pathfigure+'Gamma_luminosity_all_it%d_t0%d.eps'%(iteration,i))
-        #figure_number = figure + 1
-        #plt.show()
 
         Lum_tot = interpolation1d(time, Lum_t_tot)
 
         Flux_tot = interpolation2d(spectrum, time, Flux)
+
+        Lum_pwn_tot = interpolation1d(time, Lum_pwn_t)
+        Lum_psr_tot = interpolation1d(time, Lum_psr_t)
 
         for l in (indt):
 
@@ -436,5 +460,28 @@ def data(correction_factor, t0, t, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, Ese
 
             Lumtot_sn[l] += Lum_tot(t[l])
             Flux_sn[l] += Flux_tot(spectrum, t[l])
+            Lum_pwn_sn[l] += Lum_pwn_tot(t[l])
+	    Lum_psr_sn[l] += Lum_psr_tot(t[l])
 
-    return Lumtot_sn, Flux_sn, spectrum, n_pwn_tot, Lum_pwn_tot, nob, figure_number
+    return Lumtot_sn, Flux_sn, spectrum, n_pwn_tot, Lum_pwn_sn, Lum_psr_sn, nob
+
+
+def energy_gamma(lum_gamma, time):
+
+    """
+    Return the energy radiation by gamma photons.
+
+    Inputs:
+        lum_gamma   :   intrinsic luminosity (erg s^-1)
+        time        :   time array (yr)
+
+    Output:
+        E_gamma     :   total energy radiation (ergs)
+    """
+
+    time = time * yr2s
+
+    energy = integrate.trapz(lum_gamma, time)
+    energy = numpy.nan_to_num(energy)
+
+    return energy
