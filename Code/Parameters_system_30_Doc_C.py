@@ -13,7 +13,7 @@ from Conversion_factors import *
 ##=============================##
 
     # OB asociation
-Nob = 30           # number of OB-stars in the association
+Nob = 117           # number of OB-stars in the association
 Lob = 1e36          # mean luminosity of an OB-star (erg/s)
 Pob = Nob * Lob     # mean power of the association (erg/s)
 L36 = Pob * erg236erg     # mechanical energy expressed in 10^36 erg/s
@@ -97,7 +97,7 @@ alpha = 2.0         # exponent of the power-law distribution
 
     # Diffusion coefficient of the cosmic rays (cm^2 s^-1)
 delta = 1.0/2       # exponent of the power-law of the diffusion coefficient
-D0 = 1e28           # diffusion coefficient at 10 GeV/c in cm^2 s^-1  ==> prendre *10 et /10
+D0 = 1e26           # diffusion coefficient at 10 GeV/c in cm^2 s^-1  ==> prendre *10 et /10
 
 ##==============##
 # Gamma emission #

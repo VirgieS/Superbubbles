@@ -1,0 +1,318 @@
+/anaconda2/lib/python2.7/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+/Users/stage/Documents/Virginie/Superbubbles/Code/Functions_CR.py:91: RuntimeWarning: divide by zero encountered in divide
+  a = r_in/(numpy.sqrt(4 * D * deltat))
+/Users/stage/Documents/Virginie/Superbubbles/Code/Functions_CR.py:92: RuntimeWarning: divide by zero encountered in divide
+  b = r_out/(numpy.sqrt(4 * D * deltat))
+/Users/stage/Documents/Virginie/Superbubbles/Code/Functions_CR.py:94: RuntimeWarning: invalid value encountered in multiply
+  N = NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * (erf(b) - erf(a)) + 2 * numpy.exp(-a**2) * a - 2 * numpy.exp(-b**2) * b)
+For 30 SN
+For 150 iterations
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 0
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 1
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 2
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 3
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 4
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 5
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 6
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 7
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 8
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 9
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 10
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 11
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 12
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 13
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 14
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 15
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 16
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 17
+[0.00000000e+00 0.00000000e+00 0.00000000e+00 ... 9.44055986e+33
+ 9.31457571e+33 9.18859157e+33]
+end of the iteration 18
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 19
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 20
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 21
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 22
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 23
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 24
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 25
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 26
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 27
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 28
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 29
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 30
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 31
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 32
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 33
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 34
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 35
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 36
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 37
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 38
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 39
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 40
+[0.00000000e+00 0.00000000e+00 0.00000000e+00 ... 3.43570535e+33
+ 3.41208333e+33 3.38907888e+33]
+end of the iteration 41
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 42
+[0.00000000e+00 0.00000000e+00 0.00000000e+00 ... 2.21264646e+34
+ 2.16358661e+34 2.11610583e+34]
+end of the iteration 43
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 44
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 45
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 46
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 47
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 48
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 49
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 50
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 51
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 52
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 53
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 54
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 55
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 56
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 57
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 58
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 59
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 60
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 61
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 62
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 63
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 64
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 65
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 66
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 67
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 68
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 69
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 70
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 71
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 72
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 73
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 74
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 75
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 76
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 77
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 78
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 79
+[0. 0. 0. ... 0. 0/Users/stage/Documents/Virginie/Superbubbles/Code/Functions_gamma.py:126: RuntimeWarning: divide by zero encountered in log
+  return -(numpy.log(lum_ph_max) - numpy.log(lum_ph_min))/(numpy.log(Emax) - numpy.log(Emin))
+/Users/stage/Documents/Virginie/Superbubbles/Code/Functions_gamma.py:126: RuntimeWarning: invalid value encountered in subtract
+  return -(numpy.log(lum_ph_max) - numpy.log(lum_ph_min))/(numpy.log(Emax) - numpy.log(Emin))
+. 0.]
+end of the iteration 80
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 81
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 82
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 83
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 84
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 85
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 86
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 87
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 88
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 89
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 90
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 91
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 92
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 93
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 94
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 95
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 96
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 97
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 98
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 99
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 100
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 101
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 102
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 103
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 104
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 105
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 106
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 107
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 108
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 109
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 110
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 111
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 112
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 113
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 114
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 115
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 116
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 117
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 118
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 119
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 120
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 121
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 122
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 123
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 124
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 125
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 126
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 127
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 128
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 129
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 130
+[0.00000000e+00 0.00000000e+00 0.00000000e+00 ... 4.60244752e+34
+ 4.40429122e+34 4.20613491e+34]
+end of the iteration 131
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 132
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 133
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 134
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 135
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 136
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 137
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 138
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 139
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 140
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 141
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 142
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 143
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 144
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 145
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 146
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 147
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 148
+[0. 0. 0. ... 0. 0. 0.]
+end of the iteration 149

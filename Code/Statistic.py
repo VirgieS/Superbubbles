@@ -63,7 +63,7 @@ else:
 
     # Fix time array (yr)
 t0min = 3           # Myr
-t0max = 7t_end_6    # Myr
+t0max = 37          # Myr
 tmin = t0min/yr26yr # yr
 tmax = (t0max+1)/yr26yr         # yr
 number_bin_t = 3000

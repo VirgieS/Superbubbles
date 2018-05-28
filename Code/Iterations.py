@@ -26,7 +26,7 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # IRAP
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/10/5')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/30/10')
 
     # Home
 #os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/Parameters/stars/10/5')
@@ -40,7 +40,7 @@ Compute the important parameters for each iterations
 """
 
     # Number of iterations
-nit = 100                                                                       #you need to change it for your simulations
+nit = 150                                                                      #you need to change it for your simulations
 
     # Which zone for the Computation
 zones = [2]                                                                     #you need to change it for your simulations
@@ -51,7 +51,8 @@ need_correction = False
 
 if need_correction:
 
-    t_end_6 = 4.5           # Myr
+    t_end_6 = 4.0           # Myr
+    t_sn = t_end_6 + 1      # Myr
     t_end = t_end_6/yr26yr  # yr
     Rsb = 47.0                          # observed radius (pc)                  #you need to change it for your simulations
     Rw = radius_velocity_SB(t_end_6)[0] # from Weaver's model (pc and km/s)
@@ -59,23 +60,19 @@ if need_correction:
 
 else:
     correction_factor = 1
-    t_end_6 = 7
+    t_sn = 37
 
     # Fix time array (yr)
 t0min = 3           # Myr
-t0max = t_end_6     # Myr
+t0max = t_sn
 tmin = t0min/yr26yr     # yr
-tmax = (t0max+1)/yr26yr         # yr
+tmax = 10/yr26yr        # yr
 number_bin_t = 3000
 t_fix = numpy.linspace(tmin, tmax, number_bin_t)    # yr
 t6 = t_fix * yr26yr                                 # Myr
 
     # Initialization
 figure_number = 1
-random = False
-
-time_sn = (t0max - t0min) * 1.0/Nob * 1.0/yr26yr # yr
-mean_sn = int(tmax/time_sn) # mean value of SN explosions already happen        #you need to change it for your simulations
 
 Lum_it = []                 # total gamma luminosity for the whole energy range
 Flux_it = []                # photon flux for the whole energy range
@@ -97,16 +94,19 @@ with open('SB', 'wb') as SB_write:
 
     for i in range (nit):
 
-        if random:
+        if need_correction:
 
+            mean_sn = 5                                                         # you need to change it for your simulations
             nsn = numpy.random.poisson(lam = mean_sn)       # random number of SN which mean value equals to mean_sn
 
         else:
-
-            nsn = mean_sn
+            nsn = 1
 
         t0 = random_uniform(t0min, t0max, nsn)/yr26yr   # random SN explosion times with an uniform distribution from t0min to t0max
         t0 = sorted(t0)
+        t0 = numpy.asarray(t0)
+        indsn = numpy.where(t0 <= tmax)[0]
+        t0 = t0[indsn]
 
         t0_it.append(t0)
 
@@ -123,6 +123,7 @@ with open('General', 'wb') as data_write:
         t0 = t0_it[i]
 
         Lum, Flux, spectrum, n_pwn, Lum_pwn, Lum_psr, nob = data(correction_factor, t0, t_fix, Emin_CR, Emax_CR, Emin_gamma, Emax_gamma, zones)
+        print(Lum)
 
         Lum_it.append(Lum)
         Flux_it.append(Flux)
@@ -154,7 +155,6 @@ with open('General', 'wb') as data_write:
     Fluxmax = Flux_it[:, :, indE[-1]]
     Gamma_HESS_it = spectral_index(Emin, Emax, Fluxmin, Fluxmax)
     Gamma_HESS_it = numpy.nan_to_num(Gamma_HESS_it)
-    #Gamma_HESS_it = numpy.asarray(Gamma_HESS_it)
 
         # Fermi energy range
 
@@ -174,7 +174,6 @@ with open('General', 'wb') as data_write:
     Fluxmax = Flux_it[:, :, indE[-1]]
     Gamma_Fermi_it = spectral_index(Emin, Emax, Fluxmin, Fluxmax)
     Gamma_Fermi_it = numpy.nan_to_num(Gamma_Fermi_it)
-    #Gamma_Fermi_it = numpy.asarray(Gamma_Fermi_it)
 
     n_pwn_it = numpy.asarray(n_pwn_it)
     Lum_pwn_it = numpy.asarray(Lum_pwn_it)
@@ -184,7 +183,7 @@ with open('General', 'wb') as data_write:
     pickle.dump(Lum_HESS_it, data_write)
     pickle.dump(Lum_Fermi_it, data_write)
     pickle.dump(Lum_it, data_write)
-    pickle.dump(Flux_it, data_write)
+    #pickle.dump(Flux_it, data_write)
     pickle.dump(Gamma_HESS_it, data_write)
     pickle.dump(Gamma_Fermi_it, data_write)
     pickle.dump(n_pwn_it, data_write)
