@@ -3,6 +3,7 @@ Here are all the free parameters for the system!
 """
 
 import numpy
+import astropy.units as units
 
 # Physical constants and conversion factors
 from Physical_constants import *
@@ -13,7 +14,7 @@ from Conversion_factors import *
 ##=============================##
 
     # OB asociation
-Nob = 30           # number of OB-stars in the association
+Nob = 100           # number of OB-stars in the association
 Lob = 1e36          # mean luminosity of an OB-star (erg/s)
 Pob = Nob * Lob     # mean power of the association (erg/s)
 L36 = Pob * erg236erg     # mechanical energy expressed in 10^36 erg/s
@@ -90,6 +91,9 @@ Esng = Esn * erg2GeV    # GeV
     # Energy (GeV)
 Emin_CR = 1            # minimum kinetic energy: Emin = 1GeV
 Emax_CR = 1*PeV2GeV    # minimum kinetic energy: Emax = 1PeV in GeV
+number_bin_E = 10
+ECR = numpy.logspace(numpy.log10(Emin_CR), numpy.log10(Emax_CR), number_bin_E)
+E_CR = ECR * units.GeV
 
     # Power-law distribution of the cosmic rays (GeV^-1 cm^-3)
 p0 = 10             # normalization constant (GeV/c)
@@ -97,7 +101,7 @@ alpha = 2.0         # exponent of the power-law distribution
 
     # Diffusion coefficient of the cosmic rays (cm^2 s^-1)
 delta = 1.0/2       # exponent of the power-law of the diffusion coefficient
-D0 = 1e28           # diffusion coefficient at 10 GeV/c in cm^2 s^-1  ==> prendre *10 et /10
+D0 = 1e26           # diffusion coefficient at 10 GeV/c in cm^2 s^-1  ==> prendre *10 et /10
 
 ##==============##
 # Gamma emission #
@@ -106,3 +110,9 @@ D0 = 1e28           # diffusion coefficient at 10 GeV/c in cm^2 s^-1  ==> prendr
     # Energy of the gamma photons (GeV)
 Emin_gamma = 100 * MeV2GeV      # 100 MeV (GeV)
 Emax_gamma = 100 * TeV2GeV      # 100 TeV (GeV)
+
+number_bin_E = 20
+spectrum = numpy.logspace(numpy.log10(Emin_gamma), numpy.log10(Emax_gamma), number_bin_E)   # GeV
+spectrum_erg = spectrum * 1.0/erg2GeV       # erg
+spectrum_ev = spectrum * GeV2eV             # eV
+spectrum_energy = spectrum * units.GeV      # with the units

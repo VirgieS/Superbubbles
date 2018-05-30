@@ -86,6 +86,9 @@ def shell_particles(r_in, r_out, NE, D, deltat):
     if deltat < 1e-8 and r_in == 0:
         N = NE
 
+    elif delta < 1e-8:
+        N = numpy.zeros_like(NE)
+
     else:
         deltat = deltat * yr2s            # in s
         a = r_in/(numpy.sqrt(4 * D * deltat))

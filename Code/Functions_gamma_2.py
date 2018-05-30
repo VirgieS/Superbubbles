@@ -221,7 +221,7 @@ def data(correction_factor, t0, t, zones):
         tdiffmin = diffusion_time(Rsb, D[-1])   # minimal difffusion time scale (yr)
         tmin = t0[i] + tdiffmin        # only when the SN occurs and the high-energy particles enter the supershell (yr)
         tmax = tmin + 10*tdiffmax      # almost all the CR have left the superbubble (yr)
-        number_bin_t = 200
+        number_bin_t = 100
         time = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)
         time6 = time * yr26yr   # Myr
 

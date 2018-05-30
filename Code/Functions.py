@@ -100,7 +100,7 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
 
     return
 
-def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle, color, text):
+def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle, color, text, xmin, xmax, ymin, ymax):
     """
     Function to plot a linear graphic
     Inputs:
@@ -119,6 +119,16 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
         # figure
     fig = plt.figure(figure_number, figsize=(8,5))
     ax = fig.add_subplot(111)
+
+        # limit
+    #xmin = min(x)
+    #xmax = max(x)
+    plt.xlim((xmin, xmax))
+
+    #y = numpy.nan_to_num(y)
+    #ymax = numpy.max(y)
+    #ymin = numpy.min(y)
+    plt.ylim((ymin, ymax))
 
         # Plot
     if number_of_plot > 1:
@@ -292,7 +302,7 @@ def plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbol):
 
     return
 
-def histogramme(figure_number, hist, label_name, title, xlabel, ylabel):
+def histogramme(figure_number, hist, label_name, title, xlabel, ylabel, len_bins):
     """
     Return the histogramme of hist
     Inputs:
@@ -304,11 +314,21 @@ def histogramme(figure_number, hist, label_name, title, xlabel, ylabel):
         ylabel          :       label of the y axis
     """
     plt.figure(figure_number, figsize=(8,5))
-    plt.hist(hist, histtype = 'step', bins = 10, align = 'mid', label = label_name)
+    hist_max = numpy.max(hist)
+    hist_min = numpy.min(hist)
+    bins = int((hist_max - hist_min)/len_bins)
+
+    if label_name == 'none':
+        plt.hist(hist, histtype = 'step', bins = bins, align = 'mid')
+
+    else:
+        plt.hist(hist, histtype = 'step', bins = bins, align = 'mid', label = label_name)
+        plt.legend(loc = 'best')
+
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.legend(loc = 'best')
+
 
     return
 
