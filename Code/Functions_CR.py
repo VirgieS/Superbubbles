@@ -91,10 +91,13 @@ def shell_particles(r_in, r_out, NE, D, deltat):
 
     else:
         deltat = deltat * yr2s            # in s
-        a = r_in/(numpy.sqrt(4 * D * deltat))
-        b = r_out/(numpy.sqrt(4 * D * deltat))
+        alpha = numpy.sqrt(4 * D * deltat)
+        a = r_in/(alpha)
+        b = r_out/(alpha)
 
-        N = NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * (erf(b) - erf(a)) + 2 * numpy.exp(-a**2) * a - 2 * numpy.exp(-b**2) * b)
+        spi = numpy.sqrt(numpy.pi)
+
+        N = NE/(spi) * (spi * (erf(b) - erf(a)) + 2 * numpy.exp(-a**2) * a - 2 * numpy.exp(-b**2) * b)
 
     return N
 
@@ -114,7 +117,8 @@ def inf_particles(Rsb, NE, D, deltat):
     if deltat > 1e-8:
         N = numpy.zeros_like(NE)
         a = (Rsb*pc2cm)/(numpy.sqrt(4 * D * deltat * yr2s))
-        N = NE/(numpy.sqrt(numpy.pi)) * (numpy.sqrt(numpy.pi) * erfc(a) + 2 * numpy.exp(-a**2) * a)
+        spi = numpy.sqrt(numpy.pi)
+        N = NE/(spi) * (spi * erfc(a) + 2 * numpy.exp(-a**2) * a)
 
     return N
 

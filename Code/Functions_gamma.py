@@ -218,8 +218,7 @@ def data(correction_factor, t0, t, zones):
         Rsb = radius_velocity_SB(t6)[0]         # outer radius of the superbubble (Weaver model) (pc)
         Rsb = correction_factor * Rsb           # outer radius of the superbubble (corrected) (pc)
         tdiffmax = diffusion_time(Rsb, D[0])    # maximal diffusion time scale (yr)
-        tdiffmin = diffusion_time(Rsb, D[-1])   # minimal difffusion time scale (yr)
-        tmin = t0[i] + tdiffmin        # only when the SN occurs and the high-energy particles enter the supershell (yr)
+        tmin = t0[i]                            # only when the SN occurs and the high-energy particles enter the supershell (yr)
         tmax = tmin + 10*tdiffmax      # almost all the CR have left the superbubble (yr)
         number_bin_t = 200
         time = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)
@@ -272,8 +271,8 @@ def data(correction_factor, t0, t, zones):
             Vsb = Vsb_t[j]
             Msb, Mswept = masses(t7, Rsb)                                               # swept-up and inner masses (solar masses)
             Ms_t[j] = Mswept - Msb                                                      # mass in the shell (solar masses)
-            #hs, ns = density_thickness_shell_percentage(percentage, Rsb, Mswept, Msb)  # thickness (pc) and density (cm^-3) of the shell
-            hs, ns = density_thickness_shell(Vsb, Mswept, Msb, Rsb)                     # thickness (pc) and density (cm^-3) of the shell
+            ns, hs = density_thickness_shell_percentage(percentage, Rsb, Mswept, Msb)  # thickness (pc) and density (cm^-3) of the shell
+            #ns, hs = density_thickness_shell(Vsb, Mswept, Msb, Rsb)                     # thickness (pc) and density (cm^-3) of the shell
             ns_t[j] = ns
 
                 # For each zones

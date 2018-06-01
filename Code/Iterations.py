@@ -26,7 +26,7 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # IRAP
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Test')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/percentage/20/10')
 
     # Home
 #os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/Parameters/stars/10/5')
@@ -40,7 +40,7 @@ Compute the important parameters for each iterations
 """
 
     # Number of iterations
-nit = 1                                                                      #you need to change it for your simulations
+nit = 10                                                                      #you need to change it for your simulations
 
     # Which zone for the Computation
 zones = [2]                                                                     #you need to change it for your simulations
@@ -66,7 +66,7 @@ else:
 t0min = 3           # Myr
 t0max = t_sn        # Myr
 tmin = t0min/yr26yr     # yr
-tmax = 37/yr26yr        # yr
+tmax = 10/yr26yr        # yr
 number_bin_t = 3000
 t_fix = numpy.linspace(tmin, tmax, number_bin_t)    # yr
 t6 = t_fix * yr26yr                                 # Myr
@@ -99,7 +99,7 @@ with open('SB', 'wb') as SB_write:
 
     for i in range (nit):
 
-        nsn = 1
+        nsn = Nob
 
         t0 = numpy.random.uniform(t0min, t0max, nsn)/yr26yr   # random SN explosion times with an uniform distribution from t0min to t0max
         t0 = sorted(t0)
@@ -192,8 +192,8 @@ with open('General', 'wb') as data_write:
     Gamma_GeV_it = numpy.nan_to_num(Gamma_GeV_it)
 
             # Spectral photon index (100 MeV to 1 GeV)
-    Emin = 100 * MeV2GeV  # 100 MeV
-    Emax = 1            # 1 GeV
+    Emin = 100 * MeV2GeV    # 100 MeV
+    Emax = 1                # 1 GeV
     indE = numpy.where((spectrum >= Emin) & (spectrum <= Emax))[0]
     Fluxmin = Flux_it[:, :, indE[0]]
     Fluxmax = Flux_it[:, :, indE[-1]]
@@ -219,3 +219,6 @@ with open('General', 'wb') as data_write:
     pickle.dump(Vsb, data_write)
     pickle.dump(Ms, data_write)
     pickle.dump(ns, data_write)
+
+print('number of SN: %d' %Nob)
+print('diffusion coefficient: %.2e cm^2 s^-1' %D0)

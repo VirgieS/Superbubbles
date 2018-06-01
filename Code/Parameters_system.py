@@ -14,7 +14,7 @@ from Conversion_factors import *
 ##=============================##
 
     # OB asociation
-Nob = 100           # number of OB-stars in the association
+Nob = 300           # number of OB-stars in the association
 Lob = 1e36          # mean luminosity of an OB-star (erg/s)
 Pob = Nob * Lob     # mean power of the association (erg/s)
 L36 = Pob * erg236erg     # mechanical energy expressed in 10^36 erg/s
@@ -26,7 +26,7 @@ n0 = 10             # ambient density (cm^-3)
 xH = 0.9            # mass fraction of hydrogen
 xHe = 0.1           # mass fraction of helium
 mu = xH + xHe * 4   # average molecular weight
-percentage = 0.10   # percentage of the thickness of the shell in term of the outer radius of the SB
+percentage = 0.20   # percentage of the thickness of the shell in term of the outer radius of the SB
 Ts = 1e2            # shell temperature (K)
 
     # R(t) = ar * n0^alphar * L36^betar * t6^gammar                  (pc)
@@ -101,7 +101,7 @@ alpha = 2.0         # exponent of the power-law distribution
 
     # Diffusion coefficient of the cosmic rays (cm^2 s^-1)
 delta = 1.0/2       # exponent of the power-law of the diffusion coefficient
-D0 = 1e26           # diffusion coefficient at 10 GeV/c in cm^2 s^-1  ==> prendre *10 et /10
+D0 = 1e28           # diffusion coefficient at 10 GeV/c in cm^2 s^-1  ==> prendre *10 et /10
 
 ##==============##
 # Gamma emission #

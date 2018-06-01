@@ -26,9 +26,9 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # IRAP
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/30/Gamma_emission/2'
-pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/30/Remain/2'
-pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/30/SB/2'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/300/Gamma_emission/'
+pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/300/Remain/'
+pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/300/SB/'
     # Home
 #pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Gamma_emission/bis_300'
 #pathfigure_remain = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Remain/bis_300'
@@ -59,7 +59,7 @@ t6 = t_fix * yr26yr                                 # Myr
 
     # Initialization
 figure_number = 1
-
+"""
 Lum_HESS_it = numpy.zeros((nit_tot, number_bin_t))              # total gamma luminosity for the energy range of HESS
 Lum_Fermi_it = numpy.zeros((nit_tot, number_bin_t))             # total gamma luminosity for the energy range of Fermi
 Lum_it = numpy.zeros((nit_tot, number_bin_t))                   # total gamma luminosity for the whole energy range
@@ -79,7 +79,7 @@ Ms_t = numpy.zeros(number_bin_t)
     # Load data #
     ## ------- ##
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/30/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/300/')
 
 with open('Total', 'rb') as iteration_write:
 
@@ -92,6 +92,7 @@ with open('Total', 'rb') as iteration_write:
     Lum_pwn_it = pickle.load(iteration_write)
     Lum_psr_it = pickle.load(iteration_write)
     nob_it = pickle.load(iteration_write)
+    tsn_it = pickle.load(iteration_write)
     nsn_it = pickle.load(iteration_write)
 
     ##-------------------------------------------##
@@ -106,32 +107,37 @@ if nit_tot > 1:
     figure = figure_number
     label = 'none'
     len_bins = 1
+    histmin = numpy.min(nsn_it)
+    histmax = numpy.max(nsn_it)
 
     histogramme(figure, nsn_it, label, title, xlabel, ylabel, len_bins)
     plt.savefig(pathfigure+'Histogramme_nsn.pdf')
 
     figure_number = figure + 1
-"""
-    # Computation of the probability to get tsn
+
+    # Computation of the probability to get nsn
 title = ''
 xlabel = '$t_{sn}$'
 ylabel = 'counts'
 figure = figure_number
 label = 'none'
+len_bins = 1    # Myr
 
-histogramme(figure, t0, label, title, xlabel, ylabel)
+for i in range (nfiles):
+    histogramme(figure, tsn_it[i], label, title, xlabel, ylabel, len_bins)
+
 plt.savefig(pathfigure+'Histogramme_tsn.pdf')
 
 figure_number = figure + 1
-"""
+
     ## ---------------------------------------------------------------- ##
     # Histogramme of the probability to have one luminosity/photon index #
     ## ---------------------------------------------------------------- ##
-indt8 = numpy.where((t6 >= 7.5) & (t6 <= 8.5))[0]
 
+indt = [1000, 2500]
 if nit_tot > 1:
             # choosen time
-    ind_hist = [indt8[0], indt8[-1]]
+    ind_hist = [indt[0], indt[-1]]
             # Computation of the probability to get a luminosity L
     title = ''
     xlabel_LH = '$L_\gamma$ (1 TeV - 10 TeV)'
@@ -145,7 +151,8 @@ if nit_tot > 1:
     figure_LH = figure_number
     figure_GH = figure_LH + 1
     figure_LF = figure_GH + 1
-    figure_GG = figure_LF + 1
+    figure_L = figure_LF + 1
+    figure_GG = figure_L + 1
     figure_GM = figure_GG + 1
     figure_PSR = figure_GM + 1
     figure_PWN = figure_PSR + 1
@@ -169,8 +176,14 @@ if nit_tot > 1:
         Lum_Fermi = Lum_Fermi_it[:, j]
         len_bins = 1e33
 
-        histogramme(figure_LF, Lum_Fermi, label, title, xlabel_LF, ylabel, len_bins)
+        histogramme(figure_L, Lum_Fermi, label, title, xlabel_LF, ylabel, len_bins)
         plt.savefig(pathfigure_gamma+'Histogramme_Lum_Fermi.pdf')
+
+        Lum = Lum_it[:, j]
+        len_bins = 1e33
+
+        histogramme(figure_LF, Lum, label, title, xlabel_LF, ylabel, len_bins)
+        plt.savefig(pathfigure_gamma+'Histogramme_Lum_.pdf')
 
         Gamma_GeV = Gamma_GeV_it[:, j]
         len_bins = 0.001
@@ -185,7 +198,7 @@ if nit_tot > 1:
         plt.savefig(pathfigure_gamma+'Histogramme_Gamma_MeV.pdf')
 
         Lum_PSR = Lum_psr_it[:, j]
-        len_bins = 1e34
+        len_bins = 1e33
 
         histogramme(figure_PSR, Lum_PSR, label, title, xlabel_PSR, ylabel, len_bins)
         plt.savefig(pathfigure_gamma+'Histogramme_Lum_PSR.pdf')
@@ -229,22 +242,19 @@ Lum_psr_std = numpy.zeros(number_bin_t)                 # GeV emission of PSRs
 for j in range (number_bin_t):
 
     Lum_HESS = Lum_HESS_it[:, j]
-    #Lum_HESS = Lum_HESS[numpy.where(Lum_HESS > 0.0)[0]]
 
     Lum_Fermi = Lum_Fermi_it[:, j]
-    #Lum_Fermi = Lum_Fermi[numpy.where(Lum_Fermi > 0.0)[0]]
 
     Lum = Lum_it[:, j]
-    #Lum = Lum[numpy.where(Lum > 0.0)[0]]
 
     Gamma_HESS = Gamma_HESS_it[:, j]
-    #Gamma_HESS = Gamma_HESS[numpy.where(Gamma_HESS > 0.0)[0]]
+    Gamma_HESS = Gamma_HESS[numpy.where(Gamma_HESS > 0.0)[0]]
 
     Gamma_GeV = Gamma_GeV_it[:, j]
-    #Gamma_GeV = Gamma_GeV[numpy.where(Gamma_GeV > 0.0)[0]]
+    Gamma_GeV = Gamma_GeV[numpy.where(Gamma_GeV > 0.0)[0]]
 
     Gamma_MeV = Gamma_MeV_it[:, j]
-    #Gamma_MeV = Gamma_MeV[numpy.where(Gamma_MeV > 0.0)[0]]
+    Gamma_MeV = Gamma_MeV[numpy.where(Gamma_MeV > 0.0)[0]]
 
     Lum_pwn = Lum_pwn_it[:, j]
     Lum_pwn = Lum_pwn[numpy.where(Lum_pwn > 0.0)[0]]
@@ -267,7 +277,7 @@ for j in range (number_bin_t):
     Lum_std[j] = numpy.std(Lum)
     Gamma_HESS_std[j] = numpy.std(Gamma_HESS)
     Gamma_GeV_std[j] = numpy.std(Gamma_GeV)
-    Gamma_MeV_mean[j] = numpy.std(Gamma_MeV)
+    Gamma_MeV_std[j] = numpy.std(Gamma_MeV)
     nob_std[j] = numpy.std(nob_it[:, j])
     Lum_pwn_std[j] = numpy.std(numpy.log10(Lum_pwn))
     Lum_psr_std[j] = numpy.std(numpy.log10(Lum_psr))
@@ -275,48 +285,60 @@ for j in range (number_bin_t):
 Lum_HESS_mean = numpy.nan_to_num(Lum_HESS_mean)
 Lum_HESS_std = numpy.nan_to_num(Lum_HESS_std)
 Lum_HESS_pst = Lum_HESS_mean + Lum_HESS_std
-Lum_HESS_mst = Lum_HESS_mean - Lum_HESS_std
-#Lum_HESS_mst = numpy.nan_to_num(Lum_HESS_mst)
-#ind0 = numpy.where(Lum_HESS_mst < 0)[0]
-#Lum_HESS_mst[ind0] = numpy.zeros(len(ind0))
+
+if Nob == 30:
+
+    Lum_HESS_mst = numpy.zeros(number_bin_t)
+
+else:
+
+    Lum_HESS_mst = Lum_HESS_mean - Lum_HESS_std
+    Lum_HESS_mst = numpy.nan_to_num(Lum_HESS_mst)
+    ind0 = numpy.where(Lum_HESS_mst < 0)[0]
+    Lum_HESS_mst[ind0] = numpy.zeros(len(ind0))
 
 Lum_Fermi_mean = numpy.nan_to_num(Lum_Fermi_mean)
 Lum_Fermi_std = numpy.nan_to_num(Lum_Fermi_std)
 Lum_Fermi_pst = Lum_Fermi_mean + Lum_Fermi_std
-Lum_Fermi_mst = Lum_Fermi_mean - Lum_Fermi_std
-#Lum_Fermi_mst = numpy.nan_to_num(Lum_Fermi_mst)
-#ind0 = numpy.where(Lum_Fermi_mst < 0)[0]
-#Lum_Fermi_mst[ind0] = numpy.zeros(len(ind0))
+
+if Nob == 30:
+
+    Lum_Fermi_mst = numpy.zeros(number_bin_t)
+
+else:
+
+    Lum_Fermi_mst = Lum_Fermi_mean - Lum_Fermi_std
+    Lum_Fermi_mst = numpy.nan_to_num(Lum_Fermi_mst)
+    ind0 = numpy.where(Lum_Fermi_mst < 0)[0]
+    Lum_Fermi_mst[ind0] = numpy.zeros(len(ind0))
 
 Lum_mean = numpy.nan_to_num(Lum_mean)
 Lum_std = numpy.nan_to_num(Lum_std)
 Lum_pst = Lum_mean + Lum_std
-Lum_mst = Lum_mean - Lum_std
-#Lum_mst = numpy.nan_to_num(Lum_mst)
-#ind0 = numpy.where(Lum_mst < 0)[0]
-#Lum_mst[ind0] = numpy.zeros(len(ind0))
 
-Gamma_HESS_mean = numpy.nan_to_num(Gamma_HESS_mean)
-Gamma_HESS_std = numpy.nan_to_num(Gamma_HESS_std)
+if Nob == 30:
+
+    Lum_mst = numpy.zeros(number_bin_t)
+
+else:
+
+    Lum_mst = Lum_mean - Lum_std
+    Lum__mst = numpy.nan_to_num(Lum_mst)
+    ind0 = numpy.where(Lum_mst < 0)[0]
+    Lum_mst[ind0] = numpy.zeros(len(ind0))
+
 Gamma_HESS_pst = Gamma_HESS_mean + Gamma_HESS_std
 Gamma_HESS_mst = Gamma_HESS_mean - Gamma_HESS_std
-Gamma_HESS_mst = numpy.nan_to_num(Gamma_HESS_mst)
 ind0 = numpy.where(Gamma_HESS_mst < 0)[0]
 Gamma_HESS_mst[ind0] = numpy.zeros(len(ind0))
 
-Gamma_GeV_mean = numpy.nan_to_num(Gamma_GeV_mean)
-Gamma_GeV_std = numpy.nan_to_num(Gamma_GeV_std)
 Gamma_GeV_pst = Gamma_GeV_mean + Gamma_GeV_std
 Gamma_GeV_mst = Gamma_GeV_mean - Gamma_GeV_std
-Gamma_GeV_mst = numpy.nan_to_num(Gamma_GeV_mst)
 ind0 = numpy.where(Gamma_GeV_mst < 0)[0]
 Gamma_GeV_mst[ind0] = numpy.zeros(len(ind0))
 
-Gamma_MeV_mean = numpy.nan_to_num(Gamma_MeV_mean)
-Gamma_MeV_std = numpy.nan_to_num(Gamma_MeV_std)
 Gamma_MeV_pst = Gamma_MeV_mean + Gamma_MeV_std
 Gamma_MeV_mst = Gamma_MeV_mean - Gamma_MeV_std
-Gamma_MeV_mst = numpy.nan_to_num(Gamma_MeV_mst)
 ind0 = numpy.where(Gamma_MeV_mst < 0)[0]
 Gamma_MeV_mst[ind0] = numpy.zeros(len(ind0))
 
@@ -351,44 +373,41 @@ xmax = tmax * yr26yr + 0.5
         # Gamma luminosity of the superbubble
 
             # HESS energy range
-y = [numpy.log10(Lum_HESS_mean), numpy.log10(Lum_HESS_pst), numpy.log10(Lum_HESS_mst)]
-y = numpy.nan_to_num(y)
+y = [Lum_HESS_mean, Lum_HESS_pst, Lum_HESS_mst]
 ind0 = 1000
-ymin = numpy.asarray(y[0])[ind0] - 3
-ymax = numpy.asarray(y[0])[ind0] + 2
-ylabel_HESS = '$\log(L_\gamma)$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
+ymin = 10**(numpy.asarray(numpy.log10(y[0]))[ind0] - 3)
+ymax = 10**(numpy.asarray(numpy.log10(y[0]))[ind0] + 2)
+ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
 #ind0 = numpy.where(Lum_HESS_mst > 0)[0]
 
-plot(figure_number, 3, t6, y, label, Title, xlabel, ylabel_HESS, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
-plt.savefig(pathfigure_gamma+'Mean_gamma_emission_HESS2.pdf')
+semilog_plot(figure_number, 3, t6, y, label, Title, xlabel, ylabel_HESS, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
+plt.savefig(pathfigure_gamma+'Mean_gamma_emission_HESS.pdf')
 
 figure_number += 1
 
             # Fermi energy range
-y = [numpy.log10(Lum_Fermi_mean), numpy.log10(Lum_Fermi_pst), numpy.log10(Lum_Fermi_mst)]
-y = numpy.nan_to_num(y)
+y = [Lum_Fermi_mean, Lum_Fermi_pst, Lum_Fermi_mst]
 ind0 = 1000
-ymin = numpy.asarray(y[0])[ind0] - 3
-ymax = numpy.asarray(y[0])[ind0] + 2
-ylabel_Fermi = '$\log(L_\gamma)$ [erg s$^{-1}$] (100 MeV - 100 GeV)'
+ymin = 10**(numpy.asarray(numpy.log10(y[0]))[ind0] - 3)
+ymax = 10**(numpy.asarray(numpy.log10(y[0]))[ind0] + 2)
+ylabel_Fermi = '$L_\gamma$ [erg s$^{-1}$] (100 MeV - 100 GeV)'
 #ind0 = numpy.where(Lum_Fermi_mst > 0)[0]
 
-plot(figure_number, 3, t6, y, label, Title, xlabel, ylabel_Fermi, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
-plt.savefig(pathfigure_gamma+'Mean_gamma_emission_Fermi2.pdf')
+semilog_plot(figure_number, 3, t6, y, label, Title, xlabel, ylabel_Fermi, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
+plt.savefig(pathfigure_gamma+'Mean_gamma_emission_Fermi.pdf')
 
 figure_number += 1
 
             # whole energy range
-y = [numpy.log10(Lum_mean), numpy.log10(Lum_pst), numpy.log10(Lum_mst)]
-y = numpy.nan_to_num(y)
+y = [Lum_mean, Lum_pst, Lum_mst]
 ind0 = 1000
-ymin = numpy.asarray(y[0])[ind0] - 3
-ymax = numpy.asarray(y[0])[ind0] + 2
-ylabel = '$\log(L_\gamma)$ [erg s$^{-1}$] (100 MeV - 100 TeV)'
+ymin = 10**(numpy.asarray(numpy.log10(y[0]))[ind0] - 3)
+ymax = 10**(numpy.asarray(numpy.log10(y[0]))[ind0] + 2)
+ylabel = '$L_\gamma$ [erg s$^{-1}$] (100 MeV - 100 TeV)'
 #ind0 = numpy.where(Lum_mst > 0)[0]
 
-plot(figure_number, 3, t6, y, label, Title, xlabel, ylabel, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
-plt.savefig(pathfigure_gamma+'Mean_gamma_emission2.pdf')
+semilog_plot(figure_number, 3, t6, y, label, Title, xlabel, ylabel, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
+plt.savefig(pathfigure_gamma+'Mean_gamma_emission.pdf')
 
 figure_number += 1
 
@@ -398,39 +417,39 @@ figure_number += 1
 y = [Gamma_HESS_mean, Gamma_HESS_pst, Gamma_HESS_mst]
 y = numpy.nan_to_num(y)
 ind0 = numpy.where(y[0] > 0.0)[0]
-ymin = numpy.min(numpy.asarray(y[2])[ind0]) - 0.2
-ymax = numpy.max(numpy.asarray(y[1])[ind0]) + 0.2
+ymin = numpy.min(numpy.asarray(y[2])[ind0]) - 0.02
+ymax = numpy.max(numpy.asarray(y[1])[ind0]) + 0.02
 ylabel_HESS = '$\Gamma_{ph}$ (1 TeV - 10 TeV)'
 #ind0 = numpy.where(Gamma_HESS_mst > 0)[0]
 
 plot(figure_number, 3, t6, y, label, Title, xlabel, ylabel_HESS, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
-plt.savefig(pathfigure_gamma+'Photon_index_HESS2.pdf')
+plt.savefig(pathfigure_gamma+'new_stat_Photon_index_HESS.pdf')
 
 figure_number += 1
 
             # 1 GeV to 10 GeV
 y = [Gamma_GeV_mean, Gamma_GeV_pst, Gamma_GeV_mst]
 ind0 = numpy.where(y[0] > 0.0)[0]
-ymin = numpy.min(numpy.asarray(y[2])[ind0]) - 0.2
-ymax = numpy.max(numpy.asarray(y[1])[ind0]) + 0.2
+ymin = numpy.min(numpy.asarray(y[2])[ind0]) - 0.02
+ymax = numpy.max(numpy.asarray(y[1])[ind0]) + 0.02
 ylabel_GeV = '$\Gamma_{ph}$ (1 GeV - 10 GeV)'
 #ind0 = numpy.where(Gamma_GeV_mst > 0)[0]
 
 plot(figure_number, 3, t6, y, label, Title, xlabel, ylabel_GeV, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
-plt.savefig(pathfigure_gamma+'Photon_index_GeV2.pdf')
+plt.savefig(pathfigure_gamma+'new_stat_Photon_index_GeV.pdf')
 
 figure_number += 1
 
             # 100 MeV to 1 GeV
 y = [Gamma_MeV_mean, Gamma_MeV_pst, Gamma_MeV_mst]
 ind0 = numpy.where(y[0] > 0.0)[0]
-ymin = numpy.min(numpy.asarray(y[2])[ind0]) - 0.2
-ymax = numpy.max(numpy.asarray(y[1])[ind0]) + 0.2
+ymin = numpy.min(numpy.asarray(y[2])[ind0]) - 0.02
+ymax = numpy.max(numpy.asarray(y[1])[ind0]) + 0.02
 ylabel_MeV = '$\Gamma_{ph}$ (100 MeV - 1 GeV)'
 #ind0 = numpy.where(Gamma_MeV_mst > 0)[0]
 
 plot(figure_number, 3, t6, y, label, Title, xlabel, ylabel_MeV, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
-plt.savefig(pathfigure_gamma+'Photon_index_MeV2.pdf')
+plt.savefig(pathfigure_gamma+'new_stat_Photon_index_MeV.pdf')
 
 figure_number += 1
 
@@ -472,16 +491,31 @@ plt.savefig(pathfigure_remain+'Mean_ob.pdf')
 
 figure_number += 1
 """
-Rw, Vw = radius_velocity_SB(t6)
+    ## ================== ##
+    # Parameters of the SB #
+    ## ================== ##
+
+t7 = t6 * s6yr27yr  # 10 Myr
+
+Rsb, Vsb = radius_velocity_SB(t6)                           # radius (pc) and velocity of the shell (km/s)
+Msb, Mswept = masses(t7, Rsb)                               # swept-up and inner masses (solar masses)
+Ms = Mswept - Msb                                           # mass in the shell (solar masses)
+ns, hs = density_thickness_shell(Vsb, Mswept, Msb, Rsb)     # thickness (pc) and density (cm^-3) of the shell
+
     # Parameters of the superbubble
-ind = numpy.where(Rsb_t > 0.0)[0]
-x = t6[ind]
+x = t6
+xmin = tmin * yr26yr - 0.5
+xmax = tmax * yr26yr + 0.5
 color = 'cornflowerblue'
 symbol = 'x'
 linestyle = ''
+label = 'none'
+Title = ''
+xlabel = 'Time [Myrs]'
+text = ''
 
     # Radius
-y = Rsb_t[ind]/100.
+y = Rsb/100.
 ymin = numpy.min(y) - 0.1
 ymax = numpy.max(y) + 0.1
 ylabel = '$R_{sb}$/(100 [pc])'
@@ -490,37 +524,43 @@ symbol_2 = ['x', '+']
 linestyle_2 = ['', '']
 
 plot(figure_number, 1, x, y, label, Title, xlabel, ylabel, symbol, linestyle, color, text, xmin, xmax, ymin, ymax)
+plt.savefig(pathfigure+'Radius_SB.pdf')
 
 figure_number += 1
 
     # Velocity
-y = Vsb_t[ind]/10.
+y = Vsb/10.
 ymin = numpy.min(y) - 0.1
 ymax = numpy.max(y) + 0.1
 ylabel = '$V_{sb}$/(10 [km/s])'
 
 plot(figure_number, 1, x, y, label, Title, xlabel, ylabel, symbol, linestyle, color, text, xmin, xmax, ymin, ymax)
+plt.savefig(pathfigure+'Velocity_SB.pdf')
 
 figure_number += 1
 
     # Mass
-y = Ms_t[ind]/1000000.
+print(Ms[2999])
+y = Ms/1000000.
 ymin = numpy.min(y) - 0.1
 ymax = numpy.max(y) + 0.1
 ylabel = '$M_{shell}$/(100000 [M$_\odot$])'
 
 plot(figure_number, 1, x, y, label, Title, xlabel, ylabel, symbol, linestyle, color, text, xmin, xmax, ymin, ymax)
+plt.savefig(pathfigure+'Mass_shell.pdf')
 
 figure_number += 1
 
     # Density
-y = ns_t[ind]/1.
+print(ns[2999])
+y = ns/10.
 ymin = numpy.min(y) - 0.01
 ymax = numpy.max(y) + 0.01
 ylabel = '$n_{shell}$/(1 [cm$^{-3}$])'
 
 plot(figure_number, 1, x, y, label, Title, xlabel, ylabel, symbol, linestyle, color, text, xmin, xmax, ymin, ymax)
+plt.savefig(pathfigure+'Density_shell.pdf')
 
 figure_number += 1
-"""
+
 plt.show()

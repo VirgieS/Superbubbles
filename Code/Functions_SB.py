@@ -105,7 +105,7 @@ def density_thickness_shell(Vsb, Mswept, Msb, Rsb):
         hs      :       thickness in the shell (cm^-3)
     """
         # density in the shell (cm^-3)
-    Cs2 = kb*Ts/(mu*mpg)/(km2cm)**2             # isothermal sound speed in the shell (km/s)
+    Cs2 = kb*Ts/(mu*mpg)/(km2cm)**2             # isothermal sound speed in the shell (km2/s2)
     ns = n0 * (Vsb**2 + C02)/Cs2                # density in the shell (cm^-3)
 
         # thickness of the shell (pc)

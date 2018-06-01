@@ -180,6 +180,87 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
 
     return
 
+def semilog_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle, color, text, xmin, xmax, ymin, ymax):
+    """
+    Function to plot a linear graphic
+    Inputs:
+        figure_number   :       define the number of the figure
+        number_of_plot  :       define how many plot you want on one figure (with the same axis)
+        x               :       x-vector
+        y               :       y-array (line = one y-array and row = each different y-plot)
+        label_name      :       legend of one y
+        title           :       title of the plot
+        xlabel          :       label of the x-axis
+        ylabel          :       label of the y-axis
+        symbol          :       symbol of one y
+        linestyle       :       style of the line (drashed, etc)
+        text            :       important parameters that you will write on the figure
+    """
+        # figure
+    fig = plt.figure(figure_number, figsize=(8,5))
+    ax = fig.add_subplot(111)
+
+        # limit
+    #xmin = min(x)
+    #xmax = max(x)
+    plt.xlim((xmin, xmax))
+
+    #y = numpy.nan_to_num(y)
+    #ymax = numpy.max(y)
+    #ymin = numpy.min(y)
+    plt.ylim((ymin, ymax))
+
+        # Plot
+    if number_of_plot > 1:
+
+        for i in range (number_of_plot):
+            y_plot = y[i]
+
+            if len(symbol) > 1:
+                rcParams['lines.marker'] = symbol[i]
+                rcParams['lines.linestyle'] = linestyle[i]
+                col = color[i]
+
+            else:
+                rcParams['lines.marker'] = symbol
+                rcParams['lines.linestyle'] = linestyle
+                col = color
+
+            if label_name == 'none':
+                plt.plot(x, y_plot, color = col)
+
+            else:
+                plt.plot(x, y_plot, label = label_name[i], color = col)
+                plt.legend(loc = 'best')
+
+    elif label_name == 'none':
+        rcParams['lines.marker'] = symbol
+        rcParams['lines.linestyle'] = linestyle
+        col = color
+
+        plt.plot(x, y, color = col)
+
+    else:
+        rcParams['lines.marker'] = symbol
+        rcParams['lines.linestyle'] = linestyle
+        col = color
+
+        plt.plot(x, y, label = label_name, color = col)
+        plt.legend(loc = 'best')
+
+    plt.yscale('log')
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+
+        # grid
+    plt.grid(color = 'k', alpha = 0.15, linestyle = ':')
+
+        # text
+    plt.text(0.5, 0.5, text, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
+
+    return
+
 def log_plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbol):
     """
     Plot a log-log graphic for two different y-axis
