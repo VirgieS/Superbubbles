@@ -14,7 +14,7 @@ from Conversion_factors import *
 ##=============================##
 
     # OB asociation
-Nob = 300           # number of OB-stars in the association
+Nob = 114           # number of OB-stars in the association
 Lob = 1e36          # mean luminosity of an OB-star (erg/s)
 Pob = Nob * Lob     # mean power of the association (erg/s)
 L36 = Pob * erg236erg     # mechanical energy expressed in 10^36 erg/s

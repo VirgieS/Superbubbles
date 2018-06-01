@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import numpy
 import scipy.integrate as integrate
 import astropy.units as units
+from astropy.io import ascii
 import os
 import pickle
 import naima
@@ -23,6 +24,42 @@ from Parameters_system import *
 ##---------##
 # Functions #
 ##---------##
+
+# Load local interstellar cosmic ray spectrum from file
+def cosmicray_lis(ekin):
+    """
+    Return the cosmic rays spectrum from a table of kinetic energy.
+
+    Inputs:
+        ekin    :   kinetic energy array (GeV)
+
+    Output:
+        n_recast:   cosmic rays spectrum interpolated from file (GeV^-1 cm^-3)
+    """
+        # Physical constants
+    mpgev = mp * MeV2GeV     # GeV
+    clight = cl * cm2m       # m/s
+
+        # Load LIS data from Boschini-2017 papers
+    data = ascii.read('/Users/stage/Documents/Virginie/Superbubbles/Code/CosmicRayLocal.txt',data_start=1)
+
+        # Convert from proton/m2/s/sr/GeV into proton/GeV/cm3 by multiplying by 4pi/v and 1e6 for m-3 to cm-3
+    ek_lis = numpy.asarray(data['Ekin'])
+    lorentz = 1.0+ek_lis/mpgev
+    beta = numpy.sqrt(1.0-1.0/numpy.power(lorentz,2))
+    n_lis = numpy.asarray(data['Flux']*4.0*numpy.pi/beta/clight) * (cm2m)**3  # proton/GeV/cm3
+
+        # Recast on input grid
+    lis_itp = lambda e : 10.0**(loglog_interpolation(ek_lis,n_lis)(numpy.log10(e)))
+    nk = ekin.size
+    n_recast = numpy.zeros(nk)
+
+    for i in range(nk):
+            # Interpolate LIS spectrum over the input LIS range
+            #...and extend with power-law interpolation of index -2.7 above the range (see figure 4 of AMS-02 2015 paper)
+        n_recast[i] = lis_itp(ekin[i]) if ekin[i] <= ek_lis.max() else n_lis[-1]*(ekin[i]/ek_lis[-1])**(-2.7)  # proton/GeV/cm3
+
+    return n_recast
 
 def pwn_emission(tsn,tsb):
 

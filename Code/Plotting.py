@@ -26,9 +26,9 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # IRAP
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/300/Gamma_emission/'
-pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/300/Remain/'
-pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/300/SB/'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/percentage/20/Gamma_emission/'
+pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/percentage/20/Remain/'
+pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/percentage/20/SB/'
     # Home
 #pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Gamma_emission/bis_300'
 #pathfigure_remain = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Remain/bis_300'
@@ -86,7 +86,7 @@ for i in range (nfiles):
     file = '%d'%nfile
 
         # IRAP
-    os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/300/' + file)
+    os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/percentage/20/' + file)
 
         # HOME
     #os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/Parameters/stars/30/'+ file)
@@ -150,7 +150,7 @@ for i in range (nfiles):
 
         k += nit
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/300/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/percentage/20/')
 
 with open('Total', 'wb') as iteration_write:
 
@@ -322,13 +322,13 @@ for j in range (number_bin_t):
     Lum = Lum[numpy.where(Lum > 0.0)[0]]
 
     Gamma_HESS = Gamma_HESS_it[:, j]
-    Gamma_HESS = Gamma_HESS[numpy.where(Gamma_HESS > 0.0)[0]]
+    #Gamma_HESS = Gamma_HESS[numpy.where(Gamma_HESS > 0.0)[0]]
 
     Gamma_GeV = Gamma_GeV_it[:, j]
-    Gamma_GeV = Gamma_GeV[numpy.where(Gamma_GeV > 0.0)[0]]
+    #Gamma_GeV = Gamma_GeV[numpy.where(Gamma_GeV > 0.0)[0]]
 
     Gamma_MeV = Gamma_MeV_it[:, j]
-    Gamma_MeV = Gamma_MeV[numpy.where(Gamma_MeV > 0.0)[0]]
+    #Gamma_MeV = Gamma_MeV[numpy.where(Gamma_MeV > 0.0)[0]]
 
     Lum_pwn = Lum_pwn_it[:, j]
     Lum_pwn = Lum_pwn[numpy.where(Lum_pwn > 0.0)[0]]

@@ -52,19 +52,16 @@ need_correction = False
 if need_correction:
 
     t_end_6 = 4.0           # Myr
-    t_sn = t_end_6 + 1      # Myr
-    t_end = t_end_6/yr26yr  # yr
     Rsb = 47.0                          # observed radius (pc)                  #you need to change it for your simulations
     Rw = radius_velocity_SB(t_end_6)[0] # from Weaver's model (pc and km/s)
     correction_factor = Rsb/Rw
 
 else:
     correction_factor = 1
-    t_sn = 37
 
     # Fix time array (yr)
 t0min = 3           # Myr
-t0max = t_sn        # Myr
+t0max = 37          # Myr
 tmin = t0min/yr26yr     # yr
 tmax = 10/yr26yr        # yr
 number_bin_t = 3000

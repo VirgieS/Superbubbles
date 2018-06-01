@@ -28,6 +28,7 @@ pc2cm = 3.085678e18         # from pc to cm
 AU2cm = 1.495979e13         # from au to cm
 AU2km=1.495979e8            # from au to km
 km2cm = 1e5                 # from km to cm
+cm2m = 1e-2
 
 # Surface
 mbarn2cm=1.0e-27            # from mbarn to cm
