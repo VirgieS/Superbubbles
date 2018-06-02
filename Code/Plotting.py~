@@ -26,9 +26,9 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # IRAP
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/diffusion/delta0_33/Gamma_emission/'
-pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/diffusion/delta0_33/Remain/'
-pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/diffusion/delta0_33/SB/'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/diffusion/alpha2_2/Gamma_emission/'
+pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/diffusion/alpha2_2/Remain/'
+pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/diffusion/alpha2_2/SB/'
     # Home
 #pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Gamma_emission/bis_300'
 #pathfigure_remain = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Remain/bis_300'
@@ -86,7 +86,7 @@ for i in range (nfiles):
     file = '%d'%nfile
 
         # IRAP
-    os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/diffusion/delta0_33/')# + file)
+    os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/diffusion/alpha2_2/')# + file)
 
         # HOME
     #os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/Parameters/stars/30/'+ file)
@@ -151,7 +151,7 @@ for i in range (nfiles):
 
         k += nit
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/diffusion/delta0_33/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/diffusion/alpha2_2/')
 
 with open('Total', 'wb') as iteration_write:
 

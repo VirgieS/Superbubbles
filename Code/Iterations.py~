@@ -26,7 +26,7 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # IRAP
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/delta0_5')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/alpha2_2')
 
     # Home
 #os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/Parameters/stars/10/5')
