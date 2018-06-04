@@ -26,7 +26,7 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # IRAP
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/1e28/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/alpha2_2')
 
     # Home
 #os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/Parameters/stars/10/5')
@@ -47,7 +47,7 @@ zones = [2]                                                                     
 
     # Correction factor
 
-need_correction = True
+need_correction = False
 
 if need_correction:
 
@@ -89,7 +89,6 @@ nsn_it = []                 # number of supernova per iterations
     ##----------##
 print('For %d SN'%Nob)
 print('For %d iterations' %nit)
-print(n0)
 
         # SN explosions time (yr)
 
@@ -222,4 +221,3 @@ print('number of SN: %d' %Nob)
 print('diffusion coefficient: %.2e cm^2 s^-1' %D0)
 print('injection index: %.2f' %alpha)
 print('energy dependence: %.2f'%delta)
-print('density: %.2f'%n0)

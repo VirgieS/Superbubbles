@@ -26,8 +26,8 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # IRAP
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/')
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/background/'
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/')
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/'
 print(Nob)
 
     # Home
@@ -44,6 +44,7 @@ number_bin_t = 3000
 t_fix = numpy.linspace(tmin, tmax, number_bin_t)    # yr
 t6 = t_fix * yr26yr                                 # Myr
 t7 = t6 * s6yr27yr
+print(n0)
 
     # Correction factor
 
@@ -62,18 +63,17 @@ else:
     # Parameters of the SB
 
 Rsb, Vsb = radius_velocity_SB(t6)   # radius of the SB (pc)
-correction_factor = 1
 Rsb = correction_factor * Rsb       # correction of the radius
 Msb, Mswept = masses(t7, Rsb)       # swept-up and inner masses (solar masses)
 Ms = Mswept - Msb                   # mass in the shell (solar masses)
-ns, hs = density_thickness_shell_percentage(percentage, Rsb, Mswept, Msb)  # thickness (pc) and density (cm^-3) of the shell
-#ns, hs = density_thickness_shell(Vsb, Mswept, Msb, Rsb)                     # thickness (pc) and density (cm^-3) of the shell
+#ns, hs = density_thickness_shell_percentage(percentage, Rsb, Mswept, Msb)  # thickness (pc) and density (cm^-3) of the shell
+ns, hs = density_thickness_shell(Vsb, Mswept, Msb, Rsb)                     # thickness (pc) and density (cm^-3) of the shell
 Vs = (Ms*Msun2g)/(ns * mu * mpg)
 
 with open('CRbackground', 'wb') as CR_write:
 
         # CR particles density (cm^-3 GeV^-1)
-    n_CRb = 0.3 * cosmicray_lis(ECR)
+    n_CRb = cosmicray_lis(ECR)
 
         # Gamma luminosity (erg s^-1)
     Lum_CRb = numpy.zeros(number_bin_t)
@@ -183,4 +183,4 @@ semilog_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
 plt.savefig(pathfigure_gamma+'Background_HESS.pdf')
 figure_number += 1
 
-plt.show()
+#plt.show()

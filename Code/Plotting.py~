@@ -26,9 +26,9 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # IRAP
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/300/Gamma_emission/'
-pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/300/Remain/'
-pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/300/SB/'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/diffusion/delta0_33/Gamma_emission/'
+pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/diffusion/delta0_33/Remain/'
+pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/diffusion/delta0_33/SB/'
     # Home
 #pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Gamma_emission/bis_300'
 #pathfigure_remain = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Remain/bis_300'
@@ -42,10 +42,10 @@ Plot the graphics for all iterations
 """
 
     # Number of iterations per files
-nit = 10                                                                       #you need to change it for your simulations
+nit = 100                                                                       #you need to change it for your simulations
 
     # Number of Files
-nfiles = 10                                                                     #you need to change it for your simulations
+nfiles = 1                                                                     #you need to change it for your simulations
 
     # Total number of iterations
 nit_tot = nit * nfiles                                                          #you need to change it for your simulations
@@ -86,7 +86,7 @@ for i in range (nfiles):
     file = '%d'%nfile
 
         # IRAP
-    os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/300/' + file)
+    os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/diffusion/delta0_33/')# + file)
 
         # HOME
     #os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/Parameters/stars/30/'+ file)
@@ -151,7 +151,7 @@ for i in range (nfiles):
 
         k += nit
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/300/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/diffusion/delta0_33/')
 
 with open('Total', 'wb') as iteration_write:
 

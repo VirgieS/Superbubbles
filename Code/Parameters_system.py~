@@ -100,7 +100,7 @@ p0 = 10             # normalization constant (GeV/c)
 alpha = 2.0         # exponent of the power-law distribution
 
     # Diffusion coefficient of the cosmic rays (cm^2 s^-1)
-delta = 1.0/3       # exponent of the power-law of the diffusion coefficient
+delta = 1.0/2       # exponent of the power-law of the diffusion coefficient
 D0 = 1e28           # diffusion coefficient at 10 GeV/c in cm^2 s^-1  ==> prendre *10 et /10
 
 ##==============##

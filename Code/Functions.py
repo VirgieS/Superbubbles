@@ -479,10 +479,11 @@ def loglog_interpolation(x,y):
 
     return interp1d(numpy.log10(x[nzidx]),numpy.log10(y[nzidx]),kind='linear',bounds_error=False,fill_value=0.0)
 
-def probability(Lum_HESS, Lum_Fermi, Lum_pwn, Lum_psr, Lum_HESS_CRb, Lum_Fermi_CRb, nit_tot):
+def probability(Lum_HESS, Lum_Fermi, Lum_pwn, Lum_psr, Lum_HESS_CRb, Lum_Fermi_CRb, nit_tot, number_bin_t):
 
     """
     Return the probabilities
+
     Inputs:
         Lum_HESS        :   each iterations and time step of the gamma luminosity of CR in the HESS energy range
         Lum_Fermi       :   each iterations and time step of the gamma luminosity of CR in the Fermi energy range
@@ -491,6 +492,8 @@ def probability(Lum_HESS, Lum_Fermi, Lum_pwn, Lum_psr, Lum_HESS_CRb, Lum_Fermi_C
         Lum_HESS_CRb    :   each time step of the gamma luminosity of CR background in the HESS energy range
         Lum_Fermi_CRb   :   each time step of the gamma luminosity of CR background in the Fermi energy range
         nit_tot         :   total number of iterations
+        number_bin_t    :   len of the time array
+
     Outputs:
         Prob_HESS       :   probability to observe the SB (PWN + CR) in the HESS energy range
         Proba_HESS_CR   :   probability to observe only the CRs in the HESS energy range
@@ -501,10 +504,18 @@ def probability(Lum_HESS, Lum_Fermi, Lum_pwn, Lum_psr, Lum_HESS_CRb, Lum_Fermi_C
 
     nit_tot = float(nit_tot)
 
-    Proba_HESS = sum((Lum_HESS > Lum_HESS_CRb) & (Lum_pwn > Lum_HESS_CRb))/nit_tot
-    Proba_Fermi_CR = sum(Lum_HESS > Lum_HESS_CRb)/nit_tot
-    Proba_Fermi = sum((Lum_Fermi > Lum_Fermi_CRb) & (Lum_psr > Lum_Fermi_CRb))/nit_tot
-    Proba_Fermi_CR = sum(Lum_HESS > Lum_HESS_CRb)/nit_tot
-    Proba_pwn_psr = sum((Lum_pwn <= 0.0) & (Lum_psr < 0.0))/nit_tot
+    Proba_HESS = numpy.zeros(number_bin_t)
+    Proba_HESS_CR = numpy.zeros(number_bin_t)
+    Proba_Fermi = numpy.zeros(number_bin_t)
+    Proba_Fermi_CR = numpy.zeros(number_bin_t)
+    Proba_pwn_psr = numpy.zeros(number_bin_t)
+
+    for i in range (number_bin_t):
+
+        Proba_HESS[i] = sum((Lum_HESS[:,i] > Lum_HESS_CRb[i]) | (Lum_pwn[:,i] > Lum_HESS_CRb[i]))/nit_tot
+        Proba_HESS_CR[i] = sum(Lum_HESS[:,i] > Lum_HESS_CRb[i])/nit_tot
+        Proba_Fermi[i] = sum((Lum_Fermi[:,i] > Lum_Fermi_CRb[i]) | (Lum_psr[:,i] > Lum_Fermi_CRb[i]))/nit_tot
+        Proba_Fermi_CR[i] = sum(Lum_Fermi[:,i] > Lum_Fermi_CRb[i])/nit_tot
+        Proba_pwn_psr[i] = sum((Lum_pwn[:,i] <= 0.0) & (Lum_psr[:,i] <= 0.0))/nit_tot
 
     return Proba_HESS, Proba_HESS_CR, Proba_Fermi, Proba_Fermi_CR, Proba_pwn_psr
