@@ -26,7 +26,7 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # IRAP
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/diffusion/Total/Gamma_emission/'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/density/Total/Gamma_emission/'
     # Home
 #pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Gamma_emission/bis_300'
 #pathfigure_remain = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Remain/bis_300'
@@ -58,7 +58,7 @@ figure_number = 1
 
         # Nob = 30
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/diffusion/1e26/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/diffusion/alpha2_2/')
 
 with open('Total', 'rb') as iteration_write:
 
@@ -98,10 +98,8 @@ for j in range (number_bin_t):
     Lum_Fermi = Lum_Fermi_30[:, j]
 
     Gamma_HESS = Gamma_HESS_30[:, j]
-    #Gamma_HESS = Gamma_HESS[numpy.where(Gamma_HESS > 0.0)[0]]
 
     Gamma_GeV = Gamma_GeV_30[:, j]
-    #Gamma_GeV = Gamma_GeV[numpy.where(Gamma_GeV > 0.0)[0]]
 
     Lum_pwn = Lum_pwn_30[:, j]
     Lum_pwn = Lum_pwn[numpy.where(Lum_pwn > 0.0)[0]]
@@ -151,7 +149,7 @@ Gamma_GeV_mst_30[ind0] = numpy.zeros(len(ind0))
 
         # Nob = 100
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/diffusion/1e27/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/')
 
 with open('Total', 'rb') as iteration_write:
 
@@ -191,10 +189,8 @@ for j in range (number_bin_t):
     Lum_Fermi = Lum_Fermi_100[:, j]
 
     Gamma_HESS = Gamma_HESS_100[:, j]
-    #Gamma_HESS = Gamma_HESS[numpy.where(Gamma_HESS > 0.0)[0]]
 
     Gamma_GeV = Gamma_GeV_100[:, j]
-    #Gamma_GeV = Gamma_GeV[numpy.where(Gamma_GeV > 0.0)[0]]
 
     Lum_pwn = Lum_pwn_100[:, j]
     Lum_pwn = Lum_pwn[numpy.where(Lum_pwn > 0.0)[0]]
@@ -240,10 +236,9 @@ Gamma_GeV_mst_100 = Gamma_GeV_mean_100 - Gamma_GeV_std_100
 ind0 = numpy.where(Gamma_GeV_mst_100 < 0)[0]
 Gamma_GeV_mst_100[ind0] = numpy.zeros(len(ind0))
 
-
         # Nob = 300
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/diffusion/delta0_33/')
 
 with open('Total', 'rb') as iteration_write:
 
@@ -283,10 +278,8 @@ for j in range (number_bin_t):
     Lum_Fermi = Lum_Fermi_300[:, j]
 
     Gamma_HESS = Gamma_HESS_300[:, j]
-    #Gamma_HESS = Gamma_HESS[numpy.where(Gamma_HESS > 0.0)[0]]
 
     Gamma_GeV = Gamma_GeV_300[:, j]
-    #Gamma_GeV = Gamma_GeV[numpy.where(Gamma_GeV > 0.0)[0]]
 
     Lum_pwn = Lum_pwn_300[:, j]
     Lum_pwn = Lum_pwn[numpy.where(Lum_pwn > 0.0)[0]]
@@ -334,7 +327,7 @@ Gamma_GeV_mst_300[ind0] = numpy.zeros(len(ind0))
 
 
     # Plot
-label_mean = ['$10^{26}$', '$10^{27}$', '$10^{28}$']
+label_mean = ['alpha = 2.2, delta = 0.5', 'alpha = 2.0, delta = 0.5', 'alpha = 2.0, delta = 0.33']
 label_std = 'none'
 
 sym_mean = ['', '', '']
@@ -357,27 +350,30 @@ ymax = 1e36
             # HESS energy range
 
 y_mean = [Lum_HESS_mean_30, Lum_HESS_mean_100, Lum_HESS_mean_300]
-y_std = [Lum_HESS_pst_30, Lum_HESS_mst_30, Lum_HESS_pst_100, Lum_HESS_mst_300, Lum_HESS_pst_300, Lum_HESS_mst_300]
+print(Lum_HESS_mean_30[2999], Lum_HESS_std_30[2999])
+print(Lum_HESS_mean_100[2999], Lum_HESS_std_100[2999])
+print(Lum_HESS_mean_300[2999], Lum_HESS_std_300[2999])
 ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
 
 semilog_plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
-#plt.fill_between(t6, Lum_HESS_pst_100, Lum_HESS_mst_100, color = 'blue', alpha = '0.25')
+#plt.fill_between(t6, Lum_HESS_pst_30, Lum_HESS_mst_30, color = 'purple', alpha = '0.15')
+#plt.fill_between(t6, Lum_HESS_pst_100, Lum_HESS_mst_100, color = 'blue', alpha = '0.15')
 #plt.fill_between(t6, Lum_HESS_pst_300, Lum_HESS_mst_300, color = 'green', alpha = '0.25')
-#plt.xscale('log')
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_HESS.pdf')
 
 figure_number += 1
 
             # Fermi energy range
 y_mean = [Lum_Fermi_mean_30, Lum_Fermi_mean_100, Lum_Fermi_mean_300]
-y_std = [Lum_Fermi_pst_30, Lum_Fermi_mst_30, Lum_Fermi_pst_100, Lum_Fermi_mst_300, Lum_Fermi_pst_300, Lum_Fermi_mst_300]
+print(Lum_Fermi_mean_30[2999], Lum_Fermi_std_30[2999])
+print(Lum_Fermi_mean_100[2999], Lum_Fermi_std_100[2999])
+print(Lum_Fermi_mean_300[2999], Lum_Fermi_std_300[2999])
 ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (100 MeV - 100 GeV)'
 
 semilog_plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
-#plt.fill_between(t6, Lum_Fermi_pst_30, Lum_Fermi_mst_30, color = 'purple', alpha = '0.25')
-#plt.fill_between(t6, Lum_Fermi_pst_100, Lum_Fermi_mst_100, color = 'blue', alpha = '0.25')
+#plt.fill_between(t6, Lum_Fermi_pst_30, Lum_Fermi_mst_30, color = 'purple', alpha = '0.15')
+#plt.fill_between(t6, Lum_Fermi_pst_100, Lum_Fermi_mst_100, color = 'blue', alpha = '0.15')
 #plt.fill_between(t6, Lum_Fermi_pst_300, Lum_Fermi_mst_300, color = 'green', alpha = '0.25')
-#plt.xscale('log')
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_Fermi.pdf')
 
 figure_number += 1
@@ -388,12 +384,14 @@ ymax = 3.5
 
             # HESS energy range
 y_mean = [Gamma_HESS_mean_30, Gamma_HESS_mean_100, Gamma_HESS_mean_300]
-y_std = [Gamma_HESS_pst_30, Gamma_HESS_mst_30, Gamma_HESS_pst_100, Gamma_HESS_mst_300, Gamma_HESS_pst_300, Gamma_HESS_mst_300]
+print(Gamma_HESS_mean_30[2999], Gamma_HESS_std_30[2999])
+print(Gamma_HESS_mean_100[2999], Gamma_HESS_std_100[2999])
+print(Gamma_HESS_mean_300[2999], Gamma_HESS_std_300[2999])
 ylabel_HESS = '$\Gamma_{ph}$ (1 TeV - 10 TeV)'
 
 plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
-#plt.fill_between(t6, Gamma_HESS_pst_30, Gamma_HESS_mst_30, color = 'purple', alpha = '0.25')
-#plt.fill_between(t6, Gamma_HESS_pst_100, Gamma_HESS_mst_100, color = 'blue', alpha = '0.25')
+#plt.fill_between(t6, Gamma_HESS_pst_30, Gamma_HESS_mst_30, color = 'purple', alpha = '0.15')
+#plt.fill_between(t6, Gamma_HESS_pst_100, Gamma_HESS_mst_100, color = 'blue', alpha = '0.15')
 #plt.fill_between(t6, Gamma_HESS_pst_300, Gamma_HESS_mst_300, color = 'green', alpha = '0.25')
 plt.savefig(pathfigure_gamma+'Photon_index_HESS.pdf')
 
@@ -401,12 +399,14 @@ figure_number += 1
 
             # 1 GeV to 10 GeV
 y_mean = [Gamma_GeV_mean_30, Gamma_GeV_mean_100, Gamma_GeV_mean_300]
-y_std = [Gamma_GeV_pst_30, Gamma_GeV_mst_30, Gamma_GeV_pst_100, Gamma_GeV_mst_300, Gamma_GeV_pst_300, Gamma_GeV_mst_300]
+print(Gamma_GeV_mean_30[2999], Gamma_GeV_std_30[2999])
+print(Gamma_GeV_mean_100[2999], Gamma_GeV_std_100[2999])
+print(Gamma_GeV_mean_300[2999], Gamma_GeV_std_300[2999])
 ylabel_HESS = '$\Gamma_{ph}$ (1 GeV - 10 GeV)'
 
 plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
-#plt.fill_between(t6, Gamma_GeV_pst_30, Gamma_GeV_mst_30, color = 'purple', alpha = '0.25')
-#plt.fill_between(t6, Gamma_GeV_pst_100, Gamma_GeV_mst_100, color = 'blue', alpha = '0.25')
+#plt.fill_between(t6, Gamma_GeV_pst_30, Gamma_GeV_mst_30, color = 'purple', alpha = '0.15')
+#plt.fill_between(t6, Gamma_GeV_pst_100, Gamma_GeV_mst_100, color = 'blue', alpha = '0.15')
 #plt.fill_between(t6, Gamma_GeV_pst_300, Gamma_GeV_mst_300, color = 'green', alpha = '0.25')
 plt.savefig(pathfigure_gamma+'Photon_index_GeV.pdf')
 

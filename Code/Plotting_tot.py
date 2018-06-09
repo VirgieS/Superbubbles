@@ -26,9 +26,9 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # IRAP
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/Gamma_emission/Tot_'
-pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/Remain/Tot_'
-pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/SB/Tot_'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e26/Gamma_emission/Tot_'
+pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e26/Remain/Tot_'
+pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e26/Tot_'
     # Home
 #pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Gamma_emission/bis_300'
 #pathfigure_remain = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Remain/bis_300'
@@ -69,7 +69,7 @@ Ms_t = numpy.zeros(number_bin_t)
     # Load data #
     ## ------- ##
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/1e26/')
 
 with open('Total', 'rb') as iteration_write:
 
@@ -85,7 +85,7 @@ with open('Total', 'rb') as iteration_write:
     tsn_it = pickle.load(iteration_write)
     nsn_it = pickle.load(iteration_write)
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/CR/')
 
 with open('CRbackground', 'rb') as CR_write:
 
@@ -126,13 +126,10 @@ for j in range (number_bin_t):
     Lum = Lum_it[:, j]
 
     Gamma_HESS = Gamma_HESS_it[:, j]
-    #Gamma_HESS = Gamma_HESS[numpy.where(Gamma_HESS > 0.0)[0]]
 
     Gamma_GeV = Gamma_GeV_it[:, j]
-    #Gamma_GeV = Gamma_GeV[numpy.where(Gamma_GeV > 0.0)[0]]
 
     Gamma_MeV = Gamma_MeV_it[:, j]
-    #Gamma_MeV = Gamma_MeV[numpy.where(Gamma_MeV > 0.0)[0]]
 
     Lum_pwn = Lum_pwn_it[:, j]
     Lum_pwn = Lum_pwn[numpy.where(Lum_pwn > 0.0)[0]]
@@ -219,12 +216,8 @@ Gamma_MeV_mst[ind0] = numpy.zeros(len(ind0))
 
     # Plot
 label_std = 'none'
-sym_mean = ['', '']
-sym_sea = ''
-sym_std = ['', '']
-linestyle_mean = ['-.', '-']
-linestyle_sea = 'dashed'
-linestyle_std = [':', ':']
+sym_mean = ['', '', '']
+linestyle_mean = ['-.', '-', 'dashed']
 xlabel = 'Time [Myr]'
 text = ''
 Title = ''
@@ -232,77 +225,68 @@ xmin = tmin * yr26yr - 0.5
 xmax = tmax * yr26yr + 0.5
 ymin = 1e31
 ymax = 1e37
-x_sea = t_CR*yr26yr
+tobs = 4
 
         # Gamma luminosity of the superbubble
 
             # HESS energy range
-label_mean = ['VHE CRs', 'PWNe']
-label_sea = 'CRs background'
-color_mean = ['cornflowerblue', 'green']
-color_sea = 'darkblue'
+label_mean = ['VHE CRs', 'PWNe', 'CRs background']
+color_mean = ['cornflowerblue', 'green', 'darkblue']
 color_std = ['cornflowerblue', 'cornflowerblue']
-y_mean = [Lum_HESS_mean, Lum_pwn_mean]
-y_sea = Lum_HESS_CRb
-y_std = [Lum_HESS_mst, Lum_HESS_pst]
+y_mean = [Lum_HESS_mean, Lum_pwn_mean, Lum_HESS_CRb]
+y_HESS = 0.9e35
 ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
 
-semilog_plot(figure_number, 2, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
-semilog_plot(figure_number, 1, x_sea, y_sea, label_sea, Title, xlabel, ylabel_HESS, sym_sea, linestyle_sea, color_sea, text, xmin, xmax, ymin, ymax)
-semilog_plot(figure_number, 2, t6, y_std, label_std, Title, xlabel, ylabel_HESS, sym_std, linestyle_std, color_std, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
+plt.fill_between(t6, Lum_HESS_pst, Lum_HESS_mst, color = 'cornflowerblue', alpha = '0.25')
+plt.errorbar(tobs, y_HESS, yerr=0.2e35, label = 'HESS', marker = 'd', color = 'darkred')
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_HESS.pdf')
 
 figure_number += 1
 
             # Fermi energy range
-label_mean = ['HE CRs', 'PSRs']
-color_mean = ['orangered', 'orange']
-color_sea = 'maroon'
-color_std = ['orangered', 'orangered']
-y_mean = [Lum_Fermi_mean, Lum_psr_mean]
-y_sea = Lum_Fermi_CRb
-y_std = [Lum_Fermi_mst, Lum_Fermi_pst]
+label_mean = ['HE CRs', 'PSRs', 'CRs background']
+color_mean = ['orangered', 'orange', 'maroon']
+y_mean = [Lum_Fermi_mean, Lum_psr_mean, Lum_Fermi_CRb]
 ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (100 MeV - 100 GeV)'
 
-semilog_plot(figure_number, 2, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
-semilog_plot(figure_number, 1, x_sea, y_sea, label_sea, Title, xlabel, ylabel_HESS, sym_sea, linestyle_sea, color_sea, text, xmin, xmax, ymin, ymax)
-semilog_plot(figure_number, 2, t6, y_std, label_std, Title, xlabel, ylabel_HESS, sym_std, linestyle_std, color_std, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
+plt.fill_between(t6, Lum_Fermi_pst, Lum_Fermi_mst, color = 'orangered', alpha = '0.25')
+plt.savefig(pathfigure_gamma+'Mean_gamma_emission_Fermi.pdf')
 
 figure_number += 1
 
         # Spectral index
 label = 'none'
-sym = ['', '', '']
-linestyle = ['-.', ':', ':']
+sym = ''
+linestyle = '-.'
+ymin = 0.0
+ymax = 3.5
 
             # HESS energy range
-y = [Gamma_HESS_mean, Gamma_HESS_pst, Gamma_HESS_mst]
-color = ['cornflowerblue', 'cornflowerblue', 'cornflowerblue']
-y = numpy.nan_to_num(y)
-ind0 = numpy.where(y[0] > 0.0)[0]
-ymin = numpy.min(numpy.asarray(y[2])[ind0]) - 0.02
-ymax = numpy.max(numpy.asarray(y[1])[ind0]) + 0.02
+y = Gamma_HESS_mean
+color = 'cornflowerblue'
+y_HESS = 2.6
 ylabel_HESS = '$\Gamma_{ph}$ (1 TeV - 10 TeV)'
 
-plot(figure_number, 3, t6, y, label, Title, xlabel, ylabel_HESS, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
+plot(figure_number, 1, t6, y, label, Title, xlabel, ylabel_HESS, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
+plt.fill_between(t6, Gamma_HESS_pst, Gamma_HESS_mst, color = 'cornflowerblue', alpha = '0.25')
+plt.errorbar(tobs, y_HESS, yerr=0.2, label = 'HESS', marker = 'd', color = 'darkred')
 plt.savefig(pathfigure_gamma+'Photon_index_HESS.pdf')
 
 figure_number += 1
 
             # 1 GeV to 10 GeV
-y = [Gamma_GeV_mean, Gamma_GeV_pst, Gamma_GeV_mst]
-color = ['orangered', 'orangered', 'orangered']
-ind0 = numpy.where(y[0] > 0.0)[0]
-ymin = numpy.min(numpy.asarray(y[2])[ind0]) - 0.02
-ymax = numpy.max(numpy.asarray(y[1])[ind0]) + 0.02
+y = Gamma_GeV_mean
+color = 'orangered'
 ylabel_GeV = '$\Gamma_{ph}$ (1 GeV - 10 GeV)'
-#ind0 = numpy.where(Gamma_GeV_mst > 0)[0]
 
-plot(figure_number, 3, t6, y, label, Title, xlabel, ylabel_GeV, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
+plot(figure_number, 1, t6, y, label, Title, xlabel, ylabel_GeV, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
+plt.fill_between(t6, Gamma_GeV_pst, Gamma_GeV_mst, color = 'orangered', alpha = '0.25')
 plt.savefig(pathfigure_gamma+'Photon_index_GeV.pdf')
 
 figure_number += 1
-"""
+
     ## ----------- ##
     # Probabilities #
     ## ----------- ##
@@ -319,5 +303,5 @@ y = [Proba_HESS, Proba_HESS_CR, Proba_Fermi, Proba_Fermi_CR, Proba_pwn_psr]
 
 plot(figure_number, 5, t6, y, label, Title, xlabel, ylabel_GeV, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
 plt.savefig(pathfigure_gamma+'Probabilities.pdf')
-"""
+
 plt.show()

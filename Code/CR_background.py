@@ -28,7 +28,6 @@ from Parameters_system import *
     # IRAP
 os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/')
 pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/'
-print(Nob)
 
     # Home
 #os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/Parameters/stars/10/5')
@@ -36,15 +35,6 @@ print(Nob)
 ## =========== ##
 # CR background #
 ## =========== ##
-
-    # Fix time array (yr)
-tmin = 3/yr26yr     # yr
-tmax = 10/yr26yr    # yr
-number_bin_t = 3000
-t_fix = numpy.linspace(tmin, tmax, number_bin_t)    # yr
-t6 = t_fix * yr26yr                                 # Myr
-t7 = t6 * s6yr27yr
-print(n0)
 
     # Correction factor
 
@@ -137,7 +127,8 @@ with open('CRbackground', 'wb') as CR_write:
 print(Lum_CRb)
 print(Lum_HESS_CRb)
 print(Lum_Fermi_CRb)
-print(Nob)
+print('number of massive stars: %d' %Nob)
+print('ambient medium density: %d cm^-3' %n0)
 
     # plot
 

@@ -26,8 +26,8 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # IRAP
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/Total/Gamma_emission/'
-pathfigure_sn = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/Total/SN/'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e27/Gamma_emission/'
+pathfigure_sn = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e27/SN/'
 
 ## ======================================= ##
 # Statistic for a high number of iterations #
@@ -39,6 +39,13 @@ Plot the graphics for all iterations
 
     # Total number of iterations
 nit_tot = 100                                                          #you need to change it for your simulations
+
+    # Fix time array (yr)
+tmin = 3/yr26yr         # yr
+tmax = 10/yr26yr   # yr
+number_bin_t = 3000
+t_fix = numpy.linspace(tmin, tmax, number_bin_t)    # yr
+t6 = t_fix * yr26yr                                 # Myr
 
     # Initialization
 figure_number = 1
@@ -52,9 +59,9 @@ Ms_t = numpy.zeros(number_bin_t)
     # Load data #
     ## ------- ##
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/1e27/')
 
-with open('Total', 'rb') as iteration_write:
+with open('General', 'rb') as iteration_write:
 
     Lum_HESS_it = pickle.load(iteration_write)
     Lum_Fermi_it = pickle.load(iteration_write)
@@ -64,17 +71,37 @@ with open('Total', 'rb') as iteration_write:
     Gamma_MeV_it = pickle.load(iteration_write)
     Lum_pwn_it = pickle.load(iteration_write)
     Lum_psr_it = pickle.load(iteration_write)
-    nob_it = pickle.load(iteration_write)
+
+with open('SB', 'rb') as iteration_write:
+
     tsn_it = pickle.load(iteration_write)
     nsn_it = pickle.load(iteration_write)
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/CR/')
 
 with open('CRbackground', 'rb') as CR_write:
 
     Lum_CRb = pickle.load(CR_write)
     Lum_HESS_CRb = pickle.load(CR_write)
     Lum_Fermi_CRb = pickle.load(CR_write)
+
+    ##---------------------##
+    # Supernovae explosions #
+    ##---------------------##
+
+    # Computation of the probability to get nsn
+title = ''
+xlabel = '$n_{sn}$'
+ylabel = 'P($n_{sn}$)'
+label = 'none'
+len_bins = 1
+histmin = numpy.min(nsn_it)
+histmax = numpy.max(nsn_it)
+
+histogramme(figure_number, nsn_it, label, title, xlabel, ylabel, len_bins)
+plt.savefig(pathfigure_sn+'Histogramme_nsn.pdf')
+
+figure_number += 1
 
     ##---------------------------##
     # Mean and standard deviation #
@@ -179,10 +206,11 @@ xmax = tmax * yr26yr + 0.5
 
 ymin = 1e31
 ymax = 1e37
-
+tobs = 4
         # Gamma luminosity of the superbubble
 
             # HESS energy range
+Lum_obs_HESS = 0.9e35
 label_mean = ['VHE CRs', 'PWNe', 'CRs background']
 color_mean = ['cornflowerblue', 'green', 'darkblue']
 y_mean = [Lum_HESS_mean, Lum_pwn_mean, Lum_HESS_CRb]
@@ -191,8 +219,11 @@ ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
 
 semilog_plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
 plt.fill_between(t6, Lum_HESS_pst, Lum_HESS_mst, color = 'cornflowerblue', alpha = '0.25')
+plt.errorbar(tobs, Lum_obs_HESS, yerr=0.2, marker = 'd', linestyle = '', color = 'darkred', label = 'H.E.S.S.')
+#plt.plot(tobs, Lum_obs_HESS, marker = 'd', linestyle = '', color = 'darkred', label = 'H.E.S.S.')
 plt.yscale('log')
-plt.savefig(pathfigure_gamma+'Mean_gamma_emission_HESS.pdf')
+plt.legend(loc = 'best')
+plt.savefig(pathfigure_gamma+'Mean_gamma_emission_HESS_1e27.pdf')
 
 figure_number += 1
 
@@ -206,7 +237,7 @@ ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (100 MeV - 100 GeV)'
 semilog_plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
 plt.fill_between(t6, Lum_Fermi_pst, Lum_Fermi_mst, color = 'orangered', alpha = '0.25')
 plt.yscale('log')
-plt.savefig(pathfigure_gamma+'Mean_gamma_emission_Fermi.pdf')
+plt.savefig(pathfigure_gamma+'Mean_gamma_emission_Fermi_1e27.pdf')
 
 figure_number += 1
 
@@ -218,13 +249,17 @@ ymin = 0.0
 ymax = 3.5
 
             # HESS energy range
+Gamma_obs_HESS = 2.6
 y = Gamma_HESS_mean
 color = 'cornflowerblue'
 ylabel_HESS = '$\Gamma_{ph}$ (1 TeV - 10 TeV)'
 
 plot(figure_number, 1, t6, y, label, Title, xlabel, ylabel_HESS, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
 plt.fill_between(t6, Gamma_HESS_pst, Gamma_HESS_mst, color = 'cornflowerblue', alpha = '0.25')
-plt.savefig(pathfigure_gamma+'Photon_index_HESS.pdf')
+plt.errorbar(tobs, Gamma_obs_HESS, yerr=0.2, marker = 'd', linestyle = '', color = 'darkred', label = 'H.E.S.S.')
+#plt.plot(tobs, Gamma_obs_HESS, marker = 'd', color = 'darkred', label = 'H.E.S.S.')
+plt.legend(loc = 'best')
+plt.savefig(pathfigure_gamma+'Photon_index_HESS_1e27.pdf')
 
 figure_number += 1
 
@@ -235,7 +270,7 @@ ylabel_GeV = '$\Gamma_{ph}$ (1 GeV - 10 GeV)'
 
 plot(figure_number, 1, t6, y, label, Title, xlabel, ylabel_GeV, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
 plt.fill_between(t6, Gamma_GeV_pst, Gamma_GeV_mst, color = 'orangered', alpha = '0.25')
-plt.savefig(pathfigure_gamma+'Photon_index_GeV.pdf')
+plt.savefig(pathfigure_gamma+'Photon_index_GeV_1e27.pdf')
 
 figure_number += 1
 
@@ -244,7 +279,6 @@ figure_number += 1
     ## ----------- ##
 
 Proba_HESS, Proba_HESS_CR, Proba_Fermi, Proba_Fermi_CR, Proba_pwn_psr = probability(Lum_HESS_it, Lum_Fermi_it, Lum_pwn_it, Lum_psr_it, Lum_HESS_CRb, Lum_Fermi_CRb, nit_tot, number_bin_t)
-
 ymin = 0.0
 ymax = 1.0
 sym = ['', '', '', '', '']
@@ -255,6 +289,15 @@ y = [Proba_HESS, Proba_HESS_CR, Proba_Fermi, Proba_Fermi_CR, Proba_pwn_psr]
 ylabel = 'Probability'
 
 plot(figure_number, 5, t6, y, label, Title, xlabel, ylabel, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
-plt.savefig(pathfigure_gamma+'Probabilities.pdf')
+plt.savefig(pathfigure_gamma+'Probabilities_1e27.pdf')
+
+    # Analyse (t6 = 4 Myrs)
+indt = numpy.where(t6 >= 4)[0]
+print('at t = %.3f Myrs'%t6[indt[0]])
+print('Gamma-ray emission in the VHE range: (%.3e +/- %.3e) erg s^-1' %(Lum_HESS_mean[indt[0]], Lum_HESS_std[indt[0]]))
+print('Photon spectral index: (%.3f +/- %.3f)'%(Gamma_HESS_mean[indt[0]], Gamma_HESS_std[indt[0]]))
+print('Probability to observe the SB in the VHE range: %.2f'%Proba_HESS[indt[0]])
+print('Probability to observe only the VHE CRs: %.2f' %Proba_HESS[indt[0]])
+print('Probability to observe no PWN: %.2f' %Proba_pwn_psr[indt[0]])
 
 plt.show()

@@ -97,10 +97,10 @@ E_CR = ECR * units.GeV
 
     # Power-law distribution of the cosmic rays (GeV^-1 cm^-3)
 p0 = 10             # normalization constant (GeV/c)
-alpha = 2.0         # exponent of the power-law distribution
+alpha = 2.2         # exponent of the power-law distribution
 
     # Diffusion coefficient of the cosmic rays (cm^2 s^-1)
-delta = 1.0/3       # exponent of the power-law of the diffusion coefficient
+delta = 1.0/2       # exponent of the power-law of the diffusion coefficient
 D0 = 1e28           # diffusion coefficient at 10 GeV/c in cm^2 s^-1  ==> prendre *10 et /10
 
 ##==============##
@@ -116,3 +116,20 @@ spectrum = numpy.logspace(numpy.log10(Emin_gamma), numpy.log10(Emax_gamma), numb
 spectrum_erg = spectrum * 1.0/erg2GeV       # erg
 spectrum_ev = spectrum * GeV2eV             # eV
 spectrum_energy = spectrum * units.GeV      # with the units
+
+##=======================##
+# Supernovae & time array #
+##=======================##
+
+    # SN explosion time
+        # from the data of Limongi & Chieffi (2006)
+tsnmin = 3          # Myrs
+tsnmax = 37         # Myrs
+
+    # Time array
+tmin = tsnmin/yr26yr    # yrs
+tmax = 10/yr26yr        # yrs
+number_bin_t = 3000
+t_fix = numpy.linspace(tmin, tmax, number_bin_t)    # yrs
+t6 = t_fix * yr26yr                                 # Myrs
+t7 = t6 * s6yr27yr                                  # 10 Myrs

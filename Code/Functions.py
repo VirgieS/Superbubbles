@@ -512,10 +512,10 @@ def probability(Lum_HESS, Lum_Fermi, Lum_pwn, Lum_psr, Lum_HESS_CRb, Lum_Fermi_C
 
     for i in range (number_bin_t):
 
-        Proba_HESS[i] = sum((Lum_HESS[:,i] > Lum_HESS_CRb[i]) | (Lum_pwn[:,i] > Lum_HESS_CRb[i]))/nit_tot
-        Proba_HESS_CR[i] = sum(Lum_HESS[:,i] > Lum_HESS_CRb[i])/nit_tot
-        Proba_Fermi[i] = sum((Lum_Fermi[:,i] > Lum_Fermi_CRb[i]) | (Lum_psr[:,i] > Lum_Fermi_CRb[i]))/nit_tot
-        Proba_Fermi_CR[i] = sum(Lum_Fermi[:,i] > Lum_Fermi_CRb[i])/nit_tot
-        Proba_pwn_psr[i] = sum((Lum_pwn[:,i] <= 0.0) & (Lum_psr[:,i] <= 0.0))/nit_tot
+        Proba_HESS[i] = sum((Lum_HESS[:,i] + Lum_pwn[:,i]) > Lum_HESS_CRb[i])/nit_tot
+        Proba_HESS_CR[i] = sum((Lum_HESS[:,i] > Lum_HESS_CRb[i]) * (Lum_pwn[:,i] <= Lum_HESS_CRb[i]))/nit_tot
+        Proba_Fermi[i] = sum((Lum_Fermi[:,i] + Lum_psr[:,i]) > Lum_Fermi_CRb[i])/nit_tot
+        Proba_Fermi_CR[i] = sum((Lum_Fermi[:,i] > Lum_Fermi_CRb[i]) * (Lum_psr[:,i] <= Lum_Fermi_CRb[i]))/nit_tot
+        Proba_pwn_psr[i] = sum((Lum_pwn[:,i] <= 0.0) * (Lum_psr[:,i] <= 0.0))/nit_tot
 
     return Proba_HESS, Proba_HESS_CR, Proba_Fermi, Proba_Fermi_CR, Proba_pwn_psr
