@@ -32,9 +32,9 @@ from Parameters_system import *
 ##====##
 
     # You need to change it
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e27/Gamma_emission/'
-pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e27/Remain/'
-pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e27/SN/'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/2_'
+pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/2_'
+pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/2_'
 
 ## ======================================= ##
 # Statistic for a high number of iterations #
@@ -45,10 +45,10 @@ Plot the graphics for all iterations
 """
 
     # Number of iterations per files
-nit = 10                                                                        #you need to change it for your simulations (depends on the number of iterations per files)
+nit = 100                                                                        #you need to change it for your simulations (depends on the number of iterations per files)
 
     # Number of Files
-nfiles = 10                                                                     #you need to change it for your simulations (depends on the number of files (paralelization you have done))
+nfiles = 1                                                                     #you need to change it for your simulations (depends on the number of files (paralelization you have done))
 
     # Total number of iterations
 nit_tot = nit * nfiles                                                          #you need to change it for your simulations
@@ -78,10 +78,10 @@ for i in range (nfiles):
 
         # You need to change it
     if nfiles > 1:
-        os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/1e27/' + file)
+        os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/' + file)
 
     else:
-        os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/1e27/')
+        os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/')
 
     with open('SB', 'rb') as SB_load:
 
@@ -123,9 +123,9 @@ for i in range (nfiles):
             nsn_it[j + k] = nsn[j]
 
         k += nit
-
+"""
     # Recording of the concatenisation (you need to change it)
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/1e27/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/')
 
 with open('General', 'wb') as iteration_write:
 
@@ -142,7 +142,7 @@ with open('SB', 'wb') as iteration_write:
 
     pickle.dump(tsn_it, iteration_write)
     pickle.dump(nsn_it, iteration_write)
-
+"""
     ##-------------------------------------------##
     # Histogramme of the sn in our time interval  #
     ##-------------------------------------------##
@@ -377,23 +377,33 @@ ymin = 1e29
 ymax = 1e36
 
             # HESS energy range
-y = Lum_HESS_mean
+y_mean = Lum_HESS_mean
+label_mean = 'CRs only'
+y_pwn = Lum_pwn_mean
+label_pwn = 'PWNe'
 ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
-color = 'cornflowerblue'
+color_mean = 'cornflowerblue'
+color_pwn = 'green'
 
-semilog_plot(figure_number, 1, t6, y, label, Title, xlabel, ylabel_HESS, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
-plt.fill_between(t6, Lum_HESS_pst, Lum_HESS_mst, color = color, alpha = '0.15')
+semilog_plot(figure_number, 1, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym, linestyle, color_mean, text, xmin, xmax, ymin, ymax)
+plt.fill_between(t6, Lum_HESS_pst, Lum_HESS_mst, color = color_mean, alpha = '0.15')
+semilog_plot(figure_number, 1, t6, y_pwn, label_pwn, Title, xlabel, ylabel_HESS, sym, linestyle, color_pwn, text, xmin, xmax, ymin, ymax)
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_HESS.pdf')
 
 figure_number += 1
 
             # Fermi energy range
-y = Lum_Fermi_mean
+y_mean = Lum_Fermi_mean
+label_mean = 'CRs only'
 ylabel_Fermi = '$L_\gamma$ [erg s$^{-1}$] (100 MeV - 100 GeV)'
-color = 'orangered'
+color_mean = 'orangered'
+y_psr = Lum_psr_mean
+label_psr = 'PSRs'
+color_psr = 'orange'
 
-semilog_plot(figure_number, 1, t6, y, label, Title, xlabel, ylabel_Fermi, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
-plt.fill_between(t6, Lum_Fermi_pst, Lum_Fermi_mst, color = color, alpha = '0.15')
+semilog_plot(figure_number, 1, t6, y_mean, label_mean, Title, xlabel, ylabel_Fermi, sym, linestyle, color_mean, text, xmin, xmax, ymin, ymax)
+plt.fill_between(t6, Lum_Fermi_pst, Lum_Fermi_mst, color = color_mean, alpha = '0.15')
+semilog_plot(figure_number, 1, t6, y_psr, label_psr, Title, xlabel, ylabel_Fermi, sym, linestyle, color_psr, text, xmin, xmax, ymin, ymax)
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_Fermi.pdf')
 
 figure_number += 1

@@ -26,7 +26,7 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # IRAP
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/Total/Gamma_emission/'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/Total/Gamma_emission/2_'
     # Home
 #pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Gamma_emission/bis_300'
 #pathfigure_remain = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Remain/bis_300'
@@ -122,23 +122,34 @@ sym_mean = ['', '']#['', '', '']
 linestyle_mean = ['-', '-'] #['-', '-', '-']
 
 color_mean = ['cornflowerblue', 'orangered']#['purple', 'green']
+color_pwn = ['green', 'greenyellow']#['purple', 'green']
 
             # H.E.S.S. range
 ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
 
 y_mean = [Lum_HESS_30[20], Lum_HESS_30[98]] #[Lum_HESS_30[j], Lum_HESS_300[j]]
 print(y_mean)
+y_pwn = [Lum_pwn_30[20], Lum_pwn_30[98]]
 
 semilog_plot(figure_number, 2, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
 plt.savefig(pathfigure_gamma+'Gamma_emission_one_run_HESS.pdf')
+figure_number += 1
+
+semilog_plot(figure_number, 2, t6, y_pwn, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_pwn, text, xmin, xmax, ymin, ymax)
+plt.savefig(pathfigure_gamma+'Gamma_emission_one_run_Hpwn.pdf')
 figure_number += 1
 
             # Fermi range
 ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (100 MeV - 100 GeV)'
 
 y_mean = [Lum_Fermi_30[20], Lum_Fermi_30[98]]#[Lum_Fermi_30[j], Lum_Fermi_300[j]]
+y_psr = [Lum_psr_30[20], Lum_psr_30[98]]
 
 semilog_plot(figure_number, 2, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
+plt.savefig(pathfigure_gamma+'Gamma_emission_onene_run_Fermi.pdf')
+figure_number += 1
+
+semilog_plot(figure_number, 2, t6, y_psr, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_pwn, text, xmin, xmax, ymin, ymax)
 plt.savefig(pathfigure_gamma+'Gamma_emission_onene_run_Fermi.pdf')
 figure_number += 1
 

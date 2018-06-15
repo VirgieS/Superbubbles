@@ -26,7 +26,7 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # IRAP
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/density/Total/Gamma_emission/'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/Total/Gamma_emission/'
     # Home
 #pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Gamma_emission/bis_300'
 #pathfigure_remain = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Remain/bis_300'
@@ -58,7 +58,7 @@ figure_number = 1
 
         # Nob = 30
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/diffusion/alpha2_2/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/30/')
 
 with open('Total', 'rb') as iteration_write:
 
@@ -238,7 +238,7 @@ Gamma_GeV_mst_100[ind0] = numpy.zeros(len(ind0))
 
         # Nob = 300
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/diffusion/delta0_33/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/300/')
 
 with open('Total', 'rb') as iteration_write:
 
@@ -327,7 +327,7 @@ Gamma_GeV_mst_300[ind0] = numpy.zeros(len(ind0))
 
 
     # Plot
-label_mean = ['alpha = 2.2, delta = 0.5', 'alpha = 2.0, delta = 0.5', 'alpha = 2.0, delta = 0.33']
+label_mean = ['30', '100', '300']
 label_std = 'none'
 
 sym_mean = ['', '', '']
@@ -359,7 +359,7 @@ semilog_plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HES
 #plt.fill_between(t6, Lum_HESS_pst_30, Lum_HESS_mst_30, color = 'purple', alpha = '0.15')
 #plt.fill_between(t6, Lum_HESS_pst_100, Lum_HESS_mst_100, color = 'blue', alpha = '0.15')
 #plt.fill_between(t6, Lum_HESS_pst_300, Lum_HESS_mst_300, color = 'green', alpha = '0.25')
-plt.savefig(pathfigure_gamma+'Mean_gamma_emission_HESS.pdf')
+plt.savefig(pathfigure_gamma+'Mean_gamma_emission_HESS_stars.pdf')
 
 figure_number += 1
 
@@ -374,7 +374,7 @@ semilog_plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HES
 #plt.fill_between(t6, Lum_Fermi_pst_30, Lum_Fermi_mst_30, color = 'purple', alpha = '0.15')
 #plt.fill_between(t6, Lum_Fermi_pst_100, Lum_Fermi_mst_100, color = 'blue', alpha = '0.15')
 #plt.fill_between(t6, Lum_Fermi_pst_300, Lum_Fermi_mst_300, color = 'green', alpha = '0.25')
-plt.savefig(pathfigure_gamma+'Mean_gamma_emission_Fermi.pdf')
+plt.savefig(pathfigure_gamma+'Mean_gamma_emission_Fermi_stars.pdf')
 
 figure_number += 1
 
@@ -393,7 +393,7 @@ plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_m
 #plt.fill_between(t6, Gamma_HESS_pst_30, Gamma_HESS_mst_30, color = 'purple', alpha = '0.15')
 #plt.fill_between(t6, Gamma_HESS_pst_100, Gamma_HESS_mst_100, color = 'blue', alpha = '0.15')
 #plt.fill_between(t6, Gamma_HESS_pst_300, Gamma_HESS_mst_300, color = 'green', alpha = '0.25')
-plt.savefig(pathfigure_gamma+'Photon_index_HESS.pdf')
+plt.savefig(pathfigure_gamma+'Photon_index_HESS_stars.pdf')
 
 figure_number += 1
 
@@ -408,7 +408,7 @@ plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_m
 #plt.fill_between(t6, Gamma_GeV_pst_30, Gamma_GeV_mst_30, color = 'purple', alpha = '0.15')
 #plt.fill_between(t6, Gamma_GeV_pst_100, Gamma_GeV_mst_100, color = 'blue', alpha = '0.15')
 #plt.fill_between(t6, Gamma_GeV_pst_300, Gamma_GeV_mst_300, color = 'green', alpha = '0.25')
-plt.savefig(pathfigure_gamma+'Photon_index_GeV.pdf')
+plt.savefig(pathfigure_gamma+'Photon_index_GeV_stars.pdf')
 
 figure_number += 1
 

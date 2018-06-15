@@ -30,7 +30,7 @@ from Parameters_system import *
 ##====##
 
     # You need to change it
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/new/1e28_22_050')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/new/1e25_22_050/2')
 
 ## ======= ##
 # Statistic #

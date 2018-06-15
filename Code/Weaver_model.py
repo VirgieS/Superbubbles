@@ -134,13 +134,13 @@ Msb, Mswept = masses(t7, Rsb)
 
         # Computation of the thickness and the density of the shell
 ns, hs = density_thickness_shell(Vsb, Mswept, Msb, Rsb)
-"""
+
         # Computation of the pressure inside the SB
 psb = pressure_SB(t6)
 
         # Computation of the luminosity of the SB due to the radiatiative loss
 Lsb = luminosity_SB(t7, Rsb)
-"""
+
     # Plots
 xlabel = 'Time [Myr]'
 text = ''
@@ -213,7 +213,7 @@ log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, symbol, linestyl
 plt.savefig(pathfigure_SB+'Thickness_percentage.pdf')
 
 figure_number += 1
-"""
+
         # Pressure inside the SB
 #title = 'Time evolution of the pressure inside the SB \ncompare to the pressure in the ambient medium'
 label = ['$p_{sb}$','$p_{ism}$']
@@ -249,5 +249,5 @@ symbol = '+'
 linestyle = ''
 log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, symbol, linestyle, color, text)
 plt.savefig(pathfigure_SB+'Luminosity.pdf')
-"""
+
 plt.show()

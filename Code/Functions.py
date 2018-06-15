@@ -20,14 +20,16 @@ from scipy.interpolate import interp1d,interp2d
 rcParams['xtick.bottom'] = True
 rcParams['xtick.top'] = True
 rcParams['xtick.minor.visible'] = True
+rcParams['xtick.major.size'] = 15
+rcParams['xtick.minor.size'] = 10
 
 rcParams['ytick.left'] = True
 rcParams['ytick.right'] = True
 rcParams['ytick.minor.visible'] = True
 
-plt.rc('font', family='serif', size = 12)
+plt.rc('font', family='serif', size = 45)
 
-#rcParams['lines.linewidth'] = 3
+rcParams['lines.linewidth'] = 10
 
 def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle, color, text):
     """
@@ -46,7 +48,7 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
         text            :       important parameters that you will write on the figure
     """
         # figure
-    fig = plt.figure(figure_number, figsize = (10, 7))
+    fig = plt.figure(figure_number, figsize = (20, 15))
     ax = fig.add_subplot(111)
 
         # Plot
@@ -117,7 +119,7 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
         text            :       important parameters that you will write on the figure
     """
         # figure
-    fig = plt.figure(figure_number, figsize=(8,5))
+    fig = plt.figure(figure_number, figsize=(20, 15))
     ax = fig.add_subplot(111)
 
         # limit
@@ -197,7 +199,7 @@ def semilog_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel,
         text            :       important parameters that you will write on the figure
     """
         # figure
-    fig = plt.figure(figure_number, figsize=(8,5))
+    fig = plt.figure(figure_number, figsize=(20, 15))
     ax = fig.add_subplot(111)
 
         # limit
@@ -276,7 +278,7 @@ def log_plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbo
     """
 
         # figure
-    fig = plt.figure(figure_number, figsize = (8, 5))
+    fig = plt.figure(figure_number, figsize = (20, 15))
 
         # axes
     host = host_subplot(111, axes_class=AA.Axes)
@@ -337,7 +339,7 @@ def plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbol):
     """
 
         # figure
-    fig = plt.figure(figure_number, figsize = (8, 5))
+    fig = plt.figure(figure_number, figsize = (20, 15))
 
         # axes
     host = host_subplot(111, axes_class=AA.Axes)
@@ -394,7 +396,7 @@ def histogramme(figure_number, hist, label_name, title, xlabel, ylabel, len_bins
         xlabel          :       label of the x-axis
         ylabel          :       label of the y axis
     """
-    plt.figure(figure_number, figsize=(8,5))
+    plt.figure(figure_number, figsize=(20, 15))
     hist_max = numpy.max(hist)
     hist_min = numpy.min(hist)
     bins = int((hist_max - hist_min)/len_bins)
