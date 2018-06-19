@@ -1,3 +1,11 @@
+"""
+It plots the gamma-ray luminosities in the HE and VHE energy ranges and the spectral index in both energy ranges for one case.
+
+All the parameters must be given in the Parameters_system.
+
+Make sure that you have already run the code 'Plotting.py' to have the concatenisation of the data set.
+"""
+
 ##------------------------##
 # Librairies and functions #
 ##------------------------##
@@ -23,47 +31,17 @@ from Parameters_system import *
 # Path #
 ##====##
 
-## NEED TO WRITE CLEARLY WHAT I DO
-
-    # IRAP
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e26/Gamma_emission/Tot_'
-pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e26/Remain/Tot_'
-pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e26/Tot_'
-    # Home
-#pathfigure_gamma = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Gamma_emission/bis_300'
-#pathfigure_remain = '/home/vivi/Documents/Master_2/Superbubbles/figures/Parameters/stars/100/Remain/bis_300'
+    # you need to change it
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e26/Gamma_emission/'
+pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e26/Remain/'
+pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e26/'
 
 ## ======================================= ##
 # Statistic for a high number of iterations #
 ## ======================================= ##
 
-"""
-Plot the graphics for all iterations
-"""
-
-    # Total number of iterations
-nit_tot = 100                                                          #you need to change it for your simulations
-
-    # Fix time array (yr)
-tmin = 3/yr26yr         # yr
-tmax = 10/yr26yr   # yr
-number_bin_t = 3000
-t_fix = numpy.linspace(tmin, tmax, number_bin_t)    # yr
-t6 = t_fix * yr26yr                                 # Myr
-
-    # Cosmic rays sea
-tmin_CR = 2.5/yr26yr     # yr
-tmax_CR = 10.5/yr26yr    # yr
-number_bin_t = 3000
-t_CR = numpy.linspace(tmin, tmax, number_bin_t)    # yr
-
     # Initialization
 figure_number = 1
-
-Rsb_t = numpy.zeros(number_bin_t)
-Vsb_t = numpy.zeros(number_bin_t)
-ns_t = numpy.zeros(number_bin_t)
-Ms_t = numpy.zeros(number_bin_t)
 
     ## ------- ##
     # Load data #
@@ -81,7 +59,6 @@ with open('Total', 'rb') as iteration_write:
     Gamma_MeV_it = pickle.load(iteration_write)
     Lum_pwn_it = pickle.load(iteration_write)
     Lum_psr_it = pickle.load(iteration_write)
-    nob_it = pickle.load(iteration_write)
     tsn_it = pickle.load(iteration_write)
     nsn_it = pickle.load(iteration_write)
 
@@ -156,47 +133,26 @@ for j in range (number_bin_t):
 Lum_HESS_mean = numpy.nan_to_num(Lum_HESS_mean)
 Lum_HESS_std = numpy.nan_to_num(Lum_HESS_std)
 Lum_HESS_pst = Lum_HESS_mean + Lum_HESS_std
-
-if Nob == 30:
-
-    Lum_HESS_mst = numpy.zeros(number_bin_t)
-
-else:
-
-    Lum_HESS_mst = Lum_HESS_mean - Lum_HESS_std
-    Lum_HESS_mst = numpy.nan_to_num(Lum_HESS_mst)
-    ind0 = numpy.where(Lum_HESS_mst < 0)[0]
-    Lum_HESS_mst[ind0] = numpy.zeros(len(ind0))
+Lum_HESS_mst = Lum_HESS_mean - Lum_HESS_std
+Lum_HESS_mst = numpy.nan_to_num(Lum_HESS_mst)
+ind0 = numpy.where(Lum_HESS_mst < 0)[0]
+Lum_HESS_mst[ind0] = numpy.zeros(len(ind0))
 
 Lum_Fermi_mean = numpy.nan_to_num(Lum_Fermi_mean)
 Lum_Fermi_std = numpy.nan_to_num(Lum_Fermi_std)
 Lum_Fermi_pst = Lum_Fermi_mean + Lum_Fermi_std
-
-if Nob == 30:
-
-    Lum_Fermi_mst = numpy.zeros(number_bin_t)
-
-else:
-
-    Lum_Fermi_mst = Lum_Fermi_mean - Lum_Fermi_std
-    Lum_Fermi_mst = numpy.nan_to_num(Lum_Fermi_mst)
-    ind0 = numpy.where(Lum_Fermi_mst < 0)[0]
-    Lum_Fermi_mst[ind0] = numpy.zeros(len(ind0))
+Lum_Fermi_mst = Lum_Fermi_mean - Lum_Fermi_std
+Lum_Fermi_mst = numpy.nan_to_num(Lum_Fermi_mst)
+ind0 = numpy.where(Lum_Fermi_mst < 0)[0]
+Lum_Fermi_mst[ind0] = numpy.zeros(len(ind0))
 
 Lum_mean = numpy.nan_to_num(Lum_mean)
 Lum_std = numpy.nan_to_num(Lum_std)
 Lum_pst = Lum_mean + Lum_std
-
-if Nob == 30:
-
-    Lum_mst = numpy.zeros(number_bin_t)
-
-else:
-
-    Lum_mst = Lum_mean - Lum_std
-    Lum__mst = numpy.nan_to_num(Lum_mst)
-    ind0 = numpy.where(Lum_mst < 0)[0]
-    Lum_mst[ind0] = numpy.zeros(len(ind0))
+Lum_mst = Lum_mean - Lum_std
+Lum__mst = numpy.nan_to_num(Lum_mst)
+ind0 = numpy.where(Lum_mst < 0)[0]
+Lum_mst[ind0] = numpy.zeros(len(ind0))
 
 Gamma_HESS_pst = Gamma_HESS_mean + Gamma_HESS_std
 Gamma_HESS_mst = Gamma_HESS_mean - Gamma_HESS_std
@@ -223,9 +179,8 @@ text = ''
 Title = ''
 xmin = tmin * yr26yr - 0.5
 xmax = tmax * yr26yr + 0.5
-ymin = 1e31
+ymin = 1e30
 ymax = 1e37
-tobs = 4
 
         # Gamma luminosity of the superbubble
 
@@ -234,12 +189,10 @@ label_mean = ['VHE CRs', 'PWNe', 'CRs background']
 color_mean = ['cornflowerblue', 'green', 'darkblue']
 color_std = ['cornflowerblue', 'cornflowerblue']
 y_mean = [Lum_HESS_mean, Lum_pwn_mean, Lum_HESS_CRb]
-y_HESS = 0.9e35
 ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
 
 semilog_plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
 plt.fill_between(t6, Lum_HESS_pst, Lum_HESS_mst, color = 'cornflowerblue', alpha = '0.25')
-plt.errorbar(tobs, y_HESS, yerr=0.2e35, label = 'HESS', marker = 'd', color = 'darkred')
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_HESS.pdf')
 
 figure_number += 1
@@ -266,12 +219,10 @@ ymax = 3.5
             # HESS energy range
 y = Gamma_HESS_mean
 color = 'cornflowerblue'
-y_HESS = 2.6
 ylabel_HESS = '$\Gamma_{ph}$ (1 TeV - 10 TeV)'
 
 plot(figure_number, 1, t6, y, label, Title, xlabel, ylabel_HESS, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
 plt.fill_between(t6, Gamma_HESS_pst, Gamma_HESS_mst, color = 'cornflowerblue', alpha = '0.25')
-plt.errorbar(tobs, y_HESS, yerr=0.2, label = 'HESS', marker = 'd', color = 'darkred')
 plt.savefig(pathfigure_gamma+'Photon_index_HESS.pdf')
 
 figure_number += 1

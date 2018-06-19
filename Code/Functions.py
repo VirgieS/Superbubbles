@@ -1,3 +1,5 @@
+
+
 """
 Here are all functions needed for the superbubble model
 """
@@ -20,16 +22,16 @@ from scipy.interpolate import interp1d,interp2d
 rcParams['xtick.bottom'] = True
 rcParams['xtick.top'] = True
 rcParams['xtick.minor.visible'] = True
-rcParams['xtick.major.size'] = 15
-rcParams['xtick.minor.size'] = 10
+rcParams['xtick.major.size'] = 10
+rcParams['xtick.minor.size'] = 7
 
 rcParams['ytick.left'] = True
 rcParams['ytick.right'] = True
 rcParams['ytick.minor.visible'] = True
 
-plt.rc('font', family='serif', size = 45)
+plt.rc('font', family='serif', size = 26)
 
-rcParams['lines.linewidth'] = 10
+rcParams['lines.linewidth'] = 8
 
 def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle, color, text):
     """
@@ -48,7 +50,7 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
         text            :       important parameters that you will write on the figure
     """
         # figure
-    fig = plt.figure(figure_number, figsize = (20, 15))
+    fig = plt.figure(figure_number, figsize = (12, 8))
     ax = fig.add_subplot(111)
 
         # Plot
@@ -90,7 +92,10 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
         plt.loglog(x, y, label = label_name, col = color)
         plt.legend(loc = 'best')
 
-    plt.title(title)
+    if title != 'none':
+
+        plt.title(title)
+
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 
@@ -119,7 +124,7 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
         text            :       important parameters that you will write on the figure
     """
         # figure
-    fig = plt.figure(figure_number, figsize=(20, 15))
+    fig = plt.figure(figure_number, figsize=(12,8))
     ax = fig.add_subplot(111)
 
         # limit
@@ -170,7 +175,10 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
         plt.plot(x, y, label = label_name, color = col)
         plt.legend(loc = 'best')
 
-    plt.title(title)
+    if title != 'none':
+
+        plt.title(title)
+
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 
@@ -199,7 +207,7 @@ def semilog_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel,
         text            :       important parameters that you will write on the figure
     """
         # figure
-    fig = plt.figure(figure_number, figsize=(20, 15))
+    fig = plt.figure(figure_number, figsize=(12,8))
     ax = fig.add_subplot(111)
 
         # limit
@@ -251,7 +259,11 @@ def semilog_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel,
         plt.legend(loc = 'best')
 
     plt.yscale('log')
-    plt.title(title)
+    
+    if title != 'none':
+
+        plt.title(title)
+
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 
@@ -278,7 +290,7 @@ def log_plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbo
     """
 
         # figure
-    fig = plt.figure(figure_number, figsize = (20, 15))
+    fig = plt.figure(figure_number, figsize = (12,8))
 
         # axes
     host = host_subplot(111, axes_class=AA.Axes)
@@ -317,7 +329,9 @@ def log_plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbo
     plt.grid(color = 'k', alpha = 0.15, linestyle = ':')
 
         # Title
-    plt.title(title)
+    if title != 'none':
+
+        plt.title(title)
 
         # Draw
     plt.draw()
@@ -339,7 +353,7 @@ def plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbol):
     """
 
         # figure
-    fig = plt.figure(figure_number, figsize = (20, 15))
+    fig = plt.figure(figure_number, figsize = (12,8))
 
         # axes
     host = host_subplot(111, axes_class=AA.Axes)
@@ -378,7 +392,11 @@ def plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbol):
     plt.grid(color = 'k', alpha = 0.15, linestyle = ':')
 
         # Title
-    plt.title(title)
+    if title != 'none':
+
+        plt.title(title)
+
+    
 
         # Draw
     plt.draw()
@@ -396,7 +414,7 @@ def histogramme(figure_number, hist, label_name, title, xlabel, ylabel, len_bins
         xlabel          :       label of the x-axis
         ylabel          :       label of the y axis
     """
-    plt.figure(figure_number, figsize=(20, 15))
+    plt.figure(figure_number, figsize=(12,8))
     hist_max = numpy.max(hist)
     hist_min = numpy.min(hist)
     bins = int((hist_max - hist_min)/len_bins)
@@ -408,7 +426,10 @@ def histogramme(figure_number, hist, label_name, title, xlabel, ylabel, len_bins
         plt.hist(hist, histtype = 'step', bins = bins, align = 'mid', label = label_name)
         plt.legend(loc = 'best')
 
-    plt.title(title)
+    if title != 'none':
+
+        plt.title(title)
+
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 

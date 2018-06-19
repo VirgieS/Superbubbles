@@ -1,3 +1,7 @@
+"""
+It computes the CR background followind data from the LIS
+"""
+
 ##------------------------##
 # Librairies and functions #
 ##------------------------##
@@ -23,14 +27,9 @@ from Parameters_system import *
 # Path #
 ##====##
 
-## NEED TO WRITE CLEARLY WHAT I DO
-
-    # IRAP
+    # you need to change it
 os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/')
 pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/'
-
-    # Home
-#os.chdir('/home/vivi/Documents/Master_2/Superbubbles/Files/Parameters/stars/10/5')
 
 ## =========== ##
 # CR background #
@@ -124,9 +123,7 @@ with open('CRbackground', 'wb') as CR_write:
     pickle.dump(Lum_CRb, CR_write)
     pickle.dump(Lum_HESS_CRb, CR_write)
     pickle.dump(Lum_Fermi_CRb, CR_write)
-print(Lum_CRb)
-print(Lum_HESS_CRb)
-print(Lum_Fermi_CRb)
+
 print('number of massive stars: %d' %Nob)
 print('ambient medium density: %d cm^-3' %n0)
 
@@ -174,4 +171,4 @@ semilog_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
 plt.savefig(pathfigure_gamma+'Background_HESS.pdf')
 figure_number += 1
 
-#plt.show()
+plt.show()

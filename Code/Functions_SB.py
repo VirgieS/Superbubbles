@@ -1,3 +1,7 @@
+"""
+All functions to compute the parameters of the SB
+"""
+
 ##----------##
 # Librairies #
 ##----------##

@@ -1,3 +1,7 @@
+"""
+It computes the CR distribution to check the shape
+"""
+
 ##------------------------##
 # Librairies and functions #
 ##------------------------##

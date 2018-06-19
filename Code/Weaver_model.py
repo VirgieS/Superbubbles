@@ -1,3 +1,9 @@
+"""
+It compute all the parameters of the superbubble from the Weaver's model.
+
+All the parameters must be given in the Parameters_system.
+"""
+
 ##------------------------##
 # Librairies and functions #
 ##------------------------##
@@ -16,6 +22,7 @@ from Parameters_system import *
 # Path #
 ##====##
 
+    # you need to change it
 pathfigure_SB = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Weaver/'
 
 ##===========##
@@ -77,8 +84,9 @@ for j in range (number_bin_rs):
     T.append(Tshell[j])
 
 n = numpy.asarray(n)/ns
+
         # Density/temperature profiles
-title = ''
+title = 'none'
 ylabel = ['$n(r)/n_{shell}$', '$T(r)$ [K]']
 symbol = ['-.', ':']
 y = [n, T]
@@ -89,8 +97,7 @@ plt.savefig(pathfigure_SB+'Density_temperature_profiles.pdf')
 
 figure_number += 1
 
-        # density
-title = ''
+        # Density
 ylabel = '$n(r)/n_{shell}$'
 symbol = ''
 linestyle = '-.'
@@ -102,12 +109,9 @@ plt.savefig(pathfigure_SB+'Density_profiles.pdf')
 
 figure_number += 1
 
-        # temperature
-title = ''
+        # Temperature
 ylabel = 'Temperature [K]'
 symbol = ''
-linestyle = ':'
-label = 'none'
 
 log_plot(figure_number, 1, r, T, label, title, xlabel, ylabel, symbol, linestyle, colord, text)
 plt.savefig(pathfigure_SB+'Temperature_profiles.pdf')
@@ -144,10 +148,10 @@ Lsb = luminosity_SB(t7, Rsb)
     # Plots
 xlabel = 'Time [Myr]'
 text = ''
+symbol = ['', '']
+linestyle = ['dashed', ':']
 
         # Radius vs velocity
-#title = 'Time evolution of the radius and the velocity'
-title = ''
 ylabel = ['Radius [pc]', 'Velocity [km s$^{-1}$]']
 symbol = ['-.', ':']
 label = ['Radius', 'Velocity']
@@ -159,23 +163,20 @@ figure_number += 1
 
         # Velocities comparison
 ylabel = 'Velocity [km s$^{-1}$]'
-symbol = ['', '']
 label = ['V$_{sb}$', 'C$_0$']
 y = [Vsb, C0*numpy.ones_like(t6)]
-linestyle = ['dashed', ':']
+
 color = ['cornflowerblue', 'orange']
 log_plot(figure_number, 2, t6, y, label, title, xlabel, ylabel, symbol, linestyle, color, text)
 plt.savefig(pathfigure_SB+'Velocities.pdf')
 
 figure_number += 1
 
-
         # Masses inside the SB and swept-up
 label = ['$M_{sb}$', '$M_{swept-up}$']
 ylabel = 'Mass [$M_{\odot}$]'
 y = [Msb, Mswept]
-symbol = ['', '']
-linestyle = ['dashed', ':']
+
 log_plot(figure_number, 2, t6, y, label, title, xlabel, ylabel, symbol, linestyle, color, text)
 plt.savefig(pathfigure_SB+'Masses.pdf')
 
@@ -185,9 +186,8 @@ figure_number += 1
 label = 'none'
 ylabel = '$M_{sb}/M_{su}$'
 y = Msb/Mswept
-symbol = ''
-linestyle = '-'
-log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, symbol, linestyle, 'cornflowerblue', text)
+
+log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, '', '-', 'cornflowerblue', text)
 plt.savefig(pathfigure_SB+'Mass_percentage.pdf')
 
 figure_number += 1
@@ -195,8 +195,7 @@ figure_number += 1
 label = ['$h_s$', '$R_{sb}$']
 ylabel = 'Lenght [pc]'
 y = [hs, Rsb]
-symbol = ['', '']
-linestyle = ['dashed', ':']
+
 log_plot(figure_number, 2, t6, y, label, title, xlabel, ylabel, symbol, linestyle, color, text)
 plt.savefig(pathfigure_SB+'Thickness_radius.pdf')
 
@@ -206,21 +205,20 @@ figure_number += 1
 label = 'none'
 ylabel = '$h_s/R_{sb}$'
 y = hs/Rsb
-symbol = ''
-linestyle = '-'
-color = 'cornflowerblue'
-log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, symbol, linestyle, color, text)
+
+log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, '', '-.', 'cornflowerblue', text)
 plt.savefig(pathfigure_SB+'Thickness_percentage.pdf')
 
 figure_number += 1
 
         # Pressure inside the SB
-#title = 'Time evolution of the pressure inside the SB \ncompare to the pressure in the ambient medium'
+symbol = ['+', 'x']
+linestyle = ['', '']
+
 label = ['$p_{sb}$','$p_{ism}$']
 ylabel = 'p [dyne cm$^{-2}$]'
 y = [psb, pISM*numpy.ones_like(t6)]
-symbol = ['+', 'x']
-linestyle = ['', '']
+
 color = ['cornflowerblue', 'orange']
 log_plot(figure_number, 2, t6, y, label, title, xlabel, ylabel, symbol, linestyle, color, text)
 plt.savefig(pathfigure_SB+'Pressures.pdf')
@@ -228,26 +226,20 @@ plt.savefig(pathfigure_SB+'Pressures.pdf')
 figure_number += 1
 
         # Percentage of pressure
-#title = 'Time evolution of the ratio of the pressure'
 label = 'none'
 ylabel = '$p_{sb}/P_{ISM}$'
 y = psb/pISM
-symbol = '+'
-linestyle = ''
-color = 'cornflowerblue'
-log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, symbol, linestyle, color, text)
+
+log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, '+', '', 'cornflowerblue', text)
 plt.savefig(pathfigure_SB+'Pressure_percentage.pdf')
 
 figure_number += 1
 
         # Luminosity of the SB
-#title = 'Time evolution of the luminosity of the SB by cooling rate'
-label = 'none'
 ylabel = '$L_{sb}$ [erg s$^{-1}$]'
 y = Lsb
-symbol = '+'
-linestyle = ''
-log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, symbol, linestyle, color, text)
+
+log_plot(figure_number, 1, t6, y, label, title, xlabel, ylabel, '+', '', 'cornflowerblue', text)
 plt.savefig(pathfigure_SB+'Luminosity.pdf')
 
 plt.show()

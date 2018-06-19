@@ -32,9 +32,9 @@ from Parameters_system import *
 ##====##
 
     # You need to change it
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/2_'
-pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/2_'
-pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/2_'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/'
+pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/'
+pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/'
 
 ## ======================================= ##
 # Statistic for a high number of iterations #
@@ -123,10 +123,23 @@ for i in range (nfiles):
             nsn_it[j + k] = nsn[j]
 
         k += nit
-"""
+
     # Recording of the concatenisation (you need to change it)
 os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/')
 
+        # For the others
+with open('Total', 'wb') as iteration_write:
+    pickle.dump(Lum_HESS_it, iteration_write)
+    pickle.dump(Lum_Fermi_it, iteration_write)
+    pickle.dump(Lum_it, iteration_write)
+    pickle.dump(Gamma_HESS_it, iteration_write)
+    pickle.dump(Gamma_GeV_it, iteration_write)
+    pickle.dump(Gamma_MeV_it, iteration_write)
+    pickle.dump(Lum_pwn_it, iteration_write)
+    pickle.dump(Lum_psr_it, iteration_write)
+
+        # For 30 Dor C
+"""
 with open('General', 'wb') as iteration_write:
 
     pickle.dump(Lum_HESS_it, iteration_write)
@@ -137,6 +150,8 @@ with open('General', 'wb') as iteration_write:
     pickle.dump(Gamma_MeV_it, iteration_write)
     pickle.dump(Lum_pwn_it, iteration_write)
     pickle.dump(Lum_psr_it, iteration_write)
+    pickle.dump(tsn_it, iteration_write)
+    pickle.dump(nsn_it, iteration_write)
 
 with open('SB', 'wb') as iteration_write:
 

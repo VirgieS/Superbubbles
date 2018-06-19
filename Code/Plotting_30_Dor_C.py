@@ -1,3 +1,11 @@
+"""
+It plots the gamma-ray luminosities in the HE and VHE energy ranges and the spectral index in both energy ranges for all iterations and makes the statistic analyses of the results for the superbubble 30 Dor C.
+
+All the parameters must be given in the Parameters_system.
+
+Make sure that you have already run the code 'Plotting.py' with the correct formation of data set (the one for 30 Dor C).
+"""
+
 ##------------------------##
 # Librairies and functions #
 ##------------------------##
@@ -25,17 +33,13 @@ from Parameters_system import *
 
 ## NEED TO WRITE CLEARLY WHAT I DO
 
-    # IRAP
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/new/1e25_2_050/2_'
-pathfigure_sn = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/new/1e25_2_050/2_'
+    # you need to change it
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/new/1e25_2_050/'
+pathfigure_sn = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/new/1e25_2_050/'
 
 ## ======================================= ##
 # Statistic for a high number of iterations #
 ## ======================================= ##
-
-"""
-Plot the graphics for all iterations
-"""
 
     # Total number of iterations
 nit_tot = 200                                                          #you need to change it for your simulations
@@ -44,15 +48,11 @@ nit_tot = 200                                                          #you need
     # Initialization
 figure_number = 1
 
-Rsb_t = numpy.zeros(number_bin_t)
-Vsb_t = numpy.zeros(number_bin_t)
-ns_t = numpy.zeros(number_bin_t)
-Ms_t = numpy.zeros(number_bin_t)
-
     ## ------- ##
     # Load data #
     ## ------- ##
 
+        # you need to change it
 os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/new/1e25_2_050/')
 
 with open('General', 'rb') as iteration_write:
@@ -71,6 +71,7 @@ with open('SB', 'rb') as iteration_write:
     tsn_it = pickle.load(iteration_write)
     nsn_it = pickle.load(iteration_write)
 
+        # you need to change it
 os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/CR/')
 
 with open('CRbackground', 'rb') as CR_write:
@@ -88,8 +89,8 @@ with open('Pwn_psr', 'rb') as psr_write:
     # Supernovae explosions #
     ##---------------------##
 
-    # Computation of the probability to get nsn
-title = ''
+        # Computation of the probability to get nsn
+title = 'none'
 xlabel = '$n_{sn}$'
 ylabel = 'P($n_{sn}$)'
 label = 'none'
@@ -192,13 +193,13 @@ Gamma_GeV_mst[ind0] = numpy.zeros(len(ind0))
 
         # Plot
 
-sym_mean = ['', '']#, '']
-linestyle_mean = ['-.', '-']#, 'dashed']
+sym_mean = ['', '', '']
+linestyle_mean = ['-.', '-', 'dashed']
 
 xlabel = 'Time [Myr]'
 
 text = ''
-Title = ''
+Title = 'none'
 
 xmin = tmin * yr26yr - 0.5
 xmax = tmax * yr26yr + 0.5
@@ -210,9 +211,9 @@ tobs = 4
 
             # HESS energy range
 Lum_obs_HESS = 0.9e35
-label_mean = ['VHE CRs', 'PWNe']#, 'CRs background']
-color_mean = ['cornflowerblue', 'green']#, 'darkblue']
-y_mean = [Lum_HESS_mean, Lum_pwn_mean]#, Lum_HESS_CRb]
+label_mean = ['VHE CRs', 'PWNe', 'CRs background']
+color_mean = ['cornflowerblue', 'green', 'purple']
+y_mean = [Lum_HESS_mean, Lum_pwn_mean, Lum_HESS_CRb]
 ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
 
 semilog_plot(figure_number, len(y_mean), t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
@@ -224,9 +225,9 @@ plt.savefig(pathfigure_gamma+'Mean_gamma_emission_HESS.pdf')
 figure_number += 1
 
             # Fermi energy range
-label_mean = ['HE CRs', 'PSRs']#, 'CRs background']
-color_mean = ['orangered', 'orange']#, 'maroon']
-y_mean = [Lum_Fermi_mean, Lum_psr_mean]#, Lum_Fermi_CRb]
+label_mean = ['HE CRs', 'PSRs', 'CRs background']
+color_mean = ['orangered', 'orange', 'maroon']
+y_mean = [Lum_Fermi_mean, Lum_psr_mean, Lum_Fermi_CRb]
 ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (100 MeV - 100 GeV)'
 
 semilog_plot(figure_number, len(y_mean), t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
