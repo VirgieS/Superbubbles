@@ -40,10 +40,6 @@ pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/st
 # Statistic for a high number of iterations #
 ## ======================================= ##
 
-"""
-Plot the graphics for all iterations
-"""
-
     # Number of iterations per files
 nit = 100                                                                        #you need to change it for your simulations (depends on the number of iterations per files)
 
@@ -150,8 +146,6 @@ with open('General', 'wb') as iteration_write:
     pickle.dump(Gamma_MeV_it, iteration_write)
     pickle.dump(Lum_pwn_it, iteration_write)
     pickle.dump(Lum_psr_it, iteration_write)
-    pickle.dump(tsn_it, iteration_write)
-    pickle.dump(nsn_it, iteration_write)
 
 with open('SB', 'wb') as iteration_write:
 
@@ -196,7 +190,6 @@ figure_number = figure + 1
     ## ---------------------------------------------------------------- ##
     # Histogramme of the probability to have one luminosity/photon index #
     ## ---------------------------------------------------------------- ##
-#indt = numpy.where((t6 >= 5) & (t6 <= 6))[0]
 indt = [1000, 2500]
 if nit_tot > 1:
 

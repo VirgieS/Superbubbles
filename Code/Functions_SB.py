@@ -1,7 +1,3 @@
-"""
-All functions to compute the parameters of the SB
-"""
-
 ##----------##
 # Librairies #
 ##----------##
@@ -17,12 +13,16 @@ from Physical_constants import *
 from Conversion_factors import *
 from Parameters_system import *
 
+## ------- ##
+# Functions #
+## ------- ##
+
 def radius_velocity_SB(t6):
     """
     Returns the radius and the velocity of the forward shock of a superbubble
     From the equation 52 and 53 of the article Weaver et al. 1977
         Rsb = ar * n0^alphar * L36^betar * t6^gammar                    (pc)
-        Vsb = dRsb/dt = ar * gammar * n0^alphar  L36^betar * t6^gammar  (km/s)
+        Vsb = dRsb/dt = av * n0^alphav * L36^betav * t6^gammav          (km/s)
     Inputs:
         t6      :       age of the system expressed in 10^6 yr
     Outputs:
@@ -35,8 +35,7 @@ def radius_velocity_SB(t6):
     Rsb = ar * n0**alphar * L36**betar * t6**gammar
 
         # Velocity of the forward shock
-            # Vsb = dRsb/dt = gammar * ar * n0^alphar * L36^betar * t6^(gammar-1)
-    #Vsb = ar*(gammar) * n0**alphar * L36**betar * t6**(gammar-1)
+            # Vsb = dRsb/dt = av * n0^alphav * L36^betav * t6^gammav
     Vsb = av * n0**alphav * L36**betav * t6**gammav
 
     return Rsb, Vsb

@@ -34,8 +34,8 @@ from Parameters_system import *
 ## NEED TO WRITE CLEARLY WHAT I DO
 
     # you need to change it
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/new/1e25_2_050/'
-pathfigure_sn = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/new/1e25_2_050/'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Simulations/1e28_22_050/'
+pathfigure_sn = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Simulations/1e28_22_050/'
 
 ## ======================================= ##
 # Statistic for a high number of iterations #
@@ -53,7 +53,7 @@ figure_number = 1
     ## ------- ##
 
         # you need to change it
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/new/1e25_2_050/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/Simulations/1e28_22_050/')
 
 with open('General', 'rb') as iteration_write:
 
@@ -218,7 +218,7 @@ ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
 
 semilog_plot(figure_number, len(y_mean), t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
 plt.fill_between(t6, Lum_HESS_pst, Lum_HESS_mst, color = 'cornflowerblue', alpha = '0.25')
-plt.errorbar(tobs, Lum_obs_HESS, yerr = 0.2e35, marker = 'd', markersize = 15, linestyle = '', color = 'darkred', label = 'H.E.S.S.')
+plt.errorbar(tobs, Lum_obs_HESS, yerr = 0.2e35, marker = 'd', linestyle = '', color = 'darkred', label = 'H.E.S.S.')
 plt.legend(loc = 'best')
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_HESS.pdf')
 
@@ -251,7 +251,7 @@ ylabel_HESS = '$\Gamma_{ph}$ (1 TeV - 10 TeV)'
 
 plot(figure_number, 1, t6, y, label, Title, xlabel, ylabel_HESS, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
 plt.fill_between(t6, Gamma_HESS_pst, Gamma_HESS_mst, color = 'cornflowerblue', alpha = '0.25')
-plt.errorbar(tobs, Gamma_obs_HESS, yerr = 0.2, marker = 'd', markersize = 15, linestyle = '', color = 'darkred', label = 'H.E.S.S.')
+plt.errorbar(tobs, Gamma_obs_HESS, yerr = 0.2, marker = 'd', linestyle = '', color = 'darkred', label = 'H.E.S.S.')
 plt.legend(loc = 'best')
 plt.savefig(pathfigure_gamma+'Photon_index_HESS.pdf')
 

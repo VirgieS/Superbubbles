@@ -29,23 +29,7 @@ pathfigure_CR = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/C
 ##===========##
 
     # SN explosion time
-t0min = 3       # Myr
-t0max = 37      # Myr
 t0 = random_SN(t0min, t0max)/yr26yr   # SN explosion time in yr
-
-    # time array (yr) ONLY AFTER THE SN EXPLOSION
-tmin = t0min                # Myr
-tmax = t0max + 1            # Myr
-tmin = tmin/yr26yr          # yr
-tmax = tmax/yr26yr          # yr
-number_bin_t = 300
-t = numpy.logspace(numpy.log10(tmin), numpy.log10(tmax), number_bin_t)    # yr
-t6 = t * yr26yr         # Myr
-t7 = t6 * s6yr27yr          # 10 Myr
-
-    # Energy of the cosmic rays (GeV)
-number_bin_E = 10
-ECR = numpy.logspace(numpy.log10(Emin_CR), numpy.log10(Emax_CR), number_bin_E)
 
     # Cosmic rays distribution (GeV^-1) for each time step
 

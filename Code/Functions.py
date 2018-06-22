@@ -1,9 +1,3 @@
-
-
-"""
-Here are all functions needed for the superbubble model
-"""
-
 ##----------##
 # Librairies #
 ##----------##
@@ -22,36 +16,45 @@ from scipy.interpolate import interp1d,interp2d
 rcParams['xtick.bottom'] = True
 rcParams['xtick.top'] = True
 rcParams['xtick.minor.visible'] = True
-rcParams['xtick.major.size'] = 10
-rcParams['xtick.minor.size'] = 7
+#rcParams['xtick.major.size'] = 10
+#rcParams['xtick.minor.size'] = 7
 
 rcParams['ytick.left'] = True
 rcParams['ytick.right'] = True
 rcParams['ytick.minor.visible'] = True
 
-plt.rc('font', family='serif', size = 26)
+plt.rc('font', family='serif', size = 12)
+figsize = (12, 8)
 
-rcParams['lines.linewidth'] = 8
+#rcParams['lines.linewidth'] = 8
 
-def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle, color, text):
+def log_plot(figure_number, number_of_plot, x, y, label_name = 'none', title = 'none', xlabel, ylabel, symbol, linestyle, color, text = 'none', xmin, xmax, ymin, ymax):
     """
     Plot a log-log graphic
     Inputs:
-        figure_number   :       define the number of the figure
-        number_of_plot  :       define how many plot you want on one figure (with the same axis)
-        x               :       x-vector
-        y               :       y-array (line = one y-array and row = each different y-plot)
-        label_name      :       legend of one y
-        title           :       title of the plot
-        xlabel          :       label of the x-axis
-        ylabel          :       label of the y-axis
-        symbol          :       symbol of one y
-        linestyle       :       style of the line (drashed, etc)
-        text            :       important parameters that you will write on the figure
+        figure_number   :   define the number of the figure
+        number_of_plot  :   define how many plot you want on one figure (with the same axis)
+        x               :   x-vector
+        y               :   y-array (line = one y-array and row = each different y-plot)
+        label_name      :   legend of one y (default = 'none')
+        title           :   title of the plot (default = 'none')
+        xlabel          :   label of the x-axis
+        ylabel          :   label of the y-axis
+        symbol          :   symbol of one y
+        linestyle       :   style of the line (drashed, etc)
+        text            :   important parameters that you will write on the figure (default = 'none')
+        xmin            :   minimum of x
+        xmax            :   maximum of x
+        ymin            :   minimum of y
+        ymax            :   maximum of y
     """
         # figure
-    fig = plt.figure(figure_number, figsize = (12, 8))
+    fig = plt.figure(figure_number, figsize = figsize)
     ax = fig.add_subplot(111)
+
+        # limit
+    plt.xlim((xmin, xmax))
+    plt.ylim((ymin, ymax))
 
         # Plot
     if number_of_plot > 1:
@@ -107,34 +110,32 @@ def log_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, yla
 
     return
 
-def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle, color, text, xmin, xmax, ymin, ymax):
+def plot(figure_number, number_of_plot, x, y, label_name = 'none', title = 'none', xlabel, ylabel, symbol, linestyle, color, text = 'none', xmin, xmax, ymin, ymax):
     """
     Function to plot a linear graphic
     Inputs:
-        figure_number   :       define the number of the figure
-        number_of_plot  :       define how many plot you want on one figure (with the same axis)
-        x               :       x-vector
-        y               :       y-array (line = one y-array and row = each different y-plot)
-        label_name      :       legend of one y
-        title           :       title of the plot
-        xlabel          :       label of the x-axis
-        ylabel          :       label of the y-axis
-        symbol          :       symbol of one y
-        linestyle       :       style of the line (drashed, etc)
-        text            :       important parameters that you will write on the figure
+        figure_number   :   define the number of the figure
+        number_of_plot  :   define how many plot you want on one figure (with the same axis)
+        x               :   x-vector
+        y               :   y-array (line = one y-array and row = each different y-plot)
+        label_name      :   legend of one y (default = 'none')
+        title           :   title of the plot (default = 'none')
+        xlabel          :   label of the x-axis
+        ylabel          :   label of the y-axis
+        symbol          :   symbol of one y
+        linestyle       :   style of the line (drashed, etc)
+        text            :   important parameters that you will write on the figure (default = 'none')
+        xmin            :   minimum of x
+        xmax            :   maximum of x
+        ymin            :   minimum of y
+        ymax            :   maximum of y
     """
         # figure
-    fig = plt.figure(figure_number, figsize=(12,8))
+    fig = plt.figure(figure_number, figsize=figsize)
     ax = fig.add_subplot(111)
 
         # limit
-    #xmin = min(x)
-    #xmax = max(x)
     plt.xlim((xmin, xmax))
-
-    #y = numpy.nan_to_num(y)
-    #ymax = numpy.max(y)
-    #ymin = numpy.min(y)
     plt.ylim((ymin, ymax))
 
         # Plot
@@ -190,34 +191,32 @@ def plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel,
 
     return
 
-def semilog_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel, ylabel, symbol, linestyle, color, text, xmin, xmax, ymin, ymax):
+def semilog_plot(figure_number, number_of_plot, x, y, label_name = 'none', title = 'none', xlabel, ylabel, symbol, linestyle, color, text = 'none', xmin, xmax, ymin, ymax):
     """
     Function to plot a linear graphic
     Inputs:
-        figure_number   :       define the number of the figure
-        number_of_plot  :       define how many plot you want on one figure (with the same axis)
-        x               :       x-vector
-        y               :       y-array (line = one y-array and row = each different y-plot)
-        label_name      :       legend of one y
-        title           :       title of the plot
-        xlabel          :       label of the x-axis
-        ylabel          :       label of the y-axis
-        symbol          :       symbol of one y
-        linestyle       :       style of the line (drashed, etc)
-        text            :       important parameters that you will write on the figure
+        figure_number   :   define the number of the figure
+        number_of_plot  :   define how many plot you want on one figure (with the same axis)
+        x               :   x-vector
+        y               :   y-array (line = one y-array and row = each different y-plot)
+        label_name      :   legend of one y (default = 'none')
+        title           :   title of the plot (default = 'none')
+        xlabel          :   label of the x-axis
+        ylabel          :   label of the y-axis
+        symbol          :   symbol of one y
+        linestyle       :   style of the line (drashed, etc)
+        text            :   important parameters that you will write on the figure (default = 'none')
+        xmin            :   minimum of x
+        xmax            :   maximum of x
+        ymin            :   minimum of y
+        ymax            :   maximum of y
     """
         # figure
-    fig = plt.figure(figure_number, figsize=(12,8))
+    fig = plt.figure(figure_number, figsize=figsize)
     ax = fig.add_subplot(111)
 
         # limit
-    #xmin = min(x)
-    #xmax = max(x)
     plt.xlim((xmin, xmax))
-
-    #y = numpy.nan_to_num(y)
-    #ymax = numpy.max(y)
-    #ymin = numpy.min(y)
     plt.ylim((ymin, ymax))
 
         # Plot
@@ -259,7 +258,7 @@ def semilog_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel,
         plt.legend(loc = 'best')
 
     plt.yscale('log')
-    
+
     if title != 'none':
 
         plt.title(title)
@@ -275,22 +274,22 @@ def semilog_plot(figure_number, number_of_plot, x, y, label_name, title, xlabel,
 
     return
 
-def log_plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbol):
+def log_plot_multi(figure_number, x, y, label_name, title = 'none', xlabel, ylabel, symbol):
     """
     Plot a log-log graphic for two different y-axis
     Inputs:
-        figure_number   :       define the number of the figure
-        x               :       x-vector
-        y               :       (2D) y-array
-        label_name      :       legend of one y
-        title           :       title of the plot
-        xlabel          :       label of the x-axis
-        ylabel          :       labels of the y-axis
-        symbol          :       symbol of one y
+        figure_number   :   define the number of the figure
+        x               :   x-vector
+        y               :   (2D) y-array
+        label_name      :   legend of one y
+        title           :   title of the plot (default = 'none')
+        xlabel          :   label of the x-axis
+        ylabel          :   labels of the y-axis
+        symbol          :   symbol of one y
     """
 
         # figure
-    fig = plt.figure(figure_number, figsize = (12,8))
+    fig = plt.figure(figure_number, figsize = figsize)
 
         # axes
     host = host_subplot(111, axes_class=AA.Axes)
@@ -300,23 +299,11 @@ def log_plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbo
 
     par.axis["right"].toggle(all=True)
 
-            # host axes
-    #xmin = min(x)
-    #xmax = max(x)
-    #host.set_xlim(xmin, xmax)
-
-    #ymin = min(y[0])
-    #ymax = max(y[0])
-    #host.set_ylim(ymin, ymax)
-
     host.set_xlabel(xlabel)
     host.set_ylabel(ylabel[0])
     p1, = host.loglog(x, y[0], symbol[0], label = label_name[0])
 
             # second axes
-    #ymin = min(y[1])
-    #ymax = max(y[1])
-    #par.set_ylim(ymin, ymax)
     par.set_ylabel(ylabel[1])
     p2, = par.loglog(x, y[1], symbol[1], label = label_name[1])
 
@@ -338,22 +325,22 @@ def log_plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbo
 
     return
 
-def plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbol):
+def plot_multi(figure_number, x, y, label_name, title = 'none', xlabel, ylabel, symbol):
     """
     Plot a linear graphic for two different y-axis
     Inputs:
-        figure_number   :       define the number of the figure
-        x               :       x-vector
-        y               :       (2D) y-array
-        label_name      :       legend of one y
-        title           :       title of the plot
-        xlabel          :       label of the x-axis
-        ylabel          :       labels of the y-axis
-        symbol          :       symbol of one y
+        figure_number   :   define the number of the figure
+        x               :   x-vector
+        y               :   (2D) y-array
+        label_name      :   legend of one y
+        title           :   title of the plot (default = 'none')
+        xlabel          :   label of the x-axis
+        ylabel          :   labels of the y-axis
+        symbol          :   symbol of one y
     """
 
         # figure
-    fig = plt.figure(figure_number, figsize = (12,8))
+    fig = plt.figure(figure_number, figsize = figsize)
 
         # axes
     host = host_subplot(111, axes_class=AA.Axes)
@@ -364,22 +351,11 @@ def plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbol):
     par.axis["right"].toggle(all=True)
 
             # host axes
-    #xmin = min(x)
-    #xmax = max(x)
-    #host.set_xlim(xmin, xmax)
-
-    #ymin = min(y[0])
-    #ymax = max(y[0])
-    #host.set_ylim(ymin, ymax)
-
     host.set_xlabel(xlabel)
     host.set_ylabel(ylabel[0])
     p1, = host.plot(x, y[0], symbol[0], label = label_name[0])
 
             # second axes
-    #ymin = min(y[1])
-    #ymax = max(y[1])
-    #par.set_ylim(ymin, ymax)
     par.set_ylabel(ylabel[1])
     p2, = par.plot(x, y[1], symbol[1], label = label_name[1])
 
@@ -396,25 +372,23 @@ def plot_multi(figure_number, x, y, label_name, title, xlabel, ylabel, symbol):
 
         plt.title(title)
 
-    
-
         # Draw
     plt.draw()
 
     return
 
-def histogramme(figure_number, hist, label_name, title, xlabel, ylabel, len_bins):
+def histogramme(figure_number, hist, label_name = 'none', title = 'none', xlabel, ylabel, len_bins):
     """
     Return the histogramme of hist
     Inputs:
-        figure_number   :       define the number of the figure
-        hist            :       what you want to make the histogramme
-        label_name      :       label of the data
-        title           :       title of the histogramme
-        xlabel          :       label of the x-axis
-        ylabel          :       label of the y axis
+        figure_number   :   define the number of the figure
+        hist            :   what you want to make the histogramme
+        label_name      :   label of the data (default = 'none')
+        title           :   title of the histogramme (default = 'none')
+        xlabel          :   label of the x-axis
+        ylabel          :   label of the y axis
     """
-    plt.figure(figure_number, figsize=(12,8))
+    plt.figure(figure_number, figsize=figsize)
     hist_max = numpy.max(hist)
     hist_min = numpy.min(hist)
     bins = int((hist_max - hist_min)/len_bins)
@@ -442,31 +416,16 @@ def random_PL(xmin, xmax, alpha, size = 1):
     Generate random numbers with a specific size from a pdf propto x^alpha
 
     Inputs:
-        xmin    :       lower boundary of the range
-        xmax    :       upper boundary of the range
-        alpha   :       exponent of the power-law (can be negative but then [xmin, xmax] can't contain 0)
-        size    :       size of the random number (default = 1)
+        xmin    :   lower boundary of the range
+        xmax    :   upper boundary of the range
+        alpha   :   exponent of the power-law (can be negative but then [xmin, xmax] can't contain 0)
+        size    :   size of the random number (default = 1)
     """
 
     y = numpy.random.random(size = size)
     xmin_alpha, xmax_alpha = xmin**(alpha + 1), xmax**(alpha + 1)
 
     return (xmin_alpha + (xmax_alpha - xmin_alpha)*y)**(1./(alpha + 1))
-
-def random_uniform(xmin, xmax, size = 1):
-
-    """
-    Generate random number with a specific size from a uniform distribution on [xmin, xmax]
-
-    Inputs:
-        xmin    :       lower boundary of the range
-        xmax    :       upper boundary of the range
-        size    :       size of the random number (default = 1)
-    """
-
-    y = numpy.random.random(size = size)
-
-    return (xmax-xmin) * y + xmin
 
 def interpolation1d(x, y):
     """

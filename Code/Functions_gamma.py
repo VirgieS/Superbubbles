@@ -1,5 +1,3 @@
-# In this program, we will define all the important functions to compute the gamma emission of a superbubble
-
 ##------------------------##
 # Librairies and functions #
 ##------------------------##
@@ -16,7 +14,10 @@ from Functions import *
 from Functions_CR import *
 from Functions_SB import *
 
-# Physical constants and conversion factors
+## --------------------------------------- ##
+# Physical constants and conversion factors #
+## --------------------------------------- ##
+
 from Physical_constants import *
 from Conversion_factors import *
 from Parameters_system import *
@@ -25,7 +26,6 @@ from Parameters_system import *
 # Functions #
 ##---------##
 
-# Load local interstellar cosmic ray spectrum from file
 def cosmicray_lis(ekin):
     """
     Return the cosmic rays spectrum from a table of kinetic energy.
@@ -64,15 +64,15 @@ def cosmicray_lis(ekin):
 def pwn_emission(tsn,tsb):
 
    """
-   Return the TeV emission (in the HESS energy range (1 TeV to 10 TeV) from a pulsar wind nebula
-	From HESS PWNe paper of 2018
+   Return the TeV emission (in the HESS energy range (1 TeV to 10 TeV) of a pulsar wind nebula
+	  From HESS PWNe paper of 2018
 
    Inputs:
-	tsn		:	time of the SN explosion (yr)
-	tsb		:	age of the superbubble (yr)
+	  tsn		:	time of the SN explosion (yr)
+	  tsb		:	age of the superbubble (yr)
 
    Output:
-	pwn_lum	:	TeV emission of a PWN
+	  pwn_lum	:	TeV emission of a PWN (erg s^-1)
    """
    # Pulsar parameters from table A1
    n=3  		# braking index
@@ -92,20 +92,18 @@ def pwn_emission(tsn,tsb):
 
    return pwn_lum
 
-
-# Compute GeV emission from a pulsar
 def psr_emission(tsn,tsb):
 
    """
    Return the GeV emission (in the Fermi energy range (0.1 GeV to 100 GeV) from a pulsar
-	From Fermi-LAT 2PC paper with pulsar initial spin-down parameters from HESS PWNe paper
+	  From Fermi-LAT 2PC paper with pulsar initial spin-down parameters from HESS PWNe paper
 
    Inputs:
-	tsn		:	time of the SN explosion (yr)
-	tsb		:	age of the superbubble (yr)
+        tsn		:	time of the SN explosion (yr)
+        tsb		:	age of the superbubble (yr)
 
    Output:
-	psr_lum	:	GeV emission of a PWN
+        psr_lum	:	GeV emission of a pulsr (erg s^-1)
    """
 
    # Pulsar parameters from table A1
@@ -131,11 +129,11 @@ def luminosity(lum_energy, energy):
     Return the luminosity in a range of energy
 
     Inputs:
-        lum_energy 	:       intrinsic luminosity array per energy (erg/s/eV)
-        energy      	:       range of energy in which we will compute the luminosity (eV)
+        lum_energy 	:   intrinsic luminosity array per energy (erg/s/eV)
+        energy      :   range of energy in which we will compute the luminosity (eV)
 
     Output:
-        lum         		:       luminosity (erg s^-1)
+        lum         :   luminosity (erg s^-1)
     """
     lum = integrate.trapz(lum_energy, energy)
     lum = numpy.nan_to_num(lum)
@@ -148,13 +146,13 @@ def spectral_index(Emin, Emax, lum_ph_min, lum_ph_max):
     Return the spectral index at an energy
 
     Inputs:
-        Emin        :       minimum energy of the range (GeV)
-        Emax        :       maximum energy of the range (GeV)
-        lum_ph_min  :       intrinsic differential luminosity in photons at Emin (ph/eV/s)
-        lum_ph_max  :       intrinsic differential luminosity in photons at Emax (ph/eV/s)
+        Emin        :   minimum energy of the range (GeV)
+        Emax        :   maximum energy of the range (GeV)
+        lum_ph_min  :   intrinsic differential luminosity in photons at Emin (ph/eV/s)
+        lum_ph_max  :   intrinsic differential luminosity in photons at Emax (ph/eV/s)
 
     Output:
-        Gamma       :       photon spectral index
+        Gamma       :   photon spectral index
     """
 
     Emin = Emin * GeV2eV
@@ -180,13 +178,15 @@ def data(correction_factor, t0, t, zones):
         zones               :   which zone do you want to compute (1: cavity of the SB, 2: supershell and 3: outside)
 
     Outputs:
-        Lumtot_sn           :   luminosity in the all energy range (erg s^-1)
-        Flux_sn             :   intrinsic differential luminosity (eV^-1 s^-1)
-        spectrum            :   energy array of the gamma photons for the whole energy range (GeV)
-        n_pwn_tot           :   number of pulsar wind nebulae inside the SB
-	    Lum_pwn_sn		    :	TeV emission of PWNe
-        Lum_psr_sn		    :	GeV emission of PSRs
+        Lumtot_sn           :   luminosity in the whole energy range (erg s^-1)
+        Flux_sn             :   intrinsic differential luminosity in the whole energy range (eV^-1 s^-1)
+	    Lum_pwn_sn		    :	TeV emission of PWNe (erg s^-1)
+        Lum_psr_sn		    :	GeV emission of PSRs (erg s^-1)
         nob                 :   number of remained OB stars inside the OB association
+        R_sb                :   radius of the superbubble (pc)
+        V_sb                :   velocity of the superbubble (km/s)
+        M_s                 :   mass in the shell (solar masses)
+        n_s                 :   density in the shell (cm^-3)
     """
 
         ## ====================================================== ##
@@ -510,7 +510,6 @@ def data(correction_factor, t0, t, zones):
 
     return Lumtot_sn, Flux_sn, Lum_pwn_sn, Lum_psr_sn, nob, R_sb, V_sb, M_s, n_s
 
-
 def energy_gamma(lum_gamma, time):
 
     """
@@ -521,7 +520,7 @@ def energy_gamma(lum_gamma, time):
         time        :   time array (yr)
 
     Output:
-        E_gamma     :   total energy radiation (ergs)
+        E_gamma     :   total energy radiation (erg)
     """
 
     time = time * yr2s
