@@ -33,7 +33,7 @@ from Parameters_system import *
 ##====##
 
     # you need to change it
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/Total/Gamma_emission/'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parametric_studies/diffusion/delta0_33/Gamma_emission/'
 
 ## ======================================= ##
 # Statistic for a high number of iterations #
@@ -46,39 +46,35 @@ figure_number = 1
     # Load data #
     ## ------- ##
 
-        # Nob = 30
-
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parametric_studies/diffusion/delta0_33/')
 
 with open('Total', 'rb') as iteration_write:
 
-    Lum_HESS_30 = pickle.load(iteration_write)
-    Lum_Fermi_30 = pickle.load(iteration_write)
-    Lum_30 = pickle.load(iteration_write)
-    Gamma_HESS_30 = pickle.load(iteration_write)
-    Gamma_GeV_30 = pickle.load(iteration_write)
-    Gamma_MeV_30 = pickle.load(iteration_write)
-    Lum_pwn_30 = pickle.load(iteration_write)
-    Lum_psr_30 = pickle.load(iteration_write)
+    Lum_HESS = pickle.load(iteration_write)
+    Lum_Fermi = pickle.load(iteration_write)
+    Lum = pickle.load(iteration_write)
+    Gamma_HESS = pickle.load(iteration_write)
+    Gamma_GeV = pickle.load(iteration_write)
+    Gamma_MeV = pickle.load(iteration_write)
+    Lum_pwn = pickle.load(iteration_write)
+    Lum_psr = pickle.load(iteration_write)
 
     # One iteration
 j = 20  # one iteration
 
 xlabel = 'Time [Myr]'
 
-text = ''
-Title = ''
-
 xmin = tmin * yr26yr - 0.5
 xmax = tmax * yr26yr + 0.5
 
         # Gamma emission comparison
-label_mean = 'none'
 ymin = 1e29
 ymax = 1e36
 
 sym_mean = ['', '']
 linestyle_mean = ['-', '-']
+sym_pwn = ['', '']
+linestyle_pwn = [':', ':']
 
 color_mean = ['navy', 'orangered']
 color_pwn = ['green', 'darkviolet']
@@ -86,81 +82,45 @@ color_pwn = ['green', 'darkviolet']
             # H.E.S.S. range
 ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
 
-y_mean = [Lum_HESS_30[20], Lum_HESS_30[98]]
-y_pwn = [Lum_pwn_30[20], Lum_pwn_30[98]]
+y_mean = [Lum_HESS[20], Lum_HESS[98]]
+y_pwn = [Lum_pwn[20], Lum_pwn[98]]
 
-semilog_plot(figure_number, 2, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
-semilog_plot(figure_number, 2, t6, y_pwn, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_pwn, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 2, t6, y_mean, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 2, t6, y_pwn, xlabel, ylabel_HESS, sym_pwn, linestyle_pwn, color_pwn, xmin, xmax, ymin, ymax)
 plt.savefig(pathfigure_gamma+'Gamma_emission_HESS_tot.pdf')
 figure_number += 1
 
-semilog_plot(figure_number, 2, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 2, t6, y_mean, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, xmin, xmax, ymin, ymax)
 plt.savefig(pathfigure_gamma+'Gamma_emission_HESS.pdf')
 figure_number += 1
 
-semilog_plot(figure_number, 2, t6, y_pwn, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_pwn, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 2, t6, y_pwn, xlabel, ylabel_HESS, sym_pwn, linestyle_pwn, color_pwn, xmin, xmax, ymin, ymax)
 plt.savefig(pathfigure_gamma+'Gamma_emission_pwn.pdf')
 figure_number += 1
 
             # Fermi range
 ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (100 MeV - 100 GeV)'
 
-y_mean = [Lum_Fermi_30[20], Lum_Fermi_30[98]]
-y_psr = [Lum_psr_30[20], Lum_psr_30[98]]
+y_mean = [Lum_Fermi[20], Lum_Fermi[98]]
+y_psr = [Lum_psr[20], Lum_psr[98]]
 
-semilog_plot(figure_number, 2, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
-semilog_plot(figure_number, 2, t6, y_psr, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_pwn, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 2, t6, y_mean, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 2, t6, y_psr, xlabel, ylabel_HESS, sym_pwn, linestyle_pwn, color_pwn, xmin, xmax, ymin, ymax)
 plt.savefig(pathfigure_gamma+'Gamma_emission_Fermi_tot.pdf')
 figure_number += 1
 
-semilog_plot(figure_number, 2, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 2, t6, y_mean, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, xmin, xmax, ymin, ymax)
 plt.savefig(pathfigure_gamma+'Gamma_emission_Fermi.pdf')
 figure_number += 1
 
-semilog_plot(figure_number, 2, t6, y_psr, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_pwn, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 2, t6, y_psr, xlabel, ylabel_HESS, sym_pwn, linestyle_pwn, color_pwn, xmin, xmax, ymin, ymax)
 plt.savefig(pathfigure_gamma+'Gamma_emission_psr.pdf')
 figure_number += 1
 
-        # Comparison energy range
-label_comparison = ['HE CRs', 'VHE CRs']
+label = ['VHE', 'HE']
+y_mean = [Lum_HESS[20], Lum_Fermi[20]]
 
-            # Low diffusion coefficient
-ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$]'
-
-y_mean = [Lum_Fermi_30[20], Lum_HESS_30[20]]
-
-semilog_plot(figure_number, 2, t6, y_mean, label_comparison, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
-plt.savefig(pathfigure_gamma+'Gamma_emission_one_run.pdf')
-figure_number += 1
-
-    # spectral index
-ymin = 0.0
-ymax = 3.5
-
-        # H.E.S.S. range
-ylabel_HESS = '$\Gamma_{ph}$ (1 TeV - 10 TeV)'
-
-y_mean = [Gamma_HESS_30[20], Gamma_HESS_30[98]]
-
-plot(figure_number, 2, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
-plt.savefig(pathfigure_gamma+'Photon_index_HESS.pdf')
-figure_number += 1
-
-        # Fermi range
-ylabel_HESS = '$\Gamma_{ph}$ (1 GeV - 10 GeV)'
-
-y_mean = [Gamma_GeV_30[20], Gamma_GeV_30[98]]
-
-plot(figure_number, 2, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
-plt.savefig(pathfigure_gamma+'Photon_index_Fermi.pdf')
-figure_number += 1
-
-            # High diffusion coefficient
-ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$]'
-
-y_mean = [Lum_Fermi_300[j], Lum_HESS_300[j]]
-
-semilog_plot(figure_number, 2, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
-plt.savefig(pathfigure_gamma+'One_run_300.pdf')
+semilog_plot(figure_number, 2, t6, y_mean, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, xmin, xmax, ymin, ymax, label_name = label)
+plt.savefig(pathfigure_gamma+'Gamma_emission_comparison.pdf')
 
 plt.show()

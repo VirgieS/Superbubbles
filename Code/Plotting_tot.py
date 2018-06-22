@@ -32,9 +32,7 @@ from Parameters_system import *
 ##====##
 
     # you need to change it
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e26/Gamma_emission/'
-pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e26/Remain/'
-pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/30_Dor_C/Bons/1e26/'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parametric_studies/percentage/20/Gamma_emission/'
 
 ## ======================================= ##
 # Statistic for a high number of iterations #
@@ -47,11 +45,12 @@ figure_number = 1
     # Load data #
     ## ------- ##
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/1e26/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parametric_studies/percentage/20/')
 
 with open('Total', 'rb') as iteration_write:
 
     Lum_HESS_it = pickle.load(iteration_write)
+    nit_tot = len(Lum_HESS_it)
     Lum_Fermi_it = pickle.load(iteration_write)
     Lum_it = pickle.load(iteration_write)
     Gamma_HESS_it = pickle.load(iteration_write)
@@ -62,7 +61,7 @@ with open('Total', 'rb') as iteration_write:
     tsn_it = pickle.load(iteration_write)
     nsn_it = pickle.load(iteration_write)
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/30_Dor_C/CR/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parametric_studies/stars/100/')
 
 with open('CRbackground', 'rb') as CR_write:
 
@@ -191,7 +190,7 @@ color_std = ['cornflowerblue', 'cornflowerblue']
 y_mean = [Lum_HESS_mean, Lum_pwn_mean, Lum_HESS_CRb]
 ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
 
-semilog_plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 3, t6, y_mean, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, xmin, xmax, ymin, ymax, label_name = label_mean)
 plt.fill_between(t6, Lum_HESS_pst, Lum_HESS_mst, color = 'cornflowerblue', alpha = '0.25')
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_HESS.pdf')
 
@@ -203,7 +202,7 @@ color_mean = ['orangered', 'orange', 'maroon']
 y_mean = [Lum_Fermi_mean, Lum_psr_mean, Lum_Fermi_CRb]
 ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (100 MeV - 100 GeV)'
 
-semilog_plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 3, t6, y_mean, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, xmin, xmax, ymin, ymax, label_name = label_mean)
 plt.fill_between(t6, Lum_Fermi_pst, Lum_Fermi_mst, color = 'orangered', alpha = '0.25')
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_Fermi.pdf')
 
@@ -221,7 +220,7 @@ y = Gamma_HESS_mean
 color = 'cornflowerblue'
 ylabel_HESS = '$\Gamma_{ph}$ (1 TeV - 10 TeV)'
 
-plot(figure_number, 1, t6, y, label, Title, xlabel, ylabel_HESS, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
+plot(figure_number, 1, t6, y, xlabel, ylabel_HESS, sym, linestyle, color, xmin, xmax, ymin, ymax)
 plt.fill_between(t6, Gamma_HESS_pst, Gamma_HESS_mst, color = 'cornflowerblue', alpha = '0.25')
 plt.savefig(pathfigure_gamma+'Photon_index_HESS.pdf')
 
@@ -232,7 +231,7 @@ y = Gamma_GeV_mean
 color = 'orangered'
 ylabel_GeV = '$\Gamma_{ph}$ (1 GeV - 10 GeV)'
 
-plot(figure_number, 1, t6, y, label, Title, xlabel, ylabel_GeV, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
+plot(figure_number, 1, t6, y, xlabel, ylabel_GeV, sym, linestyle, color, xmin, xmax, ymin, ymax)
 plt.fill_between(t6, Gamma_GeV_pst, Gamma_GeV_mst, color = 'orangered', alpha = '0.25')
 plt.savefig(pathfigure_gamma+'Photon_index_GeV.pdf')
 
@@ -252,7 +251,7 @@ color = ['green', 'blue', 'orange', 'red', 'violet']
 label = ['VHE CRs + PWNe', 'only VHE CRs', 'HE CRs + PSRs', 'only HE CRs', 'no PWN - no PSR']
 y = [Proba_HESS, Proba_HESS_CR, Proba_Fermi, Proba_Fermi_CR, Proba_pwn_psr]
 
-plot(figure_number, 5, t6, y, label, Title, xlabel, ylabel_GeV, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
+plot(figure_number, 5, t6, y, xlabel, ylabel_GeV, sym, linestyle, color, xmin, xmax, ymin, ymax, label_name = label)
 plt.savefig(pathfigure_gamma+'Probabilities.pdf')
 
 plt.show()

@@ -31,7 +31,7 @@ from Parameters_system import *
 ##====##
 
     # you need to change it
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/diffusion/Total/Gamma_emission/'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parametric_studies/diffusion/Comparison/indices/'
 
 ## ======================================= ##
 # Statistic for a high number of iterations #
@@ -46,7 +46,7 @@ figure_number = 1
 
         # First set for comparison
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/diffusion/1e26/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parametric_studies/diffusion/alpha2_2/')
 
 with open('Total', 'rb') as iteration_write:
 
@@ -137,7 +137,7 @@ Gamma_GeV_mst_30[ind0] = numpy.zeros(len(ind0))
 
         # Second data set for comparison
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/diffusion/1e27/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parametric_studies/diffusion/delta0_33/')
 
 with open('Total', 'rb') as iteration_write:
 
@@ -226,7 +226,7 @@ Gamma_GeV_mst_100[ind0] = numpy.zeros(len(ind0))
 
         # Third data set for comparison
 
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parametric_studies/stars/100/')
 
 with open('Total', 'rb') as iteration_write:
 
@@ -313,10 +313,8 @@ Gamma_GeV_mst_300 = Gamma_GeV_mean_300 - Gamma_GeV_std_300
 ind0 = numpy.where(Gamma_GeV_mst_300 < 0)[0]
 Gamma_GeV_mst_300[ind0] = numpy.zeros(len(ind0))
 
-
     # Plot
-label_mean = ['$D_0 = 10^{26}$ [cm$^2$ s$^{-1}$]', '$D_0 = 10^{27}$ [cm$^2$ s$^{-1}$]', '$D_0 = 10^{28}$ [cm$^2$ s$^{-1}$]']
-label_std = 'none'
+label_mean = ['alpha = 2.2, delta = 1/2', 'alpha = 2.0, delta = 1/3', 'alpha = 2.0, delta = 1/2']
 
 sym_mean = ['', '', '']
 linestyle_mean = ['-', '-', '-']
@@ -324,13 +322,9 @@ linestyle_mean = ['-', '-', '-']
 color_mean = ['purple', 'blue', 'green']
 
 xlabel = 'Time [Myr]'
-text = ''
-Title = 'none'
 
 xmin = tmin * yr26yr - 0.5
 xmax = tmax * yr26yr + 0.5
-
-
 
         # Gamma luminosity of the superbubble
 ymin = 1e29
@@ -340,7 +334,7 @@ ymax = 1e36
 y_mean = [Lum_HESS_mean_30, Lum_HESS_mean_100, Lum_HESS_mean_300]
 ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
 
-semilog_plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 3, t6, y_mean, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, xmin, xmax, ymin, ymax, label_name = label_mean)
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_HESS.pdf')
 
 figure_number += 1
@@ -349,7 +343,7 @@ figure_number += 1
 y_mean = [Lum_Fermi_mean_30, Lum_Fermi_mean_100, Lum_Fermi_mean_300]
 ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (100 MeV - 100 GeV)'
 
-semilog_plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 3, t6, y_mean, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, xmin, xmax, ymin, ymax, label_name = label_mean)
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_Fermi.pdf')
 
 figure_number += 1
@@ -362,7 +356,7 @@ ymax = 3.5
 y_mean = [Gamma_HESS_mean_30, Gamma_HESS_mean_100, Gamma_HESS_mean_300]
 ylabel_HESS = '$\Gamma_{ph}$ (1 TeV - 10 TeV)'
 
-plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
+plot(figure_number, 3, t6, y_mean, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, xmin, xmax, ymin, ymax, label_name = label_mean)
 plt.savefig(pathfigure_gamma+'Photon_index_HESS.pdf')
 
 figure_number += 1
@@ -371,7 +365,7 @@ figure_number += 1
 y_mean = [Gamma_GeV_mean_30, Gamma_GeV_mean_100, Gamma_GeV_mean_300]
 ylabel_HESS = '$\Gamma_{ph}$ (1 GeV - 10 GeV)'
 
-plot(figure_number, 3, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, text, xmin, xmax, ymin, ymax)
+plot(figure_number, 3, t6, y_mean, xlabel, ylabel_HESS, sym_mean, linestyle_mean, color_mean, xmin, xmax, ymin, ymax, label_name = label_mean)
 plt.savefig(pathfigure_gamma+'Photon_index_GeV.pdf')
 
 figure_number += 1

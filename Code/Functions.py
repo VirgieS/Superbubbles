@@ -28,7 +28,7 @@ figsize = (12, 8)
 
 #rcParams['lines.linewidth'] = 8
 
-def log_plot(figure_number, number_of_plot, x, y, label_name = 'none', title = 'none', xlabel, ylabel, symbol, linestyle, color, text = 'none', xmin, xmax, ymin, ymax):
+def log_plot(figure_number, number_of_plot, x, y, xlabel, ylabel, symbol, linestyle, color, xmin, xmax, ymin, ymax, label_name = 'none', title = 'none', text = 'none'):
     """
     Plot a log-log graphic
     Inputs:
@@ -106,11 +106,12 @@ def log_plot(figure_number, number_of_plot, x, y, label_name = 'none', title = '
     plt.grid(color = 'k', alpha = 0.15, linestyle = ':')
 
         # text
-    plt.text(0.5, 0.5, text, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
+    if text != 'none':
+        plt.text(0.5, 0.5, text, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
 
     return
 
-def plot(figure_number, number_of_plot, x, y, label_name = 'none', title = 'none', xlabel, ylabel, symbol, linestyle, color, text = 'none', xmin, xmax, ymin, ymax):
+def plot(figure_number, number_of_plot, x, y, xlabel, ylabel, symbol, linestyle, color, xmin, xmax, ymin, ymax, label_name = 'none', title = 'none', text = 'none'):
     """
     Function to plot a linear graphic
     Inputs:
@@ -187,11 +188,12 @@ def plot(figure_number, number_of_plot, x, y, label_name = 'none', title = 'none
     plt.grid(color = 'k', alpha = 0.15, linestyle = ':')
 
         # text
-    plt.text(0.5, 0.5, text, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
+    if text != 'none':
+        plt.text(0.5, 0.5, text, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
 
     return
 
-def semilog_plot(figure_number, number_of_plot, x, y, label_name = 'none', title = 'none', xlabel, ylabel, symbol, linestyle, color, text = 'none', xmin, xmax, ymin, ymax):
+def semilog_plot(figure_number, number_of_plot, x, y, xlabel, ylabel, symbol, linestyle, color, xmin, xmax, ymin, ymax, label_name = 'none', title = 'none', text = 'none'):
     """
     Function to plot a linear graphic
     Inputs:
@@ -270,11 +272,12 @@ def semilog_plot(figure_number, number_of_plot, x, y, label_name = 'none', title
     plt.grid(color = 'k', alpha = 0.15, linestyle = ':')
 
         # text
-    plt.text(0.5, 0.5, text, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
+    if text != 'none':
+        plt.text(0.5, 0.5, text, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
 
     return
 
-def log_plot_multi(figure_number, x, y, label_name, title = 'none', xlabel, ylabel, symbol):
+def log_plot_multi(figure_number, x, y, label_name, xlabel, ylabel, symbol, title = 'none'):
     """
     Plot a log-log graphic for two different y-axis
     Inputs:
@@ -325,7 +328,7 @@ def log_plot_multi(figure_number, x, y, label_name, title = 'none', xlabel, ylab
 
     return
 
-def plot_multi(figure_number, x, y, label_name, title = 'none', xlabel, ylabel, symbol):
+def plot_multi(figure_number, x, y, xlabel, ylabel, symbol, label_name, title = 'none'):
     """
     Plot a linear graphic for two different y-axis
     Inputs:
@@ -377,7 +380,7 @@ def plot_multi(figure_number, x, y, label_name, title = 'none', xlabel, ylabel, 
 
     return
 
-def histogramme(figure_number, hist, label_name = 'none', title = 'none', xlabel, ylabel, len_bins):
+def histogramme(figure_number, hist, xlabel, ylabel, len_bins, label_name = 'none', title = 'none'):
     """
     Return the histogramme of hist
     Inputs:

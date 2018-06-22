@@ -32,9 +32,9 @@ from Parameters_system import *
 ##====##
 
     # You need to change it
-pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/'
-pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/'
-pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parameters/stars/100/'
+pathfigure_gamma = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parametric_studies/stars/100/'
+pathfigure_remain = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parametric_studies/stars/100/'
+pathfigure = '/Users/stage/Documents/Virginie/Superbubbles/figures/Parametric_studies/stars/100/'
 
 ## ======================================= ##
 # Statistic for a high number of iterations #
@@ -74,10 +74,10 @@ for i in range (nfiles):
 
         # You need to change it
     if nfiles > 1:
-        os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/' + file)
+        os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parametric_studies/stars/100/' + file)
 
     else:
-        os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/')
+        os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parametric_studies/stars/100/')
 
     with open('SB', 'rb') as SB_load:
 
@@ -121,7 +121,7 @@ for i in range (nfiles):
         k += nit
 
     # Recording of the concatenisation (you need to change it)
-os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parameters/stars/100/')
+os.chdir('/Users/stage/Documents/Virginie/Superbubbles/Files/Parametric_studies/stars/100/')
 
         # For the others
 with open('Total', 'wb') as iteration_write:
@@ -158,30 +158,26 @@ with open('SB', 'wb') as iteration_write:
 if nit_tot > 1:
 
         # Computation of the probability to get nsn
-    title = ''
     xlabel = '$n_{sn}$'
     ylabel = 'counts'
     figure = figure_number
-    label = 'none'
     len_bins = 1
     histmin = numpy.min(nsn_it)
     histmax = numpy.max(nsn_it)
 
-    histogramme(figure, nsn_it, label, title, xlabel, ylabel, len_bins)
+    histogramme(figure, nsn_it, xlabel, ylabel, len_bins)
     plt.savefig(pathfigure+'Histogramme_nsn.pdf')
 
     figure_number = figure + 1
 
     # Computation of the probability to get nsn
-title = ''
 xlabel = '$t_{sn}$'
 ylabel = 'counts'
 figure = figure_number
-label = 'none'
 len_bins = 1    # Myr
 
 for i in range (nfiles):
-    histogramme(figure, tsn_it[i], label, title, xlabel, ylabel, len_bins)
+    histogramme(figure, tsn_it[i], xlabel, ylabel, len_bins)
 
 plt.savefig(pathfigure+'Histogramme_tsn.pdf')
 
@@ -371,12 +367,9 @@ ind0 = numpy.where(Gamma_MeV_mst < 0)[0]
 Gamma_MeV_mst[ind0] = numpy.zeros(len(ind0))
 
     # Plot
-label = 'none'
 sym = ''
 linestyle = '-'
 xlabel = 'Time [Myr]'
-text = ''
-Title = ''
 xmin = tmin * yr26yr - 0.5
 xmax = tmax * yr26yr + 0.5
 
@@ -393,9 +386,9 @@ ylabel_HESS = '$L_\gamma$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
 color_mean = 'cornflowerblue'
 color_pwn = 'green'
 
-semilog_plot(figure_number, 1, t6, y_mean, label_mean, Title, xlabel, ylabel_HESS, sym, linestyle, color_mean, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 1, t6, y_mean, xlabel, ylabel_HESS, sym, linestyle, color_mean, xmin, xmax, ymin, ymax, label_name = label_mean)
 plt.fill_between(t6, Lum_HESS_pst, Lum_HESS_mst, color = color_mean, alpha = '0.15')
-semilog_plot(figure_number, 1, t6, y_pwn, label_pwn, Title, xlabel, ylabel_HESS, sym, linestyle, color_pwn, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 1, t6, y_pwn, label_pwn, Title, xlabel, ylabel_HESS, sym, linestyle, color_pwn, xmin, xmax, ymin, ymax, label_name = label_pwn)
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_HESS.pdf')
 
 figure_number += 1
@@ -409,9 +402,9 @@ y_psr = Lum_psr_mean
 label_psr = 'PSRs'
 color_psr = 'orange'
 
-semilog_plot(figure_number, 1, t6, y_mean, label_mean, Title, xlabel, ylabel_Fermi, sym, linestyle, color_mean, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 1, t6, y_mean, xlabel, ylabel_Fermi, sym, linestyle, color_mean, xmin, xmax, ymin, ymax, label_name = label_mean)
 plt.fill_between(t6, Lum_Fermi_pst, Lum_Fermi_mst, color = color_mean, alpha = '0.15')
-semilog_plot(figure_number, 1, t6, y_psr, label_psr, Title, xlabel, ylabel_Fermi, sym, linestyle, color_psr, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 1, t6, y_psr, xlabel, ylabel_Fermi, sym, linestyle, color_psr, xmin, xmax, ymin, ymax, label_name = label_psr)
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission_Fermi.pdf')
 
 figure_number += 1
@@ -421,7 +414,7 @@ y = Lum_mean
 ylabel = '$L_\gamma$ [erg s$^{-1}$] (100 MeV - 100 TeV)'
 color = 'cyan'
 
-semilog_plot(figure_number, 1, t6, y, label, Title, xlabel, ylabel, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 1, t6, y, xlabel, ylabel, sym, linestyle, color, xmin, xmax, ymin, ymax)
 plt.fill_between(t6, Lum_pst, Lum_mst, color = color, alpha = '0.15')
 plt.savefig(pathfigure_gamma+'Mean_gamma_emission.pdf')
 
@@ -432,7 +425,7 @@ y = Lum_pwn_mean
 ylabel = '$\log(L_{\gamma, pwn})$ [erg s$^{-1}$] (1 TeV - 10 TeV)'
 color = 'green'
 
-semilog_plot(figure_number, 1, t6, y, label, Title, xlabel, ylabel, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 1, t6, y, xlabel, ylabel, sym, linestyle, color, xmin, xmax, ymin, ymax)
 plt.savefig(pathfigure_remain+'Mean_luminosity_pwn.pdf')
 
 figure_number += 1
@@ -442,7 +435,7 @@ y = Lum_psr_mean
 ylabel = '$\log(L_{\gamma, psr})$ [erg s$^{-1}$] (100 MeV - 100 GeV)'
 color = 'orange'
 
-semilog_plot(figure_number, 1, t6, y, label, Title, xlabel, ylabel, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
+semilog_plot(figure_number, 1, t6, y, xlabel, ylabel, sym, linestyle, color, xmin, xmax, ymin, ymax)
 plt.savefig(pathfigure_remain+'Mean_luminosity_psr.pdf')
 
 figure_number += 1
@@ -456,7 +449,7 @@ y = Gamma_HESS_mean
 ylabel_HESS = '$\Gamma_{ph}$ (1 TeV - 10 TeV)'
 color = 'cornflowerblue'
 
-plot(figure_number, 1, t6, y, label, Title, xlabel, ylabel_HESS, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
+plot(figure_number, 1, t6, y, xlabel, ylabel_HESS, sym, linestyle, color, xmin, xmax, ymin, ymax)
 plt.fill_between(t6, Gamma_HESS_pst, Gamma_HESS_mst, color = color, alpha = '0.15')
 plt.savefig(pathfigure_gamma+'Photon_index_HESS.pdf')
 
@@ -467,7 +460,7 @@ y = Gamma_GeV_mean
 ylabel_GeV = '$\Gamma_{ph}$ (1 GeV - 10 GeV)'
 color = 'orangered'
 
-plot(figure_number, 1, t6, y, label, Title, xlabel, ylabel_GeV, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
+plot(figure_number, 1, t6, y, xlabel, ylabel_GeV, sym, linestyle, color, xmin, xmax, ymin, ymax)
 plt.fill_between(t6, Gamma_GeV_pst, Gamma_GeV_mst, color = color, alpha = '0.15')
 plt.savefig(pathfigure_gamma+'Photon_index_GeV.pdf')
 
@@ -478,7 +471,7 @@ y = Gamma_MeV_mean
 ylabel_MeV = '$\Gamma_{ph}$ (100 MeV - 1 GeV)'
 color = 'green'
 
-plot(figure_number, 1, t6, y, label, Title, xlabel, ylabel_MeV, sym, linestyle, color, text, xmin, xmax, ymin, ymax)
+plot(figure_number, 1, t6, y, xlabel, ylabel_MeV, sym, linestyle, color, xmin, xmax, ymin, ymax)
 plt.fill_between(t6, Gamma_MeV_pst, Gamma_MeV_mst, color = color, alpha = '0.15')
 plt.savefig(pathfigure_gamma+'Photon_index_MeV.pdf')
 
